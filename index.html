@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>UzbekCraft - 3D O'zbek Voxel O'yini</title>
+  <meta name="description" content="UzbekCraft - Google Earth uslubidagi HD Yer shari, O'zbekiston mashhur obidalari va 3D voxel dunyosi.">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <!-- Game WebGL Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- UI OVERLAY -->
+  <div id="ui-layer">
+
+    <!-- MAIN MENU -->
+    <div id="main-menu" class="screen-panel active">
+      <div class="menu-backdrop"></div>
+      <div class="menu-content">
+        <div class="brand-box">
+          <div class="game-logo">UZBEKCRAFT</div>
+          <p class="game-subtitle">3D O'ZBEK VOXEL DUNIYOSI</p>
+        </div>
+
+        <div class="menu-buttons">
+          <button id="btn-new-world" class="btn btn-emerald">
+            Yangi Dunyo Yaratish
+          </button>
+          <button id="btn-saved-worlds" class="btn btn-gold">
+            Saqlangan Dunyolar
+          </button>
+          <button id="btn-skins" class="btn btn-blue">
+            Qahramon Tanlash
+          </button>
+          <button id="btn-settings" class="btn btn-dark">
+            Sozlamalar
+          </button>
+          <button id="btn-exit" class="btn btn-red">
+            Chiqish
+          </button>
+        </div>
+
+        <div class="menu-footer">
+          UzbekCraft v2.5 Ultra HD • Google Earth Motori Integratsiyasi
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW WORLD MODAL -->
+    <div id="create-world-modal" class="modal-overlay hidden">
+      <div class="modal-card modal-large">
+        <h2 class="modal-title">Yangi Dunyo Yaratish (HD Xaritalar)</h2>
+        
+        <div class="form-group">
+          <label for="world-name-input">Dunyo Nomi:</label>
+          <input type="text" id="world-name-input" placeholder="Mening Dunyoim" value="Mening Dunyoim">
+        </div>
+
+        <div class="form-group">
+          <label for="world-seed-input">Urug' (Seed):</label>
+          <input type="text" id="world-seed-input" placeholder="Tasodifiy urug'" value="Uzbekistan2026">
+        </div>
+
+        <div class="form-group">
+          <label for="world-map-select">Google Earth & HD Mashhur Xaritalar:</label>
+          <select id="world-map-select">
+            <optgroup label="Google Earth Satellit Dunyo">
+              <option value="earth_globe">Reallashgan Yer Shari Globe (Okeanlar, qit'alar va atmosfera)</option>
+            </optgroup>
+            <optgroup label="O'zbekiston Ultra HD Xaritalar">
+              <option value="registan">Samarqand Registon Maydoni HD Mega (Moviy koshinlar)</option>
+              <option value="ichan_qala">Xiva Ichan-Qal'a HD (Loy qal'a va Kalta Minor)</option>
+              <option value="minorai_kalon">Buxoro Minorai Kalon HD (Muqaddas Buxoro)</option>
+              <option value="chimgon">Chimgon Tog' Tizmasi HD Mega (Tyan-Shan bag'ri)</option>
+              <option value="tashkent_tower">Toshkent Teleminorasi va Metropoliya HD</option>
+            </optgroup>
+            <optgroup label="Dunyo Mo'jizalari HD Obidalari">
+              <option value="pyramids">Misr — Buyuk Piramidalar va Sfinks</option>
+              <option value="eiffel">Parij — Eyfel Minorasi (96 blok baland!)</option>
+              <option value="colosseum">Rim — Kolizey Oval Arenasi</option>
+              <option value="big_ben">London — Big Ben Soat Minorasi</option>
+              <option value="burj_khalifa">Dubay — Burj Xalifa (90 qavat!)</option>
+              <option value="great_wall">Xitoy — Buyuk Xitoy Devori</option>
+              <option value="taj_mahal">Hindiston — Taj Mahal Maqbarasi</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button id="btn-start-game" class="btn btn-emerald">Yaratish va O'ynash</button>
+          <button id="btn-cancel-create" class="btn btn-dark">Bekor qilish</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAVED WORLDS MODAL -->
+    <div id="saved-worlds-modal" class="modal-overlay hidden">
+      <div class="modal-card modal-large">
+        <h2 class="modal-title">Saqlangan Dunyolar</h2>
+        <div id="saved-worlds-list" class="worlds-list">
+          <!-- Dynamically populated -->
+        </div>
+        <div class="modal-actions">
+          <button id="btn-close-saved" class="btn btn-dark">Orqaga</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARACTER SKINS & FIGURES MODAL -->
+    <div id="skins-modal" class="modal-overlay hidden">
+      <div class="modal-card modal-large">
+        <h2 class="modal-title">Qahramonlar va Taniqli Shaxslar</h2>
+        <div class="skins-grid">
+          <div class="skin-card active" data-skin="temur">
+            <div class="skin-avatar">AT</div>
+            <div class="skin-name">Amir Temur (Sohibqiron)</div>
+          </div>
+          <div class="skin-card" data-skin="navoiy">
+            <div class="skin-avatar">AN</div>
+            <div class="skin-name">Alisher Navoiy (Shoir)</div>
+          </div>
+          <div class="skin-card" data-skin="ulugbek">
+            <div class="skin-avatar">MU</div>
+            <div class="skin-name">Mirzo Ulug'bek (Astronom)</div>
+          </div>
+          <div class="skin-card" data-skin="ibnsino">
+            <div class="skin-avatar">IS</div>
+            <div class="skin-name">Ibn Sino (Avitsenna)</div>
+          </div>
+          <div class="skin-card" data-skin="botir">
+            <div class="skin-avatar">A</div>
+            <div class="skin-name">Alpomish (O'zbek Botir)</div>
+          </div>
+          <div class="skin-card" data-skin="steve">
+            <div class="skin-avatar">ST</div>
+            <div class="skin-name">Stiv (Steve)</div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button id="btn-select-skin" class="btn btn-emerald">Tanlash</button>
+          <button id="btn-close-skins" class="btn btn-dark">Orqaga</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS MODAL -->
+    <div id="settings-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <h2 class="modal-title">Sozlamalar</h2>
+        
+        <div class="form-group">
+          <label>Ovoz Balandligi: <span id="sfx-vol-val">80%</span></label>
+          <input type="range" id="slider-sfx" min="0" max="100" value="80">
+        </div>
+
+        <div class="form-group">
+          <label>Musiqa Balandligi: <span id="music-vol-val">60%</span></label>
+          <input type="range" id="slider-music" min="0" max="100" value="60">
+        </div>
+
+        <div class="form-group">
+          <label>Ko'rinish Masofasi (Render): <span id="render-dist-val">6 Chunk</span></label>
+          <input type="range" id="slider-render-dist" min="2" max="8" value="6">
+        </div>
+
+        <div class="form-group row">
+          <label for="toggle-mobile">Telefon Boshqaruvi Tugmalari:</label>
+          <input type="checkbox" id="toggle-mobile" checked>
+        </div>
+
+        <div class="modal-actions">
+          <button id="btn-close-settings" class="btn btn-emerald">Saqlash va Yopish</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAUSE MENU (IN-GAME) -->
+    <div id="pause-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <h2 class="modal-title">O'yin To'xtatildi</h2>
+        <div class="menu-buttons">
+          <button id="btn-resume-game" class="btn btn-emerald">Davom Etish</button>
+          <button id="btn-save-game" class="btn btn-gold">O'yinni Saqlash</button>
+          <button id="btn-pause-settings" class="btn btn-blue">Sozlamalar</button>
+          <button id="btn-main-menu" class="btn btn-red">Bosh Menyuga Chiqish</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXIT / SAVE PROMPT MODAL -->
+    <div id="save-prompt-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <h2 class="modal-title">O'yin Saqlansinmi?</h2>
+        <p class="modal-text">Chiqishdan oldin hozirgi o'yin jarayoningizni saqlamoqchimisiz?</p>
+        <div class="modal-actions">
+          <button id="btn-prompt-save" class="btn btn-emerald">Ha, Saqlansin</button>
+          <button id="btn-prompt-nosave" class="btn btn-red">Yo'q, Saqlanmasin</button>
+          <button id="btn-prompt-cancel" class="btn btn-dark">Bekor qilish</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIALOGUE & QUEST MODAL -->
+    <div id="dialogue-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <h2 id="dialogue-title" class="modal-title">Suhbat</h2>
+        <p id="dialogue-text" class="modal-text">Suhbat matni yuklanmoqda...</p>
+        <div class="modal-actions">
+          <button id="btn-dialogue-next" class="btn btn-emerald">Keyingi</button>
+          <button id="btn-dialogue-quest" class="btn btn-gold hidden">Vazifani Qabul Qilish</button>
+          <button id="btn-dialogue-close" class="btn btn-dark">Yopish</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVENTORY MODAL -->
+    <div id="inventory-modal" class="modal-overlay hidden">
+      <div class="modal-card modal-large">
+        <h2 class="modal-title">Bloklar Inventari</h2>
+        <p class="modal-text">Tanlangan slotga joylash uchun blok ustiga bosing:</p>
+        <div id="inventory-grid" class="inventory-grid">
+          <!-- Dynamically populated -->
+        </div>
+        <div class="modal-actions">
+          <button id="btn-close-inventory" class="btn btn-emerald">Tayyor</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- IN-GAME HUD -->
+    <div id="hud" class="hud-layer hidden">
+      <!-- Crosshair -->
+      <div id="crosshair">+</div>
+
+      <!-- Single Progress Bar Overlay for Digging -->
+      <div id="mining-progress-container" class="hidden">
+        <div class="mining-progress-card">
+          <span id="mining-progress-label">Buzilmoqda: 0%</span>
+          <div class="mining-track">
+            <div id="mining-progress-fill" class="mining-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Info Bar -->
+      <div id="top-bar">
+        <div class="bar-left">
+          <button id="btn-hud-pause" class="hud-btn" title="Pauza">||</button>
+          <div class="stat-badge"><span id="hud-fps">60</span> FPS</div>
+          <div class="stat-badge"><span id="hud-pos">X: 0 Y: 15 Z: 0</span></div>
+          <div class="stat-badge biome-badge"><span id="hud-biome">Xarita: Google Earth Globe</span></div>
+        </div>
+        <div class="bar-right">
+          <!-- Compass Widget -->
+          <div id="compass-badge" class="stat-badge compass-badge">N (0°)</div>
+          <div class="stat-badge time-badge">
+            <span id="hud-time-icon"></span> <span id="hud-time-text">Kun (12:00)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Touch Controls -->
+      <div id="mobile-controls">
+        <!-- Virtual Joystick Zone -->
+        <div id="joystick-zone">
+          <div id="joystick-base">
+            <div id="joystick-stick"></div>
+          </div>
+        </div>
+
+        <!-- Touch Look Region -->
+        <div id="touch-look-zone"></div>
+
+        <!-- Mobile Action Buttons -->
+        <div id="touch-actions">
+          <button id="btn-touch-jump" class="touch-btn">Sakrash</button>
+          <button id="btn-touch-place" class="touch-btn btn-place">Qo'yish</button>
+          <button id="btn-touch-break" class="touch-btn btn-break">Buzish</button>
+          <button id="btn-touch-cam" class="touch-btn btn-cam">Kamera</button>
+          <button id="btn-touch-inv" class="touch-btn btn-inv">Inventar</button>
+        </div>
+      </div>
+
+      <!-- Hotbar Toolbar -->
+      <div id="hotbar-container">
+        <div id="hotbar" class="hotbar-slots">
+          <!-- 9 hotbar slots populated dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div id="toast-container"></div>
+
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

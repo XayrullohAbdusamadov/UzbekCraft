@@ -1,0 +1,13 @@
+{
+  "name": "uzbekcraft",
+  "version": "1.0.0",
+  "description": "3D Uzbek Voxel Game - UzbekCraft",
+  "main": "main.js",
+  "scripts": {
+    "start": "python -m http.server 8080",
+    "dev": "python -m http.server 8080"
+  },
+  "keywords": ["game", "voxel", "threejs", "uzbekistan"],
+  "author": "UzbekCraft Team",
+  "license": "MIT"
+}
