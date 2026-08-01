@@ -230,7 +230,8 @@
   let scene, camera, renderer, clock, supabase = null;
   let sunMesh, moonMesh, sunLight, ambientLight, starsParticles;
   let playerMesh, playerSkin = 'steve';
-  let isThirdPerson = false;
+  let isThirdPerson = false, thirdPersonDistance = 6.0;
+  let orbitYaw = 0, orbitPitch = 0;
   let activeSlotIndex = 0;
   let hotbarBlocks = [1, 2, 3, 6, 17, 12, 13, 15, 18];
   let worldData = {}, modifiedBlocks = {};
@@ -1651,24 +1652,34 @@
       playerVel.z = 0;
     }
 
-    camera.position.copy(playerPos);
-    camera.position.y += 1.65;
+    // Sync orbit angles to player angles if Ctrl is not held
+    const isCtrlHeld = keys['ControlLeft'] || keys['ControlRight'] || keys['Control'];
+    let activeThirdPerson = isThirdPerson;
+    if (isCtrlHeld) {
+      activeThirdPerson = true;
+    } else {
+      orbitYaw = yaw;
+      orbitPitch = pitch;
+    }
 
-    // Third person
-    if (isThirdPerson && playerMesh) {
+    if (activeThirdPerson && playerMesh) {
       playerMesh.visible = true;
       playerMesh.position.copy(playerPos);
       playerMesh.rotation.y = yaw + Math.PI;
-      camera.position.set(
-        playerPos.x - Math.sin(yaw) * 6,
-        playerPos.y + 4,
-        playerPos.z - Math.cos(yaw) * 6
-      );
-    } else if (playerMesh) {
-      playerMesh.visible = false;
-    }
 
-    camera.rotation.set(pitch, yaw, 0, 'YXZ');
+      // Orbit camera positioning
+      const targetX = playerPos.x - Math.sin(orbitYaw) * Math.cos(orbitPitch) * thirdPersonDistance;
+      const targetY = playerPos.y + 1.2 - Math.sin(orbitPitch) * thirdPersonDistance;
+      const targetZ = playerPos.z - Math.cos(orbitYaw) * Math.cos(orbitPitch) * thirdPersonDistance;
+      
+      camera.position.set(targetX, targetY, targetZ);
+      camera.lookAt(playerPos.x, playerPos.y + 1.2, playerPos.z);
+    } else {
+      if (playerMesh) playerMesh.visible = false;
+      camera.position.copy(playerPos);
+      camera.position.y += 1.65;
+      camera.rotation.set(pitch, yaw, 0, 'YXZ');
+    }
 
     // Animate local player walking
     const isMoving = keys['KeyW'] || keys['KeyS'] || keys['KeyA'] || keys['KeyD'] || touchJoystick.active;
@@ -2494,16 +2505,31 @@
     document.addEventListener('pointerlockchange', () => isPointerLocked = (document.pointerLockElement === container));
     document.addEventListener('mousemove', e => {
       if (isPointerLocked) {
-        yaw -= e.movementX * 0.002;
-        pitch -= e.movementY * 0.002;
-        pitch = Math.max(-Math.PI / 2 + 0.05, Math.min(Math.PI / 2 - 0.05, pitch));
+        const isCtrlHeld = keys['ControlLeft'] || keys['ControlRight'] || keys['Control'] || e.ctrlKey;
+        if (isCtrlHeld) {
+          orbitYaw -= e.movementX * 0.002;
+          orbitPitch -= e.movementY * 0.002;
+          orbitPitch = Math.max(-Math.PI / 2 + 0.05, Math.min(Math.PI / 2 - 0.05, orbitPitch));
+        } else {
+          yaw -= e.movementX * 0.002;
+          pitch -= e.movementY * 0.002;
+          pitch = Math.max(-Math.PI / 2 + 0.05, Math.min(Math.PI / 2 - 0.05, pitch));
+          orbitYaw = yaw;
+          orbitPitch = pitch;
+        }
       }
     });
-    // Scroll wheel for hotbar
+    // Scroll wheel for hotbar and camera zoom
     window.addEventListener('wheel', e => {
-      activeSlotIndex = (activeSlotIndex + Math.sign(e.deltaY) + 9) % 9;
-      renderHotbar();
-    });
+      const isCtrlHeld = keys['ControlLeft'] || keys['ControlRight'] || keys['Control'] || e.ctrlKey;
+      if (isCtrlHeld) {
+        thirdPersonDistance = Math.max(2.0, Math.min(15.0, thirdPersonDistance + Math.sign(e.deltaY) * 0.5));
+        e.preventDefault();
+      } else {
+        activeSlotIndex = (activeSlotIndex + Math.sign(e.deltaY) + 9) % 9;
+        renderHotbar();
+      }
+    }, { passive: false });
   }
 
   function setupMobileControls() {
