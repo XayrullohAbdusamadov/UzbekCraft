@@ -40,13 +40,16 @@
           <button id="btn-saved-worlds" class="btn btn-gold">
             Saqlangan Dunyolar
           </button>
+          <button id="btn-multiplayer" class="btn btn-purple">
+            Ko'p O'yinchi (Onlayn)
+          </button>
           <button id="btn-skins" class="btn btn-blue">
             Qahramon Tanlash
           </button>
           <button id="btn-settings" class="btn btn-dark">
             Sozlamalar
           </button>
-          <button id="btn-supabase" class="btn btn-purple">
+          <button id="btn-supabase" class="btn btn-dark">
             Bulutli Saqlash (Supabase)
           </button>
           <button id="btn-exit" class="btn btn-red">
@@ -215,6 +218,24 @@
             <button id="btn-supabase-disconnect" class="btn btn-red" style="flex: 1;">Ulanishni uzish</button>
             <button id="btn-supabase-close" class="btn btn-dark" style="flex: 1;">Yopish</button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MULTIPLAYER MODAL -->
+    <div id="multiplayer-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <h2 class="modal-title">Ko'p O'yinchi (Onlayn)</h2>
+        <p class="modal-text">Yoningizdagi yoki uzoqdagi do'stlaringiz bilan birga o'ynash uchun bir xil xona (dunyo) nomini yozib ulaning.</p>
+        
+        <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
+          <label for="multiplayer-room-input" style="font-weight: 600; font-size: 0.9rem; color: var(--text-light);">Xona (Dunyo) Nomi:</label>
+          <input type="text" id="multiplayer-room-input" placeholder="Masalan: dostlar, registon" value="dostlar" style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glow); color: #fff; font-size: 0.9rem;">
+        </div>
+
+        <div class="modal-actions" style="margin-top: 20px; display: flex; gap: 10px; width: 100%;">
+          <button id="btn-multiplayer-join" class="btn btn-purple" style="flex: 1;">Xonaga Ulanish</button>
+          <button id="btn-multiplayer-close" class="btn btn-dark" style="flex: 1;">Yopish</button>
         </div>
       </div>
     </div>

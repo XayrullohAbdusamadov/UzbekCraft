@@ -2042,6 +2042,26 @@
       document.getElementById('save-prompt-modal').classList.remove('hidden');
     });
 
+    // --- MULTIPLAYER UI LISTENERS ---
+    document.getElementById('btn-multiplayer').addEventListener('click', () => {
+      document.getElementById('multiplayer-modal').classList.remove('hidden');
+    });
+    document.getElementById('btn-multiplayer-close').addEventListener('click', () => {
+      document.getElementById('multiplayer-modal').classList.add('hidden');
+    });
+    document.getElementById('btn-multiplayer-join').addEventListener('click', () => {
+      const roomName = document.getElementById('multiplayer-room-input').value.trim() || "dostlar";
+      currentWorldMeta = { id: 'world_' + Date.now(), name: roomName, seed: "Uzbekistan2026", map: "registan" };
+      modifiedBlocks = {};
+      currentQuestState = 'not_started';
+      generateWorld("Uzbekistan2026", "registan");
+      const hudBiome = document.getElementById('hud-biome');
+      if (hudBiome) hudBiome.textContent = getMapDisplayName("registan") + " (Onlayn)";
+      startPlayingSession();
+      document.getElementById('multiplayer-modal').classList.add('hidden');
+      showToast(`"${roomName}" xonasiga ulanildi!`);
+    });
+
     // --- SUPABASE UI LISTENERS ---
     document.getElementById('btn-supabase').addEventListener('click', () => {
       document.getElementById('supabase-url').value = localStorage.getItem('uzbekcraft_supabase_url') || 'https://dtpyfzzdfyxeklyrtuew.supabase.co';
