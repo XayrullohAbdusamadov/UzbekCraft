@@ -230,7 +230,7 @@
   let scene, camera, renderer, clock, supabase = null;
   let sunMesh, moonMesh, sunLight, ambientLight, starsParticles;
   let playerMesh, playerSkin = 'steve';
-  let isThirdPerson = false, thirdPersonDistance = 6.0;
+  let isThirdPerson = true, thirdPersonDistance = 6.0;
   let orbitYaw = 0, orbitPitch = 0;
   let activeSlotIndex = 0;
   let hotbarBlocks = [1, 2, 3, 6, 17, 12, 13, 15, 18];
@@ -1667,13 +1667,17 @@
       playerMesh.position.copy(playerPos);
       playerMesh.rotation.y = yaw + Math.PI;
 
-      // Orbit camera positioning
-      const targetX = playerPos.x - Math.sin(orbitYaw) * Math.cos(orbitPitch) * thirdPersonDistance;
-      const targetY = playerPos.y + 1.2 - Math.sin(orbitPitch) * thirdPersonDistance;
-      const targetZ = playerPos.z - Math.cos(orbitYaw) * Math.cos(orbitPitch) * thirdPersonDistance;
+      // Orbit camera positioning with over-the-shoulder offset (Scrap Mechanic style)
+      const rightOffset = 0.75;
+      const rightX = Math.cos(orbitYaw) * rightOffset;
+      const rightZ = -Math.sin(orbitYaw) * rightOffset;
+
+      const targetX = playerPos.x - Math.sin(orbitYaw) * Math.cos(orbitPitch) * thirdPersonDistance + rightX;
+      const targetY = playerPos.y + 1.4 - Math.sin(orbitPitch) * thirdPersonDistance;
+      const targetZ = playerPos.z - Math.cos(orbitYaw) * Math.cos(orbitPitch) * thirdPersonDistance + rightZ;
       
       camera.position.set(targetX, targetY, targetZ);
-      camera.lookAt(playerPos.x, playerPos.y + 1.2, playerPos.z);
+      camera.lookAt(playerPos.x + rightX * 0.5, playerPos.y + 1.2, playerPos.z + rightZ * 0.5);
     } else {
       if (playerMesh) playerMesh.visible = false;
       camera.position.copy(playerPos);
