@@ -207,3 +207,48 @@ Ushbu bosqichda quyidagi yangiliklar va yaxshilanishlar amalga oshirildi:
 4. **Yangi Metall Qilich Slash Ovozi:**
    - **O'zgarish:** Avvalgi zarba ovozi oddiy shovqin (noise burst) ko'rinishida edi. U endi ikkita chastota-slaydli osillyatorlardan (sawtooth va triangle) foydalanilgan holda haqiqiy qilich metallining shig'illashi/kesishi (metallic slash/slice) ovoziga almashtirildi.
 
+---
+
+## Part 10: Uchinchi Shaxs Dinamik Qo'lidagi Qurol/Blok va Tartiblangan Inventar Ro'yxati
+
+Biz quyidagi yaxshilanishlarni amalga oshirdik:
+
+1. **Uchinchi Shaxs Rejimida Dinamik Held Item (Qo'ldagi Narsa):**
+   - **Muammo:** Avval uchinchi shaxs kamerasiga o'tganimizda (yoki Ctrl ni bosib o'zimizni ko'rganimizda) qahramonning o'ng qo'lida har doim temir qilich modeli doimiy yopishtirilgan (hardcoded) holda turardi. Slotlarni almashtirsak ham qilich qo'ldan tushmasdi.
+   - **Yechim:** Qahramon modelidan temir qilich olib tashlandi. Buning o'rniga dinamik `updateThirdPersonHeldItem(mesh, blockId)` funksiyasi yozildi.
+   - Endi o'zingizda yoki boshqa onlayn o'yinchilarda hotbardagi slot o'zgarganda, uchinchi shaxs rejimida qo'lidagi qurol/blok ham real vaqtda o'zgaradi:
+     - Qilich tanlansa -> Olmos qilich modeli.
+     - Kamon tanlansa -> 3D Kamon yoyi modeli.
+     - Blok tanlansa -> Tegishli rangdagi kichik blok.
+     - Havo/Bo'sh slot tanlansa -> Qo'lida hech narsa bo'lmaydi.
+   - Multiplayer rejimida boshqa o'yinchilarning harakati vaqtida ularning qo'lidagi faol qurol yoki blok ham tarmoq orqali sinxronlashib ko'rinadigan bo'ldi.
+
+2. **Inventar Ro'yxatini Tartiblash (Guruhlash va Saralash):**
+   - **Imkoniyat:** O'yindagi barcha narsalar (qurollar, bloklar, chiroq) inventarda tartibsiz edi va qurollar ro'yxatning eng oxirida turgani sababli topish qiyin edi.
+   - **Yechim:** Inventarni (`renderInventoryGrid()`) foydalanish uchun qulay ketma-ketlikda guruhladik:
+     - Qurollar va Asboblar: Qilich, Kamon, Chiroq, Shisha, Suv.
+     - Foydali qazilmalar: Olmos, Oltin, Temir, Mis.
+     - Qurilish bloklari: Moviy koshin, Oq mramor, Zangori koshin, G'isht, Qora tosh, Terrakota.
+     - Tabiat bloklari: O't, Loy, Tosh, Qum, Qor, Yog'och, Barg, Taxta, Kaktus, Ko'mir.
+
+---
+
+## Part 11: Telefon uchun Tartiblangan Boshqaruv Tugmalari va Albomniy (Landscape) Rejim Enforcer
+
+Biz telefon foydalanuvchilarining o'yin tajribasini yaxshilash uchun quyidagi o'zgarishlarni kiritdik:
+
+1. **Telefon uchun Boshqaruv Tugmalarining Tartibli va Qulay Joylashuvi:**
+   - **Muammo:** Telefonda o'ng tomondagi "Qo'yish", "Buzish", "Sakrash", "Kamera" va "Inventar" tugmalari bir ustun shaklida ketma-ket joylashib, o'ynash uchun noqulay holatda edi.
+   - **Yechim:** Tugmalar shakli dumaloq (circular console controller-style) qilinib, barmoqlar harakatiga mos qulay geometrik klaster (tartib) ko'rinishida joylashtirildi:
+     - **Buzish / Attack** (Eng katta dumaloq tugma, qizil rangda, pastki chaproqda): Jang qilish va qazish uchun asosiy harakat.
+     - **Qo'yish / Place** (Dumaloq yashil tugma, yuqori chapda).
+     - **Sakrash / Jump** (Dumaloq ko'k tugma, pastki o'ngda).
+     - **Kamera** (Kichik kulrang dumaloq, yuqori o'ngda): 1-shaxs va 3-shaxs rejimlari orasida tez almashish.
+     - **Inventar** (Kichik to'q sariq dumaloq, o'rtada): Sumkani ochish.
+   - Bu boshqaruv elementlari shaffof, chiroyli gradient fonli va neon shisha effekti borderlariga ega bo'lib, o'yin ekranini to'sib qo'ymaydi.
+
+2. **Albomniy (Landscape) Rejim Enforcer (Yo'nalish ogohlantirishi):**
+   - **Tizim:** O'yin faqat telefonni yonbosh qilib (landscape) o'ynashga mo'ljallanganligi sababli, foydalanuvchi telefonni tikka (portrait) holatda ushlaganda maxsus ogohlantirish ekrani (`#landscape-warning`) paydo bo'ladi.
+   - **Ogohlantirish mazmuni:** "O'yin to'liq va boshqaruvlar tartibli ko'rinishi uchun iltimos telefoningizni yonboshga (landscape rejimiga) buring!".
+   - Telefon yonboshga burilishi bilanoq ogohlantirish avtomatik yo'qolib, o'yin to'liq ekranli keng holatda davom etadi.
+

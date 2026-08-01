@@ -474,24 +474,6 @@
     armRMesh.position.y = -0.3;
     armRGroup.add(armRMesh);
 
-    // Weapon: Iron Sword
-    const swordGroup = new THREE.Group();
-    swordGroup.position.set(0, -0.4, 0.1);
-    swordGroup.rotation.x = -Math.PI / 3;
-    
-    const handle = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.15, 0.06), matSwordHandle);
-    handle.position.y = -0.05;
-    swordGroup.add(handle);
-    
-    const guard = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.04, 0.06), matSwordHandle);
-    guard.position.y = 0.03;
-    swordGroup.add(guard);
-    
-    const blade = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.45, 0.03), matSwordBlade);
-    blade.position.y = 0.25;
-    swordGroup.add(blade);
-
-    armRGroup.add(swordGroup);
     group.add(armRGroup);
 
     // References for animation
@@ -554,6 +536,7 @@
     p.mesh.rotation.y = data.yaw + Math.PI;
     p.isMining = data.isMining || false;
     p.lastUpdate = Date.now();
+    updateThirdPersonHeldItem(p.mesh, data.activeBlockId);
   }
 
   function joinMultiplayerRoom() {
@@ -712,6 +695,7 @@
     scene.add(playerMesh);
     
     updateFirstPersonHandMesh();
+    updateThirdPersonHeldItem(playerMesh, hotbarBlocks[activeSlotIndex]);
   }
 
   // ==========================================================================
@@ -1884,7 +1868,8 @@
             yaw: yaw,
             pitch: pitch,
             skin: playerSkin,
-            isMining: isMiningHeld
+            isMining: isMiningHeld,
+            activeBlockId: hotbarBlocks[activeSlotIndex]
           }
         });
       }
@@ -2775,6 +2760,76 @@
     }
   }
 
+  function updateThirdPersonHeldItem(mesh, blockId) {
+    if (!mesh || !mesh.armR) return;
+    
+    // Find and remove existing held item (keep only the arm mesh itself)
+    while (mesh.armR.children.length > 1) {
+      mesh.armR.remove(mesh.armR.children[1]);
+    }
+
+    if (blockId === undefined || blockId === BLOCKS.AIR) return;
+
+    // Create the 3D model of the held item in third person
+    const matSwordHandle = new THREE.MeshLambertMaterial({ color: 0x795548 });
+    const matSwordBlade = new THREE.MeshLambertMaterial({ color: 0x00bcd4 }); // Diamond cyan
+    const matGuard = new THREE.MeshLambertMaterial({ color: 0x37474f });
+
+    if (blockId === BLOCKS.SWORD) {
+      const swordGroup = new THREE.Group();
+      swordGroup.position.set(0, -0.4, 0.1);
+      swordGroup.rotation.x = -Math.PI / 3;
+
+      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.15, 0.05), matSwordHandle);
+      handle.position.y = -0.05;
+      swordGroup.add(handle);
+
+      const guard = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.04, 0.05), matGuard);
+      guard.position.y = 0.03;
+      swordGroup.add(guard);
+
+      const blade = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.45, 0.03), matSwordBlade);
+      blade.position.y = 0.25;
+      swordGroup.add(blade);
+
+      mesh.armR.add(swordGroup);
+    } else if (blockId === BLOCKS.BOW) {
+      const bowGroup = new THREE.Group();
+      bowGroup.position.set(0, -0.35, 0.08);
+      bowGroup.rotation.x = -Math.PI / 3;
+      bowGroup.rotation.y = 0.2;
+
+      const bowMat = new THREE.MeshLambertMaterial({ color: 0x8d6e63 });
+      const stringMat = new THREE.MeshBasicMaterial({ color: 0xdddddd });
+
+      const center = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.2, 0.04), bowMat);
+      
+      const upper = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.15, 0.04), bowMat);
+      upper.position.set(-0.03, 0.15, 0.04);
+      upper.rotation.z = 0.2;
+      center.add(upper);
+
+      const lower = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.15, 0.04), bowMat);
+      lower.position.set(-0.03, -0.15, 0.04);
+      lower.rotation.z = -0.2;
+      center.add(lower);
+
+      const string = new THREE.Mesh(new THREE.BoxGeometry(0.006, 0.48, 0.006), stringMat);
+      string.position.set(-0.07, 0, 0);
+      center.add(string);
+
+      bowGroup.add(center);
+      mesh.armR.add(bowGroup);
+    } else {
+      // Regular block
+      const color = BLOCK_INFO[blockId]?.color || '#ffffff';
+      const blockMat = new THREE.MeshLambertMaterial({ color: color });
+      const blockMesh = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.18, 0.18), blockMat);
+      blockMesh.position.set(0, -0.45, 0.12);
+      mesh.armR.add(blockMesh);
+    }
+  }
+
   function animateFirstPersonHand(delta) {
     if (!fpHandGroup) return;
 
@@ -2922,14 +2977,25 @@
       el.appendChild(slot);
     });
     updateFirstPersonHandMesh();
+    if (playerMesh) {
+      updateThirdPersonHeldItem(playerMesh, hotbarBlocks[activeSlotIndex]);
+    }
   }
 
   function renderInventoryGrid() {
     const grid = document.getElementById('inventory-grid');
     if (!grid) return;
     grid.innerHTML = '';
-    Object.keys(BLOCK_INFO).forEach(bIdStr => {
-      const bId = Number(bIdStr);
+
+    const INVENTORY_ORDER = [
+      BLOCKS.SWORD, BLOCKS.BOW, BLOCKS.LANTERN, BLOCKS.GLASS, BLOCKS.WATER,
+      BLOCKS.DIAMOND, BLOCKS.GOLD, BLOCKS.IRON, BLOCKS.COPPER,
+      BLOCKS.BLUE_TILE, BLOCKS.WHITE_MARBLE, BLOCKS.GLAZED_BLUE, BLOCKS.RED_BRICK, BLOCKS.DARK_STONE, BLOCKS.TERRACOTTA,
+      BLOCKS.GRASS, BLOCKS.DIRT, BLOCKS.STONE, BLOCKS.SAND, BLOCKS.SNOW, BLOCKS.WOOD, BLOCKS.LEAVES, BLOCKS.PLANKS, BLOCKS.CACTUS, BLOCKS.COAL
+    ];
+
+    INVENTORY_ORDER.forEach(bId => {
+      if (BLOCK_INFO[bId] === undefined) return;
       const item = document.createElement('div');
       item.className = 'inv-slot-item';
       item.innerHTML = `<div class="block-icon-box" style="background:${BLOCK_INFO[bId].color};"></div><span class="block-slot-name">${BLOCK_INFO[bId].name}</span>`;
