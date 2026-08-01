@@ -495,7 +495,7 @@
     }
     const p = otherPlayers[id];
     p.mesh.position.set(data.x, data.y, data.z);
-    p.mesh.rotation.y = data.yaw + Math.PI;
+    p.mesh.rotation.y = data.yaw;
     p.lastUpdate = Date.now();
   }
 
@@ -1722,7 +1722,7 @@
     if (activeThirdPerson && playerMesh) {
       playerMesh.visible = true;
       playerMesh.position.copy(playerPos);
-      playerMesh.rotation.y = yaw + Math.PI;
+      playerMesh.rotation.y = yaw;
 
       // Centered third-person camera directly behind the player's back
       const targetX = playerPos.x - Math.sin(orbitYaw) * Math.cos(orbitPitch) * thirdPersonDistance;
