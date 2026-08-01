@@ -252,6 +252,12 @@
   let touchLook = { active: false, lastX: 0, lastY: 0 };
   let frameCount = 0;
 
+  // --- MULTIPLAYER REALTIME VARIABLES ---
+  let multiplayerChannel = null;
+  const myPlayerId = 'player_' + Math.random().toString(36).substring(2, 11);
+  const otherPlayers = {};
+  let broadcastCounter = 0;
+
   function initSupabase() {
     const url = localStorage.getItem('uzbekcraft_supabase_url') || 'https://dtpyfzzdfyxeklyrtuew.supabase.co';
     const key = localStorage.getItem('uzbekcraft_supabase_key') || 'sb_publishable_ioYdiKVpVMddnYFH3bABDg_-J9EImd1';
@@ -265,6 +271,79 @@
     } else {
       supabase = null;
     }
+  }
+
+  function getSkinMaterials(skinName) {
+    let colorHead = 0xffdbac;
+    let colorBody = 0x10b981; // Steve green
+    let colorLegs = 0x1a237e; // Steve blue
+
+    if (skinName === 'temur') {
+      colorBody = 0xd97706; colorLegs = 0x991b1b;
+    } else if (skinName === 'navoiy') {
+      colorBody = 0x0369a1; colorLegs = 0x065f46;
+    } else if (skinName === 'ulugbek') {
+      colorBody = 0x6d28d9; colorLegs = 0x374151;
+    }
+
+    return {
+      head: new THREE.MeshStandardMaterial({ color: colorHead, roughness: 0.6 }),
+      body: new THREE.MeshStandardMaterial({ color: colorBody, roughness: 0.7 }),
+      legs: new THREE.MeshStandardMaterial({ color: colorLegs, roughness: 0.8 })
+    };
+  }
+
+  function updateOtherPlayer(id, data) {
+    if (!otherPlayers[id]) {
+      const group = new THREE.Group();
+      const mats = getSkinMaterials(data.skin || 'temur');
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), mats.head); head.position.y = 1.4;
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 0.35), mats.body); body.position.y = 0.85;
+      const legL = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.6, 0.3), mats.legs); legL.position.set(-0.15, 0.3, 0);
+      const legR = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.6, 0.3), mats.legs); legR.position.set(0.15, 0.3, 0);
+      group.add(head, body, legL, legR);
+      scene.add(group);
+      otherPlayers[id] = { mesh: group, lastUpdate: Date.now() };
+    }
+    const p = otherPlayers[id];
+    p.mesh.position.set(data.x, data.y, data.z);
+    p.mesh.rotation.y = data.yaw + Math.PI;
+    p.lastUpdate = Date.now();
+  }
+
+  function joinMultiplayerRoom() {
+    if (!supabase) return;
+    
+    if (multiplayerChannel) {
+      multiplayerChannel.unsubscribe();
+    }
+    
+    Object.keys(otherPlayers).forEach(id => {
+      if (otherPlayers[id] && otherPlayers[id].mesh) {
+        scene.remove(otherPlayers[id].mesh);
+      }
+      delete otherPlayers[id];
+    });
+
+    const roomName = 'room_' + (currentWorldMeta.name || 'default').toLowerCase().replace(/\s+/g, '_');
+    multiplayerChannel = supabase.channel(roomName);
+    
+    multiplayerChannel
+      .on('broadcast', { event: 'player_move' }, (payload) => {
+        const data = payload.payload;
+        if (data.id === myPlayerId) return;
+        updateOtherPlayer(data.id, data);
+      })
+      .on('broadcast', { event: 'block_change' }, (payload) => {
+        const { x, y, z, blockId } = payload.payload;
+        worldData[`${x},${y},${z}`] = blockId;
+        renderInstancedWorld();
+      })
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          showToast("Ko'p o'yinchi xonasiga ulandingiz!");
+        }
+      });
   }
 
   // --- INITIALIZATION ---
@@ -1481,6 +1560,37 @@
     if (el_pos) el_pos.textContent = `X:${Math.round(playerPos.x)} Y:${Math.round(playerPos.y)} Z:${Math.round(playerPos.z)}`;
 
     checkInteractions();
+
+    // --- MULTIPLAYER REALTIME UPDATE ---
+    if (supabase && multiplayerChannel) {
+      broadcastCounter++;
+      if (broadcastCounter % 4 === 0) {
+        multiplayerChannel.send({
+          type: 'broadcast',
+          event: 'player_move',
+          payload: {
+            id: myPlayerId,
+            x: playerPos.x,
+            y: playerPos.y,
+            z: playerPos.z,
+            yaw: yaw,
+            pitch: pitch,
+            skin: playerSkin
+          }
+        });
+      }
+    }
+
+    // Remove idle/disconnected other players
+    const nowMulti = Date.now();
+    Object.keys(otherPlayers).forEach(id => {
+      if (nowMulti - otherPlayers[id].lastUpdate > 4000) {
+        if (otherPlayers[id].mesh) {
+          scene.remove(otherPlayers[id].mesh);
+        }
+        delete otherPlayers[id];
+      }
+    });
   }
 
   function animateNPCs(delta) {
@@ -1660,6 +1770,16 @@
       worldData[miningTargetKey] = BLOCKS.AIR;
       modifiedBlocks[miningTargetKey] = BLOCKS.AIR;
       soundEngine.playSFX('break');
+
+      if (supabase && multiplayerChannel) {
+        const coords = miningTargetKey.split(',');
+        multiplayerChannel.send({
+          type: 'broadcast',
+          event: 'block_change',
+          payload: { x: parseInt(coords[0]), y: parseInt(coords[1]), z: parseInt(coords[2]), blockId: BLOCKS.AIR }
+        });
+      }
+
       rebuildWorldMesh();
       cancelMining();
     }
@@ -1682,6 +1802,15 @@
       worldData[key] = hotbarBlocks[activeSlotIndex];
       modifiedBlocks[key] = hotbarBlocks[activeSlotIndex];
       soundEngine.playSFX('place');
+
+      if (supabase && multiplayerChannel) {
+        multiplayerChannel.send({
+          type: 'broadcast',
+          event: 'block_change',
+          payload: { x: bx, y: by, z: bz, blockId: hotbarBlocks[activeSlotIndex] }
+        });
+      }
+
       rebuildWorldMesh();
     }
   }
@@ -1861,6 +1990,7 @@
     if (hud) hud.classList.remove('hidden');
     soundEngine.init();
     soundEngine.startAmbientMusic();
+    joinMultiplayerRoom();
   }
 
   function returnToMainMenu() {
@@ -1869,6 +1999,18 @@
     if (hud) hud.classList.add('hidden');
     const mainMenu = document.getElementById('main-menu');
     if (mainMenu) { mainMenu.style.display = 'flex'; mainMenu.classList.add('active'); }
+    
+    // Cleanup multiplayer
+    if (multiplayerChannel) {
+      multiplayerChannel.unsubscribe();
+      multiplayerChannel = null;
+    }
+    Object.keys(otherPlayers).forEach(id => {
+      if (otherPlayers[id] && otherPlayers[id].mesh) {
+        scene.remove(otherPlayers[id].mesh);
+      }
+      delete otherPlayers[id];
+    });
   }
 
   function hideAllModals() {
