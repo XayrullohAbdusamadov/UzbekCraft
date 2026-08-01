@@ -293,15 +293,145 @@
     };
   }
 
+  function buildDetailedCharacterMesh(skinName) {
+    const group = new THREE.Group();
+    
+    // Skin colors
+    const mats = getSkinMaterials(skinName);
+    const matBeard = new THREE.MeshLambertMaterial({ color: 0x3d2314 }); // Beard
+    const matEye = new THREE.MeshLambertMaterial({ color: 0xffffff }); // White of eye
+    const matPupil = new THREE.MeshLambertMaterial({ color: 0x1e88e5 }); // Blue pupils
+    const matEyebrow = new THREE.MeshLambertMaterial({ color: 0x000000 }); // Eyebrows
+    const matSwordHandle = new THREE.MeshLambertMaterial({ color: 0x795548 }); // Brown handle
+    const matSwordBlade = new THREE.MeshLambertMaterial({ color: 0xc0c0c0 }); // Silver blade
+
+    // 1. Head
+    const head = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), mats.head);
+    head.position.y = 1.45;
+    group.add(head);
+
+    // Eyes
+    const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.06, 0.02), matEye);
+    eyeL.position.set(-0.15, 1.48, 0.301);
+    group.add(eyeL);
+    
+    const pupilL = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.06, 0.02), matPupil);
+    pupilL.position.set(-0.13, 1.48, 0.311);
+    group.add(pupilL);
+
+    const eyeR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.06, 0.02), matEye);
+    eyeR.position.set(0.15, 1.48, 0.301);
+    group.add(eyeR);
+
+    const pupilR = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.06, 0.02), matPupil);
+    pupilR.position.set(0.17, 1.48, 0.311);
+    group.add(pupilR);
+
+    // Eyebrows
+    const browL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.03, 0.02), matEyebrow);
+    browL.position.set(-0.15, 1.54, 0.305);
+    group.add(browL);
+
+    const browR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.03, 0.02), matEyebrow);
+    browR.position.set(0.15, 1.54, 0.305);
+    group.add(browR);
+
+    // Beard/Soqol (Bottom wrap around mouth)
+    const beard = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.15, 0.08), matBeard);
+    beard.position.set(0, 1.25, 0.28);
+    group.add(beard);
+
+    // 2. Body
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 0.35), mats.body);
+    body.position.y = 0.85;
+    group.add(body);
+
+    // Belt detail (Kiyim detali)
+    const belt = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.08, 0.37), new THREE.MeshLambertMaterial({ color: 0x3e2723 }));
+    belt.position.set(0, 0.6, 0);
+    group.add(belt);
+
+    // 3. Left Leg
+    const legLGroup = new THREE.Group();
+    legLGroup.position.set(-0.16, 0.55, 0);
+    const legLMesh = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.6, 0.3), mats.legs);
+    legLMesh.position.y = -0.3;
+    legLGroup.add(legLMesh);
+    group.add(legLGroup);
+
+    // 4. Right Leg
+    const legRGroup = new THREE.Group();
+    legRGroup.position.set(0.16, 0.55, 0);
+    const legRMesh = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.6, 0.3), mats.legs);
+    legRMesh.position.y = -0.3;
+    legRGroup.add(legRMesh);
+    group.add(legRGroup);
+
+    // 5. Left Arm
+    const armLGroup = new THREE.Group();
+    armLGroup.position.set(-0.41, 1.1, 0);
+    const armLMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.6, 0.22), mats.body);
+    armLMesh.position.y = -0.3;
+    armLGroup.add(armLMesh);
+    group.add(armLGroup);
+
+    // 6. Right Arm
+    const armRGroup = new THREE.Group();
+    armRGroup.position.set(0.41, 1.1, 0);
+    const armRMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.6, 0.22), mats.body);
+    armRMesh.position.y = -0.3;
+    armRGroup.add(armRMesh);
+
+    // Weapon/Qurol: Iron Sword
+    const swordGroup = new THREE.Group();
+    swordGroup.position.set(0, -0.4, 0.1);
+    swordGroup.rotation.x = -Math.PI / 3;
+    
+    const handle = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.15, 0.06), matSwordHandle);
+    handle.position.y = -0.05;
+    swordGroup.add(handle);
+    
+    const guard = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.04, 0.06), matSwordHandle);
+    guard.position.y = 0.03;
+    swordGroup.add(guard);
+    
+    const blade = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.45, 0.03), matSwordBlade);
+    blade.position.y = 0.25;
+    swordGroup.add(blade);
+
+    armRGroup.add(swordGroup);
+    group.add(armRGroup);
+
+    // References for animation
+    group.legL = legLGroup;
+    group.legR = legRGroup;
+    group.armL = armLGroup;
+    group.armR = armRGroup;
+
+    return group;
+  }
+
+  function animateCharacterWalk(mesh, speed, isMoving, grounded = true) {
+    if (!mesh || !mesh.legL || !mesh.legR || !mesh.armL || !mesh.armR) return;
+    
+    if (isMoving && grounded && speed > 0.05) {
+      const swingSpeed = 12.0;
+      const angle = Math.sin(performance.now() * 0.001 * swingSpeed) * 0.6;
+      mesh.legL.rotation.x = angle;
+      mesh.legR.rotation.x = -angle;
+      mesh.armL.rotation.x = -angle;
+      mesh.armR.rotation.x = angle;
+    } else {
+      mesh.legL.rotation.x = 0;
+      mesh.legR.rotation.x = 0;
+      mesh.armL.rotation.x = 0;
+      mesh.armR.rotation.x = 0;
+    }
+  }
+
   function updateOtherPlayer(id, data) {
     if (!otherPlayers[id]) {
-      const group = new THREE.Group();
-      const mats = getSkinMaterials(data.skin || 'temur');
-      const head = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), mats.head); head.position.y = 1.4;
-      const body = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 0.35), mats.body); body.position.y = 0.85;
-      const legL = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.6, 0.3), mats.legs); legL.position.set(-0.15, 0.3, 0);
-      const legR = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.6, 0.3), mats.legs); legR.position.set(0.15, 0.3, 0);
-      group.add(head, body, legL, legR);
+      const group = buildDetailedCharacterMesh(data.skin || 'steve');
       scene.add(group);
       otherPlayers[id] = { mesh: group, lastUpdate: Date.now() };
     }
@@ -413,16 +543,8 @@
   }
 
   function createPlayerMesh() {
-    const group = new THREE.Group();
-    const matHead = new THREE.MeshLambertMaterial({ color: 0xffdbac });
-    const matRobe = new THREE.MeshLambertMaterial({ color: 0x10b981 });
-    const matLegs = new THREE.MeshLambertMaterial({ color: 0x1a237e });
-    const head = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), matHead); head.position.y = 1.4;
-    const body = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 0.35), matRobe); body.position.y = 0.85;
-    const legL = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.6, 0.3), matLegs); legL.position.set(-0.15, 0.3, 0);
-    const legR = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.6, 0.3), matLegs); legR.position.set(0.15, 0.3, 0);
-    group.add(head, body, legL, legR);
-    playerMesh = group;
+    if (playerMesh) scene.remove(playerMesh);
+    playerMesh = buildDetailedCharacterMesh(playerSkin);
     playerMesh.visible = false;
     scene.add(playerMesh);
   }
@@ -1548,6 +1670,11 @@
 
     camera.rotation.set(pitch, yaw, 0, 'YXZ');
 
+    // Animate local player walking
+    const isMoving = keys['KeyW'] || keys['KeyS'] || keys['KeyA'] || keys['KeyD'] || touchJoystick.active;
+    const currentSpeed = Math.hypot(playerVel.x, playerVel.z);
+    animateCharacterWalk(playerMesh, currentSpeed, isMoving, isGrounded);
+
     updateTargetRaycast();
     updateMiningProgress(delta);
     animateNPCs(delta);
@@ -1581,14 +1708,21 @@
       }
     }
 
-    // Remove idle/disconnected other players
+    // Remove idle/disconnected other players and animate movement
     const nowMulti = Date.now();
     Object.keys(otherPlayers).forEach(id => {
-      if (nowMulti - otherPlayers[id].lastUpdate > 4000) {
-        if (otherPlayers[id].mesh) {
-          scene.remove(otherPlayers[id].mesh);
+      const op = otherPlayers[id];
+      if (nowMulti - op.lastUpdate > 4000) {
+        if (op.mesh) {
+          scene.remove(op.mesh);
         }
         delete otherPlayers[id];
+      } else {
+        const prevPos = op.prevPos || op.mesh.position.clone();
+        const dist = prevPos.distanceTo(op.mesh.position);
+        const moving = dist > 0.005;
+        animateCharacterWalk(op.mesh, dist / delta, moving, true);
+        op.prevPos = op.mesh.position.clone();
       }
     });
   }
