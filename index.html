@@ -77,7 +77,9 @@
         </div>
 
         <div class="menu-footer">
-          UzbekCraft v2.5 Ultra HD • Google Earth Motori Integratsiyasi
+          UzbekCraft v2.5 Ultra HD • Google Earth Motori Integratsiyasi <br>
+          <span class="creator-credit">Yaratuvchi: <strong>Hayrulloh Abdusamadov</strong></span> &bull; 
+          <span class="telegram-channel">Telegram kanal: <strong>@HayrullohAdusamadov</strong></span>
         </div>
       </div>
     </div>
@@ -312,8 +314,16 @@
     <!-- INVENTORY MODAL -->
     <div id="inventory-modal" class="modal-overlay hidden">
       <div class="modal-card modal-large">
-        <h2 class="modal-title">Bloklar Inventari</h2>
-        <p class="modal-text">Tanlangan slotga joylash uchun blok ustiga bosing:</p>
+        <h2 class="modal-title">Inventar</h2>
+        
+        <!-- Inventory Tabs Navigation -->
+        <div class="inventory-tabs">
+          <button id="tab-weapons" class="inv-tab-btn active">Qurollar</button>
+          <button id="tab-furniture" class="inv-tab-btn">Anjomlar</button>
+          <button id="tab-blocks" class="inv-tab-btn">Bloklar</button>
+        </div>
+
+        <p class="modal-text">Tanlangan slotga joylash uchun blok/qurol ustiga bosing:</p>
         <div id="inventory-grid" class="inventory-grid">
           <!-- Dynamically populated -->
         </div>
@@ -379,6 +389,10 @@
 
       <!-- Hotbar Toolbar -->
       <div id="hotbar-container">
+        <!-- Health Hearts Bar -->
+        <div id="hud-health" class="health-hearts-bar">
+          <!-- Hearts generated dynamically -->
+        </div>
         <div id="hotbar" class="hotbar-slots">
           <!-- 9 hotbar slots populated dynamically -->
         </div>
@@ -387,6 +401,9 @@
 
     <!-- TOAST NOTIFICATIONS -->
     <div id="toast-container"></div>
+
+    <!-- DAMAGE FLASH OVERLAY -->
+    <div id="damage-flash"></div>
 
     <!-- LANDSCAPE ORIENTATION WARNING FOR MOBILE -->
     <div id="landscape-warning">
