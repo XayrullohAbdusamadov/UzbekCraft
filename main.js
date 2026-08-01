@@ -2060,6 +2060,58 @@
       document.getElementById('dialogue-modal').classList.add('hidden');
       activeNpc = null;
     });
+
+    // --- GAME SETTINGS EVENT LISTENERS ---
+    const sfxSlider = document.getElementById('slider-sfx');
+    const musicSlider = document.getElementById('slider-music');
+    const renderSlider = document.getElementById('slider-render-dist');
+    const toggleMobile = document.getElementById('toggle-mobile');
+
+    if (sfxSlider) {
+      sfxSlider.addEventListener('input', () => {
+        const val = sfxSlider.value;
+        document.getElementById('sfx-vol-val').textContent = `${val}%`;
+        soundEngine.sfxVolume = val / 100;
+      });
+    }
+
+    if (musicSlider) {
+      musicSlider.addEventListener('input', () => {
+        const val = musicSlider.value;
+        document.getElementById('music-vol-val').textContent = `${val}%`;
+        soundEngine.musicVolume = val / 100;
+      });
+    }
+
+    if (renderSlider) {
+      renderSlider.addEventListener('input', () => {
+        const val = renderSlider.value;
+        document.getElementById('render-dist-val').textContent = `${val} Chunk`;
+        if (camera) {
+          camera.far = val * 64 + 100;
+          camera.updateProjectionMatrix();
+        }
+        if (scene && scene.fog) {
+          scene.fog.density = 0.08 / val;
+        }
+      });
+    }
+
+    if (toggleMobile) {
+      toggleMobile.addEventListener('change', () => {
+        const mobileCtrls = document.getElementById('mobile-controls');
+        if (mobileCtrls) {
+          mobileCtrls.style.display = toggleMobile.checked ? 'block' : 'none';
+        }
+      });
+    }
+
+    const closeSettingsBtn = document.getElementById('btn-close-settings');
+    if (closeSettingsBtn) {
+      closeSettingsBtn.addEventListener('click', () => {
+        document.getElementById('settings-modal').classList.add('hidden');
+      });
+    }
   }
 
   function getMapDisplayName(map) {
