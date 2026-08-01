@@ -229,14 +229,14 @@
   // --- GAME STATE ---
   let scene, camera, renderer, clock, supabase = null;
   let sunMesh, moonMesh, sunLight, ambientLight, starsParticles;
-  let playerMesh, playerSkin = 'steve';
-  let isThirdPerson = true, thirdPersonDistance = 6.0;
+  let playerMesh, playerSkin = 'steve', fpHandMesh = null;
+  let isThirdPerson = false, thirdPersonDistance = 6.0;
   let orbitYaw = 0, orbitPitch = 0;
   let activeSlotIndex = 0;
   let hotbarBlocks = [1, 2, 3, 6, 17, 12, 13, 15, 18];
   let worldData = {}, modifiedBlocks = {};
   let currentMapRadius = 250;
-  let currentWorldMeta = { name: "Mening Dunyoim", seed: "Uzbekistan2026", map: "registan" };
+  let currentWorldMeta = { name: "Mening Dunyoim", seed: "Uzbekistan2026", map: "minecraft_classic" };
   let dayTime = 0.25;
   let playerPos = new THREE.Vector3(0, 105, 0);
   let playerVel = new THREE.Vector3(0, 0, 0);
@@ -611,11 +611,59 @@
     createPlayerMesh();
   }
 
+  function createFirstPersonHand() {
+    if (fpHandMesh) camera.remove(fpHandMesh);
+    
+    fpHandMesh = new THREE.Group();
+    
+    // Arm sleeve/skin box
+    const armGeo = new THREE.BoxGeometry(0.18, 0.18, 0.45);
+    const mats = getSkinMaterials(playerSkin);
+    const armMesh = new THREE.Mesh(armGeo, mats.body); // Use body shirt material for sleeve
+    fpHandMesh.add(armMesh);
+    
+    // Skin hand at the end of the sleeve
+    const handGeo = new THREE.BoxGeometry(0.16, 0.16, 0.12);
+    const handMesh = new THREE.Mesh(handGeo, mats.head); // Use head skin material for hand
+    handMesh.position.z = 0.285;
+    fpHandMesh.add(handMesh);
+
+    // Mini Sword held in hand
+    const swordGroup = new THREE.Group();
+    swordGroup.position.set(0.08, 0.08, 0.28);
+    swordGroup.rotation.set(-Math.PI / 4, Math.PI / 4, 0);
+
+    const matSwordHandle = new THREE.MeshLambertMaterial({ color: 0x795548 });
+    const matSwordBlade = new THREE.MeshLambertMaterial({ color: 0xc0c0c0 });
+
+    const handle = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.1, 0.04), matSwordHandle);
+    handle.position.y = -0.03;
+    swordGroup.add(handle);
+
+    const guard = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.03, 0.04), matSwordHandle);
+    guard.position.y = 0.02;
+    swordGroup.add(guard);
+
+    const blade = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.3, 0.02), matSwordBlade);
+    blade.position.y = 0.17;
+    swordGroup.add(blade);
+
+    fpHandMesh.add(swordGroup);
+
+    // Position at bottom-right corner of camera
+    fpHandMesh.position.set(0.32, -0.28, -0.5);
+    fpHandMesh.rotation.set(0.1, -0.25, 0);
+
+    camera.add(fpHandMesh);
+  }
+
   function createPlayerMesh() {
     if (playerMesh) scene.remove(playerMesh);
     playerMesh = buildDetailedCharacterMesh(playerSkin);
     playerMesh.visible = false;
     scene.add(playerMesh);
+    
+    createFirstPersonHand();
   }
 
   // ==========================================================================
