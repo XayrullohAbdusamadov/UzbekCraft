@@ -253,8 +253,8 @@
   let frameCount = 0;
 
   function initSupabase() {
-    const url = localStorage.getItem('uzbekcraft_supabase_url');
-    const key = localStorage.getItem('uzbekcraft_supabase_key');
+    const url = localStorage.getItem('uzbekcraft_supabase_url') || 'https://dtpyfzzdfyxeklyrtuew.supabase.co';
+    const key = localStorage.getItem('uzbekcraft_supabase_key') || 'sb_publishable_ioYdiKVpVMddnYFH3bABDg_-J9EImd1';
     if (url && key && window.supabase) {
       try {
         supabase = window.supabase.createClient(url, key);
@@ -1902,8 +1902,8 @@
 
     // --- SUPABASE UI LISTENERS ---
     document.getElementById('btn-supabase').addEventListener('click', () => {
-      document.getElementById('supabase-url').value = localStorage.getItem('uzbekcraft_supabase_url') || '';
-      document.getElementById('supabase-key').value = localStorage.getItem('uzbekcraft_supabase_key') || '';
+      document.getElementById('supabase-url').value = localStorage.getItem('uzbekcraft_supabase_url') || 'https://dtpyfzzdfyxeklyrtuew.supabase.co';
+      document.getElementById('supabase-key').value = localStorage.getItem('uzbekcraft_supabase_key') || 'sb_publishable_ioYdiKVpVMddnYFH3bABDg_-J9EImd1';
       const statusEl = document.getElementById('supabase-status');
       if (supabase) {
         statusEl.textContent = "Supabase bilan ulanish faol (sinxronizatsiya yoqilgan).";
