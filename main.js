@@ -545,7 +545,7 @@
     }
     const p = otherPlayers[id];
     p.mesh.position.set(data.x, data.y, data.z);
-    p.mesh.rotation.y = data.yaw;
+    p.mesh.rotation.y = data.yaw + Math.PI;
     p.isMining = data.isMining || false;
     p.lastUpdate = Date.now();
   }
@@ -699,59 +699,13 @@
     createPlayerMesh();
   }
 
-  function createFirstPersonHand() {
-    if (fpHandMesh) camera.remove(fpHandMesh);
-    
-    fpHandMesh = new THREE.Group();
-    
-    // Arm sleeve/skin box
-    const armGeo = new THREE.BoxGeometry(0.18, 0.18, 0.45);
-    const mats = getSkinMaterials(playerSkin);
-    const armMesh = new THREE.Mesh(armGeo, mats.body); // Use body shirt material for sleeve
-    fpHandMesh.add(armMesh);
-    
-    // Skin hand at the end of the sleeve
-    const handGeo = new THREE.BoxGeometry(0.16, 0.16, 0.12);
-    const handMesh = new THREE.Mesh(handGeo, mats.head); // Use head skin material for hand
-    handMesh.position.z = 0.285;
-    fpHandMesh.add(handMesh);
-
-    // Mini Sword held in hand
-    const swordGroup = new THREE.Group();
-    swordGroup.position.set(0.08, 0.08, 0.28);
-    swordGroup.rotation.set(-Math.PI / 4, Math.PI / 4, 0);
-
-    const matSwordHandle = new THREE.MeshLambertMaterial({ color: 0x795548 });
-    const matSwordBlade = new THREE.MeshLambertMaterial({ color: 0xc0c0c0 });
-
-    const handle = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.1, 0.04), matSwordHandle);
-    handle.position.y = -0.03;
-    swordGroup.add(handle);
-
-    const guard = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.03, 0.04), matSwordHandle);
-    guard.position.y = 0.02;
-    swordGroup.add(guard);
-
-    const blade = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.3, 0.02), matSwordBlade);
-    blade.position.y = 0.17;
-    swordGroup.add(blade);
-
-    fpHandMesh.add(swordGroup);
-
-    // Position at bottom-right corner of camera
-    fpHandMesh.position.set(0.32, -0.28, -0.5);
-    fpHandMesh.rotation.set(0.1, -0.25, 0);
-
-    camera.add(fpHandMesh);
-  }
-
   function createPlayerMesh() {
     if (playerMesh) scene.remove(playerMesh);
     playerMesh = buildDetailedCharacterMesh(playerSkin);
     playerMesh.visible = false;
     scene.add(playerMesh);
     
-    createFirstPersonHand();
+    updateFirstPersonHandMesh();
   }
 
   // ==========================================================================
@@ -1875,7 +1829,7 @@
     if (activeThirdPerson && playerMesh) {
       playerMesh.visible = true;
       playerMesh.position.copy(playerPos);
-      playerMesh.rotation.y = yaw;
+      playerMesh.rotation.y = yaw + Math.PI;
 
       // Centered third-person camera directly behind the player's back
       const targetX = playerPos.x - Math.sin(orbitYaw) * Math.cos(orbitPitch) * thirdPersonDistance;
@@ -2412,6 +2366,9 @@
   }
 
   function returnToMainMenu() {
+    if (document.pointerLockElement) {
+      document.exitPointerLock();
+    }
     hideAllModals();
     const hud = document.getElementById('hud');
     if (hud) hud.classList.add('hidden');

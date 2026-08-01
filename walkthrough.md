@@ -170,6 +170,18 @@ We implemented blocky first-person arms, fully functional weapons, audio synthes
    - **Animal Damage & Death:** When hit, animals flash bright red for 120ms. When health drops below 0, a custom death loop triggers (spinning and scaling down) before removal from the scene.
 5. **Quiet Animals & Behaviors:** Disabled all emoji quotes/toasts and greeting sounds for animals in `checkInteractions()`. Animals now move with a realistic leg-swing walk animation, and halt to look at the player when approached within 10 units.
 
+---
 
+## Part 8: Menyudagi Tugmalar va Qahramon Yuzi (Face Orientation) Tuzatishlari
 
+Biz o'yindagi ikkita muhim muammoni bartaraf etdik:
 
+1. **Menyu Tugmalarining Ishlamasligi (JavaScript Crash Fix):**
+   - Muammo: O'yin yuklanish vaqtida konsolda `Uncaught ReferenceError: fpHandMesh is not defined` xatosi yuz berayotgan edi. Bu eski `createFirstPersonHand()` funksiyasida e'lon qilinmagan o'zgaruvchidan foydalanilgani sababli yuzaga kelgan.
+   - Ushbu xatolik dastur ishini to'xtatganligi sababli, menyu tugmalariga event listener-lar birikmay qolgan edi.
+   - Yechim: Eski `createFirstPersonHand()` o'rniga yangi va dinamik `updateFirstPersonHandMesh()` funksiyasidan foydalanildi hamda eskirgan kodlar butunlay o'chirildi. Natijada o'yin xatosiz yuklanib, menyu tugmalari to'liq ishlay boshladi.
+   - Shuningdek, bosh menyuga qaytishda pointer lock (sichqoncha qulflanishi) holati faol bo'lsa, uni avtomatik tarzda ochib yuboradigan kod yozildi.
+
+2. **Qahramon Yuzining Orqaga Qarab Qolishi (Face Orientation Alignment):**
+   - Muammo: Qahramon modeli (Steve/Alpomish) yuzi uning local o'qida `+Z` tomonga (kamera tomonga) qaratib chizilgan edi. Ammo o'yinchi harakat yo'nalishi `-Z` bo'lgani sababli, 3-shaxs rejimida u yurganda yuzi kameraga qarab (orqaga qarab) harakatlanardi.
+   - Yechim: `updatePlayer()` va `updateOtherPlayer()` funksiyalarida o'yinchi va boshqa onlayn o'yinchilar modellarining aylanish burchagiga `Math.PI` (180 daraja) qo'shildi (`rotation.y = yaw + Math.PI`). Endi qahramon to'g'ri oldinga qarab harakatlanadi.

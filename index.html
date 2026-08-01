@@ -1,6 +1,25 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
+  <script>
+    window.addEventListener('error', function(e) {
+      const div = document.createElement('div');
+      div.style.position = 'fixed';
+      div.style.top = '0';
+      div.style.left = '0';
+      div.style.width = '100%';
+      div.style.background = 'rgba(220, 38, 38, 0.95)';
+      div.style.color = 'white';
+      div.style.zIndex = '999999';
+      div.style.padding = '20px';
+      div.style.fontFamily = 'monospace';
+      div.style.fontSize = '14px';
+      div.style.wordBreak = 'break-all';
+      div.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
+      div.innerHTML = '<strong>JS Error:</strong> ' + e.message + '<br>Fayl: ' + e.filename + '<br>Qator: ' + e.lineno + ':' + e.colno;
+      document.body.appendChild(div);
+    });
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>UzbekCraft - 3D O'zbek Voxel O'yini</title>
