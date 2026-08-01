@@ -308,9 +308,9 @@
     const matBoots = new THREE.MeshLambertMaterial({ color: 0x271a11 }); // Dark brown boots
     const matCape = new THREE.MeshLambertMaterial({ color: 0xb71c1c }); // Dark red cape
 
-    // 1. Head
+    // 1. Head (shifted up from 1.45 to 1.55)
     const head = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), mats.head);
-    head.position.y = 1.45;
+    head.position.y = 1.55;
     group.add(head);
 
     // Eyes
@@ -363,33 +363,33 @@
     patternB.position.set(0, 0.31, -0.3);
     head.add(patternB);
 
-    // 2. Body
+    // 2. Body (shifted up from 0.85 to 0.95)
     const body = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 0.35), mats.body);
-    body.position.y = 0.85;
+    body.position.y = 0.95;
     group.add(body);
 
-    // Belt detail (Kiyim detali)
+    // Belt detail (shifted up from 0.6 to 0.7)
     const belt = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.08, 0.37), new THREE.MeshLambertMaterial({ color: 0x3e2723 }));
-    belt.position.set(0, 0.6, 0);
+    belt.position.set(0, 0.7, 0);
     group.add(belt);
 
-    // Scabbard on left hip (qilich g'ilofi)
+    // Scabbard on left hip (shifted up from 0.6 to 0.7)
     const scabbard = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.35, 0.06), new THREE.MeshLambertMaterial({ color: 0x3e2723 }));
-    scabbard.position.set(-0.32, 0.6, 0.05);
+    scabbard.position.set(-0.32, 0.7, 0.05);
     scabbard.rotation.z = 0.4;
     group.add(scabbard);
 
-    // Royal Cape / Yopinchiq
+    // Royal Cape / Yopinchiq (shifted up from 1.15 to 1.25)
     const capeGroup = new THREE.Group();
-    capeGroup.position.set(0, 1.15, -0.18);
+    capeGroup.position.set(0, 1.25, -0.18);
     const capeMesh = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.65, 0.04), matCape);
     capeMesh.position.y = -0.325;
     capeGroup.add(capeMesh);
     group.add(capeGroup);
 
-    // 3. Left Leg
+    // 3. Left Leg (shifted up from 0.55 to 0.65)
     const legLGroup = new THREE.Group();
-    legLGroup.position.set(-0.16, 0.55, 0);
+    legLGroup.position.set(-0.16, 0.65, 0);
     const legLMesh = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.6, 0.3), mats.legs);
     legLMesh.position.y = -0.3;
     legLGroup.add(legLMesh);
@@ -400,9 +400,9 @@
     legLGroup.add(bootL);
     group.add(legLGroup);
 
-    // 4. Right Leg
+    // 4. Right Leg (shifted up from 0.55 to 0.65)
     const legRGroup = new THREE.Group();
-    legRGroup.position.set(0.16, 0.55, 0);
+    legRGroup.position.set(0.16, 0.65, 0);
     const legRMesh = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.6, 0.3), mats.legs);
     legRMesh.position.y = -0.3;
     legRGroup.add(legRMesh);
@@ -413,17 +413,17 @@
     legRGroup.add(bootR);
     group.add(legRGroup);
 
-    // 5. Left Arm
+    // 5. Left Arm (shifted up from 1.1 to 1.2)
     const armLGroup = new THREE.Group();
-    armLGroup.position.set(-0.41, 1.1, 0);
+    armLGroup.position.set(-0.41, 1.2, 0);
     const armLMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.6, 0.22), mats.body);
     armLMesh.position.y = -0.3;
     armLGroup.add(armLMesh);
     group.add(armLGroup);
 
-    // 6. Right Arm
+    // 6. Right Arm (shifted up from 1.1 to 1.2)
     const armRGroup = new THREE.Group();
-    armRGroup.position.set(0.41, 1.1, 0);
+    armRGroup.position.set(0.41, 1.2, 0);
     const armRMesh = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.6, 0.22), mats.body);
     armRMesh.position.y = -0.3;
     armRGroup.add(armRMesh);
@@ -458,21 +458,31 @@
     return group;
   }
 
-  function animateCharacterWalk(mesh, speed, isMoving, grounded = true) {
+  function animateCharacterWalk(mesh, speed, isMoving, grounded = true, isMining = false) {
     if (!mesh) return;
     
-    if (mesh.legL && mesh.legR && mesh.armL && mesh.armR) {
+    if (mesh.legL && mesh.legR && mesh.armL) {
       if (isMoving && grounded && speed > 0.05) {
         const swingSpeed = 12.0;
         const angle = Math.sin(performance.now() * 0.001 * swingSpeed) * 0.6;
         mesh.legL.rotation.x = angle;
         mesh.legR.rotation.x = -angle;
         mesh.armL.rotation.x = -angle;
-        mesh.armR.rotation.x = angle;
       } else {
         mesh.legL.rotation.x = 0;
         mesh.legR.rotation.x = 0;
         mesh.armL.rotation.x = 0;
+      }
+    }
+
+    if (mesh.armR) {
+      if (isMining) {
+        const chopSpeed = 25.0;
+        mesh.armR.rotation.x = -0.5 + Math.sin(performance.now() * 0.001 * chopSpeed) * 0.8;
+      } else if (isMoving && grounded && speed > 0.05) {
+        const swingSpeed = 12.0;
+        mesh.armR.rotation.x = Math.sin(performance.now() * 0.001 * swingSpeed) * 0.6;
+      } else {
         mesh.armR.rotation.x = 0;
       }
     }
@@ -496,6 +506,7 @@
     const p = otherPlayers[id];
     p.mesh.position.set(data.x, data.y, data.z);
     p.mesh.rotation.y = data.yaw;
+    p.isMining = data.isMining || false;
     p.lastUpdate = Date.now();
   }
 
@@ -1741,7 +1752,7 @@
     // Animate local player walking
     const isMoving = keys['KeyW'] || keys['KeyS'] || keys['KeyA'] || keys['KeyD'] || touchJoystick.active;
     const currentSpeed = Math.hypot(playerVel.x, playerVel.z);
-    animateCharacterWalk(playerMesh, currentSpeed, isMoving, isGrounded);
+    animateCharacterWalk(playerMesh, currentSpeed, isMoving, isGrounded, isMiningHeld);
 
     updateTargetRaycast();
     updateMiningProgress(delta);
@@ -1770,7 +1781,8 @@
             z: playerPos.z,
             yaw: yaw,
             pitch: pitch,
-            skin: playerSkin
+            skin: playerSkin,
+            isMining: isMiningHeld
           }
         });
       }
@@ -1789,7 +1801,7 @@
         const prevPos = op.prevPos || op.mesh.position.clone();
         const dist = prevPos.distanceTo(op.mesh.position);
         const moving = dist > 0.005;
-        animateCharacterWalk(op.mesh, dist / delta, moving, true);
+        animateCharacterWalk(op.mesh, dist / delta, moving, true, op.isMining);
         op.prevPos = op.mesh.position.clone();
       }
     });
