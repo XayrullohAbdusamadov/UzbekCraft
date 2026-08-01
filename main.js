@@ -305,6 +305,8 @@
     const matEyebrow = new THREE.MeshLambertMaterial({ color: 0x000000 }); // Eyebrows
     const matSwordHandle = new THREE.MeshLambertMaterial({ color: 0x795548 }); // Brown handle
     const matSwordBlade = new THREE.MeshLambertMaterial({ color: 0xc0c0c0 }); // Silver blade
+    const matBoots = new THREE.MeshLambertMaterial({ color: 0x271a11 }); // Dark brown boots
+    const matCape = new THREE.MeshLambertMaterial({ color: 0xb71c1c }); // Dark red cape
 
     // 1. Head
     const head = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.6, 0.6), mats.head);
@@ -313,34 +315,53 @@
 
     // Eyes
     const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.06, 0.02), matEye);
-    eyeL.position.set(-0.15, 1.48, 0.301);
-    group.add(eyeL);
+    eyeL.position.set(-0.15, 0.03, 0.301);
+    head.add(eyeL);
     
     const pupilL = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.06, 0.02), matPupil);
-    pupilL.position.set(-0.13, 1.48, 0.311);
-    group.add(pupilL);
+    pupilL.position.set(-0.13, 0.03, 0.311);
+    head.add(pupilL);
 
     const eyeR = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.06, 0.02), matEye);
-    eyeR.position.set(0.15, 1.48, 0.301);
-    group.add(eyeR);
+    eyeR.position.set(0.15, 0.03, 0.301);
+    head.add(eyeR);
 
     const pupilR = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.06, 0.02), matPupil);
-    pupilR.position.set(0.17, 1.48, 0.311);
-    group.add(pupilR);
+    pupilR.position.set(0.17, 0.03, 0.311);
+    head.add(pupilR);
 
     // Eyebrows
     const browL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.03, 0.02), matEyebrow);
-    browL.position.set(-0.15, 1.54, 0.305);
-    group.add(browL);
+    browL.position.set(-0.15, 0.09, 0.305);
+    head.add(browL);
 
     const browR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.03, 0.02), matEyebrow);
-    browR.position.set(0.15, 1.54, 0.305);
-    group.add(browR);
+    browR.position.set(0.15, 0.09, 0.305);
+    head.add(browR);
 
-    // Beard/Soqol (Bottom wrap around mouth)
+    // Beard
     const beard = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.15, 0.08), matBeard);
-    beard.position.set(0, 1.25, 0.28);
-    group.add(beard);
+    beard.position.set(0, -0.2, 0.28);
+    head.add(beard);
+
+    // Uzbek Do'ppi (Skullcap) on top of head
+    const doppi = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.08, 0.62), new THREE.MeshLambertMaterial({ color: 0x1a1a1a }));
+    doppi.position.set(0, 0.31, 0);
+    head.add(doppi);
+    
+    // Do'ppi white mosaic patterns
+    const patternL = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.63), new THREE.MeshLambertMaterial({ color: 0xffffff }));
+    patternL.position.set(-0.3, 0.31, 0);
+    head.add(patternL);
+    const patternR = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.04, 0.63), new THREE.MeshLambertMaterial({ color: 0xffffff }));
+    patternR.position.set(0.3, 0.31, 0);
+    head.add(patternR);
+    const patternF = new THREE.Mesh(new THREE.BoxGeometry(0.63, 0.04, 0.04), new THREE.MeshLambertMaterial({ color: 0xffffff }));
+    patternF.position.set(0, 0.31, 0.3);
+    head.add(patternF);
+    const patternB = new THREE.Mesh(new THREE.BoxGeometry(0.63, 0.04, 0.04), new THREE.MeshLambertMaterial({ color: 0xffffff }));
+    patternB.position.set(0, 0.31, -0.3);
+    head.add(patternB);
 
     // 2. Body
     const body = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.7, 0.35), mats.body);
@@ -352,12 +373,31 @@
     belt.position.set(0, 0.6, 0);
     group.add(belt);
 
+    // Scabbard on left hip (qilich g'ilofi)
+    const scabbard = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.35, 0.06), new THREE.MeshLambertMaterial({ color: 0x3e2723 }));
+    scabbard.position.set(-0.32, 0.6, 0.05);
+    scabbard.rotation.z = 0.4;
+    group.add(scabbard);
+
+    // Royal Cape / Yopinchiq
+    const capeGroup = new THREE.Group();
+    capeGroup.position.set(0, 1.15, -0.18);
+    const capeMesh = new THREE.Mesh(new THREE.BoxGeometry(0.56, 0.65, 0.04), matCape);
+    capeMesh.position.y = -0.325;
+    capeGroup.add(capeMesh);
+    group.add(capeGroup);
+
     // 3. Left Leg
     const legLGroup = new THREE.Group();
     legLGroup.position.set(-0.16, 0.55, 0);
     const legLMesh = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.6, 0.3), mats.legs);
     legLMesh.position.y = -0.3;
     legLGroup.add(legLMesh);
+    
+    // Boot Left
+    const bootL = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.15, 0.32), matBoots);
+    bootL.position.set(0, -0.55, 0.01);
+    legLGroup.add(bootL);
     group.add(legLGroup);
 
     // 4. Right Leg
@@ -366,6 +406,11 @@
     const legRMesh = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.6, 0.3), mats.legs);
     legRMesh.position.y = -0.3;
     legRGroup.add(legRMesh);
+    
+    // Boot Right
+    const bootR = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.15, 0.32), matBoots);
+    bootR.position.set(0, -0.55, 0.01);
+    legRGroup.add(bootR);
     group.add(legRGroup);
 
     // 5. Left Arm
@@ -383,7 +428,7 @@
     armRMesh.position.y = -0.3;
     armRGroup.add(armRMesh);
 
-    // Weapon/Qurol: Iron Sword
+    // Weapon: Iron Sword
     const swordGroup = new THREE.Group();
     swordGroup.position.set(0, -0.4, 0.1);
     swordGroup.rotation.x = -Math.PI / 3;
@@ -408,25 +453,37 @@
     group.legR = legRGroup;
     group.armL = armLGroup;
     group.armR = armRGroup;
+    group.cape = capeGroup;
 
     return group;
   }
 
   function animateCharacterWalk(mesh, speed, isMoving, grounded = true) {
-    if (!mesh || !mesh.legL || !mesh.legR || !mesh.armL || !mesh.armR) return;
+    if (!mesh) return;
     
-    if (isMoving && grounded && speed > 0.05) {
-      const swingSpeed = 12.0;
-      const angle = Math.sin(performance.now() * 0.001 * swingSpeed) * 0.6;
-      mesh.legL.rotation.x = angle;
-      mesh.legR.rotation.x = -angle;
-      mesh.armL.rotation.x = -angle;
-      mesh.armR.rotation.x = angle;
-    } else {
-      mesh.legL.rotation.x = 0;
-      mesh.legR.rotation.x = 0;
-      mesh.armL.rotation.x = 0;
-      mesh.armR.rotation.x = 0;
+    if (mesh.legL && mesh.legR && mesh.armL && mesh.armR) {
+      if (isMoving && grounded && speed > 0.05) {
+        const swingSpeed = 12.0;
+        const angle = Math.sin(performance.now() * 0.001 * swingSpeed) * 0.6;
+        mesh.legL.rotation.x = angle;
+        mesh.legR.rotation.x = -angle;
+        mesh.armL.rotation.x = -angle;
+        mesh.armR.rotation.x = angle;
+      } else {
+        mesh.legL.rotation.x = 0;
+        mesh.legR.rotation.x = 0;
+        mesh.armL.rotation.x = 0;
+        mesh.armR.rotation.x = 0;
+      }
+    }
+
+    if (mesh.cape) {
+      if (isMoving && speed > 0.05) {
+        const flutter = Math.sin(performance.now() * 0.015) * 0.08 + 0.25;
+        mesh.cape.rotation.x = flutter;
+      } else {
+        mesh.cape.rotation.x = 0.05;
+      }
     }
   }
 
@@ -1667,17 +1724,13 @@
       playerMesh.position.copy(playerPos);
       playerMesh.rotation.y = yaw + Math.PI;
 
-      // Orbit camera positioning with over-the-shoulder offset (Scrap Mechanic style)
-      const rightOffset = 0.75;
-      const rightX = Math.cos(orbitYaw) * rightOffset;
-      const rightZ = -Math.sin(orbitYaw) * rightOffset;
-
-      const targetX = playerPos.x - Math.sin(orbitYaw) * Math.cos(orbitPitch) * thirdPersonDistance + rightX;
-      const targetY = playerPos.y + 1.4 - Math.sin(orbitPitch) * thirdPersonDistance;
-      const targetZ = playerPos.z - Math.cos(orbitYaw) * Math.cos(orbitPitch) * thirdPersonDistance + rightZ;
+      // Centered third-person camera directly behind the player's back
+      const targetX = playerPos.x - Math.sin(orbitYaw) * Math.cos(orbitPitch) * thirdPersonDistance;
+      const targetY = playerPos.y + 1.35 - Math.sin(orbitPitch) * thirdPersonDistance;
+      const targetZ = playerPos.z - Math.cos(orbitYaw) * Math.cos(orbitPitch) * thirdPersonDistance;
       
       camera.position.set(targetX, targetY, targetZ);
-      camera.lookAt(playerPos.x + rightX * 0.5, playerPos.y + 1.2, playerPos.z + rightZ * 0.5);
+      camera.lookAt(playerPos.x, playerPos.y + 1.15, playerPos.z);
     } else {
       if (playerMesh) playerMesh.visible = false;
       camera.position.copy(playerPos);
