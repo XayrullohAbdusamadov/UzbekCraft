@@ -1989,6 +1989,26 @@
     const hud = document.getElementById('hud');
     const pause = document.getElementById('pause-modal');
     const dialogue = document.getElementById('dialogue-modal');
+
+    // Position floating bubble if activeNpc is set
+    if (activeNpc) {
+      const tempV = new THREE.Vector3();
+      activeNpc.getWorldPosition(tempV);
+      tempV.y += 2.0; // height offset above NPC
+      tempV.project(camera);
+      if (tempV.z > 1) {
+        dialogue.style.display = 'none';
+      } else {
+        dialogue.style.display = 'block';
+        const x = (tempV.x * 0.5 + 0.5) * window.innerWidth;
+        const y = (tempV.y * -0.5 + 0.5) * window.innerHeight;
+        dialogue.style.left = `${x}px`;
+        dialogue.style.top = `${y}px`;
+      }
+    } else {
+      dialogue.style.display = '';
+    }
+
     if (hud && !hud.classList.contains('hidden') && 
         pause && pause.classList.contains('hidden') && 
         dialogue && dialogue.classList.contains('hidden')) {
