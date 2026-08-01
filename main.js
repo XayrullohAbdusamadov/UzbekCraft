@@ -235,7 +235,7 @@
   let activeSlotIndex = 0;
   let hotbarBlocks = [1, 2, 3, 6, 17, 12, 13, 15, 18];
   let worldData = {}, modifiedBlocks = {};
-  let currentMapRadius = 125;
+  let currentMapRadius = 250;
   let currentWorldMeta = { name: "Mening Dunyoim", seed: "Uzbekistan2026", map: "registan" };
   let dayTime = 0.25;
   let playerPos = new THREE.Vector3(0, 105, 0);
@@ -1646,8 +1646,8 @@
     const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
     const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
 
-    playerVel.x = (forward.x * -moveDir.z + right.x * moveDir.x) * speed;
-    playerVel.z = (forward.z * -moveDir.z + right.z * moveDir.x) * speed;
+    playerVel.x = (forward.x * -moveDir.z - right.x * moveDir.x) * speed;
+    playerVel.z = (forward.z * -moveDir.z - right.z * moveDir.x) * speed;
     playerVel.y -= 24.0 * delta;
 
     if ((keys['Space'] || keys['JumpTouch']) && isGrounded) {
