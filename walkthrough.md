@@ -99,6 +99,8 @@ Below is a generated visual concept showcasing the high-definition realism rende
 
 ![UzbekCraft Realism Concept Render](./uzbekcraft_realism_concept_1785562497097.png)
 
+![UzbekCraft Valley Concept Render](./uzbekcraft_valley_concept_1785562834186.png)
+
 ### Concept Details & Scene Composition:
 - **Style:** A photorealistic, ultra-high-definition first-person view screenshot inside a heavily modded sandbox game world. The art style is sophisticated Minecraft realism, utilizing an advanced ray-tracing shader pack with dramatic dynamic volumetric lighting, soft realistic shadows, and reflections on water and detailed block textures.
 - **Foreground:** On the bottom-right, the player's textured arm is visible, positioned next to newly placed detailed blocks (cobblestone, oak wood, iron ore, and copper). At the very bottom center, a transparent Hotbar UI shows selected block icons (e.g., cobblestone, wood, raw copper).
