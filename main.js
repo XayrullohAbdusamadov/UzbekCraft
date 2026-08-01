@@ -229,7 +229,7 @@
   // --- GAME STATE ---
   let scene, camera, renderer, clock, supabase = null;
   let sunMesh, moonMesh, sunLight, ambientLight, starsParticles;
-  let playerMesh, playerSkin = 'temur';
+  let playerMesh, playerSkin = 'steve';
   let isThirdPerson = false;
   let activeSlotIndex = 0;
   let hotbarBlocks = [1, 2, 3, 6, 17, 12, 13, 15, 18];
