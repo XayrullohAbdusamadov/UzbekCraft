@@ -123,18 +123,8 @@
       }
     }
     startAmbientMusic() {
-      if (this.musicTimer) return;
-      const notes = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
-      this.musicTimer = setInterval(() => {
-        if (!this.ctx || this.musicVolume <= 0) return;
-        const t = this.ctx.currentTime, freq = notes[Math.floor(Math.random() * notes.length)];
-        const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
-        osc.type = 'sine'; osc.frequency.setValueAtTime(freq, t);
-        gain.gain.setValueAtTime(0.001, t); gain.gain.linearRampToValueAtTime(0.08 * this.musicVolume, t + 1.0);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 4.0);
-        osc.connect(gain); gain.connect(this.ctx.destination);
-        osc.start(t); osc.stop(t + 4.2);
-      }, 5000);
+      // Ambient music disabled as requested
+      return;
     }
   }
   const soundEngine = new SoundEngine();
