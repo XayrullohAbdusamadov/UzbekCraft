@@ -146,6 +146,14 @@ html, body {
 }
 .btn-red:hover { background: linear-gradient(135deg, #f87171 0%, #dc2626 100%); }
 
+.btn-purple {
+  background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+  border-color: rgba(168, 85, 247, 0.4);
+}
+.btn-purple:hover {
+  background: linear-gradient(135deg, #c084fc 0%, #9333ea 100%);
+}
+
 /* MAIN MENU SCREEN */
 #main-menu {
   position: absolute;

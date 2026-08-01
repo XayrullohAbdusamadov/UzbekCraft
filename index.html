@@ -13,6 +13,8 @@
   <link rel="stylesheet" href="style.css?v=2.2">
   <!-- Three.js CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -43,6 +45,9 @@
           </button>
           <button id="btn-settings" class="btn btn-dark">
             Sozlamalar
+          </button>
+          <button id="btn-supabase" class="btn btn-purple">
+            Bulutli Saqlash (Supabase)
           </button>
           <button id="btn-exit" class="btn btn-red">
             Chiqish
@@ -179,6 +184,37 @@
 
         <div class="modal-actions">
           <button id="btn-close-settings" class="btn btn-emerald">Saqlash va Yopish</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUPABASE SETTINGS MODAL -->
+    <div id="supabase-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <h2 class="modal-title">Supabase Bulutli Saqlash</h2>
+        <p class="modal-text">Dunyolarni bulutga saqlash va sinxronizatsiya qilish uchun Supabase loyihangiz ma'lumotlarini kiriting.</p>
+        
+        <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
+          <label for="supabase-url" style="font-weight: 600; font-size: 0.9rem; color: var(--text-light);">Supabase URL:</label>
+          <input type="text" id="supabase-url" placeholder="https://xxxx.supabase.co" class="input-text" style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glow); color: #fff; font-size: 0.9rem;">
+        </div>
+        
+        <div class="form-group" style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
+          <label for="supabase-key" style="font-weight: 600; font-size: 0.9rem; color: var(--text-light);">Supabase Anon Key:</label>
+          <input type="password" id="supabase-key" placeholder="eyJhbGciOi..." class="input-text" style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glow); color: #fff; font-size: 0.9rem;">
+        </div>
+
+        <div id="supabase-status" class="status-msg" style="font-size: 0.85rem; padding: 8px; border-radius: 8px; text-align: center; display: none;"></div>
+
+        <div class="modal-actions" style="flex-direction: column; gap: 10px; margin-top: 15px;">
+          <div style="display: flex; gap: 10px; width: 100%;">
+            <button id="btn-supabase-test" class="btn btn-blue" style="flex: 1;">Tekshirish</button>
+            <button id="btn-supabase-save" class="btn btn-emerald" style="flex: 1;">Saqlash</button>
+          </div>
+          <div style="display: flex; gap: 10px; width: 100%;">
+            <button id="btn-supabase-disconnect" class="btn btn-red" style="flex: 1;">Ulanishni uzish</button>
+            <button id="btn-supabase-close" class="btn btn-dark" style="flex: 1;">Yopish</button>
+          </div>
         </div>
       </div>
     </div>

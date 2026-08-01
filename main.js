@@ -237,7 +237,7 @@
   }
 
   // --- GAME STATE ---
-  let scene, camera, renderer, clock;
+  let scene, camera, renderer, clock, supabase = null;
   let sunMesh, moonMesh, sunLight, ambientLight, starsParticles;
   let playerMesh, playerSkin = 'temur';
   let isThirdPerson = false;
@@ -262,8 +262,24 @@
   let touchLook = { active: false, lastX: 0, lastY: 0 };
   let frameCount = 0;
 
+  function initSupabase() {
+    const url = localStorage.getItem('uzbekcraft_supabase_url');
+    const key = localStorage.getItem('uzbekcraft_supabase_key');
+    if (url && key && window.supabase) {
+      try {
+        supabase = window.supabase.createClient(url, key);
+      } catch (e) {
+        console.error("Supabase initialization failed:", e);
+        supabase = null;
+      }
+    } else {
+      supabase = null;
+    }
+  }
+
   // --- INITIALIZATION ---
   function init() {
+    initSupabase();
     setupThree();
     setupUI();
     setupEvents();
@@ -1701,46 +1717,138 @@
     const idx = saves.findIndex(s => s.id === data.id);
     if (idx >= 0) saves[idx] = data; else saves.push(data);
     localStorage.setItem('uzbekcraft_saves', JSON.stringify(saves));
-    showToast("O'yin muvaffaqiyatli saqlandi!");
+    
+    if (supabase) {
+      showToast("Bulutga saqlanmoqda...");
+      const dbData = {
+        id: data.id,
+        name: data.name,
+        map: data.map,
+        timestamp: data.timestamp,
+        player_pos: data.playerPos,
+        yaw: data.yaw,
+        pitch: data.pitch,
+        day_time: data.dayTime,
+        hotbar_blocks: data.hotbarBlocks,
+        skin: data.skin,
+        modified_blocks: data.modifiedBlocks,
+        quest_state: data.questState
+      };
+      supabase.from('uzbekcraft_saves').upsert([dbData]).then(({ error }) => {
+        if (error) {
+          console.error("Supabase cloud save failed:", error);
+          showToast("Mahalliy saqlandi. Bulut xatoligi!");
+        } else {
+          showToast("O'yin bulutga muvaffaqiyatli saqlandi!");
+        }
+      });
+    } else {
+      showToast("O'yin mahalliy saqlandi!");
+    }
   }
 
   function loadSavedWorldsList() {
     const list = document.getElementById('saved-worlds-list');
     if (!list) return;
-    list.innerHTML = '';
-    const saves = JSON.parse(localStorage.getItem('uzbekcraft_saves') || '[]');
-    if (saves.length === 0) {
-      list.innerHTML = '<p class="modal-text">Hozircha saqlangan dunyolar mavjud emas.</p>'; return;
+    list.innerHTML = '<p class="modal-text">Dunyolar ro\'yxati yuklanmoqda...</p>';
+    
+    const localSaves = JSON.parse(localStorage.getItem('uzbekcraft_saves') || '[]');
+    
+    const renderList = (saves) => {
+      list.innerHTML = '';
+      if (saves.length === 0) {
+        list.innerHTML = '<p class="modal-text">Hozircha saqlangan dunyolar mavjud emas.</p>'; return;
+      }
+      saves.sort((a, b) => b.timestamp - a.timestamp);
+      saves.forEach(save => {
+        const item = document.createElement('div');
+        item.className = 'world-item';
+        const ts = new Date(save.timestamp).toLocaleDateString('uz-UZ');
+        item.innerHTML = `
+          <div class="world-info-box">
+            <h3>${save.name}</h3>
+            <p>Xarita: ${save.map || 'Registon'} &bull; ${ts}</p>
+          </div>
+          <div class="world-item-actions">
+            <button class="btn btn-emerald btn-play-save" data-id="${save.id}">O'ynash</button>
+            <button class="btn btn-red btn-del-save" data-id="${save.id}">O'chirish</button>
+          </div>`;
+        list.appendChild(item);
+      });
+      
+      document.querySelectorAll('.btn-play-save').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const id = e.target.closest('button').dataset.id;
+          const target = saves.find(s => s.id === id);
+          if (target) resumeWorld(target);
+        });
+      });
+      
+      document.querySelectorAll('.btn-del-save').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const id = e.target.closest('button').dataset.id;
+          const updated = saves.filter(s => s.id !== id);
+          localStorage.setItem('uzbekcraft_saves', JSON.stringify(updated));
+          
+          if (supabase) {
+            showToast("Bulutdan o'chirilmoqda...");
+            supabase.from('uzbekcraft_saves').delete().eq('id', id).then(({ error }) => {
+              if (error) {
+                console.error("Supabase delete failed:", error);
+                showToast("Bulutdan o'chirishda xatolik!");
+              } else {
+                showToast("Dunyolar o'chirildi!");
+              }
+              loadSavedWorldsList();
+            });
+          } else {
+            showToast("Dunyo o'chirildi!");
+            loadSavedWorldsList();
+          }
+        });
+      });
+    };
+
+    if (supabase) {
+      supabase.from('uzbekcraft_saves').select('*').then(({ data, error }) => {
+        if (error) {
+          console.error("Failed to fetch cloud saves:", error);
+          showToast("Bulutdan yuklashda xatolik!");
+          renderList(localSaves);
+        } else {
+          const cloudSaves = data.map(db => ({
+            id: db.id,
+            name: db.name,
+            map: db.map,
+            timestamp: Number(db.timestamp),
+            playerPos: db.player_pos,
+            yaw: db.yaw,
+            pitch: db.pitch,
+            dayTime: db.day_time,
+            hotbarBlocks: db.hotbar_blocks,
+            skin: db.skin,
+            modifiedBlocks: db.modified_blocks,
+            questState: db.quest_state
+          }));
+
+          const merged = [...localSaves];
+          cloudSaves.forEach(cloud => {
+            const idx = merged.findIndex(s => s.id === cloud.id);
+            if (idx >= 0) {
+              if (cloud.timestamp > merged[idx].timestamp) {
+                merged[idx] = cloud;
+              }
+            } else {
+              merged.push(cloud);
+            }
+          });
+          localStorage.setItem('uzbekcraft_saves', JSON.stringify(merged));
+          renderList(merged);
+        }
+      });
+    } else {
+      renderList(localSaves);
     }
-    saves.forEach(save => {
-      const item = document.createElement('div');
-      item.className = 'world-item';
-      const ts = new Date(save.timestamp).toLocaleDateString('uz-UZ');
-      item.innerHTML = `
-        <div class="world-info-box">
-          <h3>${save.name}</h3>
-          <p>Xarita: ${save.map || 'Registon'} &bull; ${ts}</p>
-        </div>
-        <div class="world-item-actions">
-          <button class="btn btn-emerald btn-play-save" data-id="${save.id}">O'ynash</button>
-          <button class="btn btn-red btn-del-save" data-id="${save.id}">O'chirish</button>
-        </div>`;
-      list.appendChild(item);
-    });
-    document.querySelectorAll('.btn-play-save').forEach(btn => {
-      btn.addEventListener('click', e => {
-        const id = e.target.closest('button').dataset.id;
-        const target = saves.find(s => s.id === id);
-        if (target) resumeWorld(target);
-      });
-    });
-    document.querySelectorAll('.btn-del-save').forEach(btn => {
-      btn.addEventListener('click', e => {
-        const id = e.target.closest('button').dataset.id;
-        localStorage.setItem('uzbekcraft_saves', JSON.stringify(saves.filter(s => s.id !== id)));
-        loadSavedWorldsList();
-      });
-    });
   }
 
   function resumeWorld(saveData) {
@@ -1800,6 +1908,94 @@
     });
     document.getElementById('btn-exit').addEventListener('click', () => {
       document.getElementById('save-prompt-modal').classList.remove('hidden');
+    });
+
+    // --- SUPABASE UI LISTENERS ---
+    document.getElementById('btn-supabase').addEventListener('click', () => {
+      document.getElementById('supabase-url').value = localStorage.getItem('uzbekcraft_supabase_url') || '';
+      document.getElementById('supabase-key').value = localStorage.getItem('uzbekcraft_supabase_key') || '';
+      const statusEl = document.getElementById('supabase-status');
+      if (supabase) {
+        statusEl.textContent = "Supabase bilan ulanish faol (sinxronizatsiya yoqilgan).";
+        statusEl.style.display = 'block';
+        statusEl.style.background = 'rgba(16, 185, 129, 0.2)';
+        statusEl.style.color = '#34d399';
+      } else {
+        statusEl.style.display = 'none';
+      }
+      document.getElementById('supabase-modal').classList.remove('hidden');
+    });
+
+    document.getElementById('btn-supabase-test').addEventListener('click', () => {
+      const url = document.getElementById('supabase-url').value.trim();
+      const key = document.getElementById('supabase-key').value.trim();
+      const statusEl = document.getElementById('supabase-status');
+      statusEl.style.display = 'block';
+      statusEl.style.background = 'rgba(255,255,255,0.05)';
+      statusEl.style.color = '#fff';
+      statusEl.textContent = "Ulanish tekshirilmoqda...";
+
+      if (!url || !key) {
+        statusEl.textContent = "Xatolik: Barcha maydonlarni to'ldiring!";
+        statusEl.style.background = 'rgba(239, 68, 68, 0.2)';
+        statusEl.style.color = '#f87171';
+        return;
+      }
+
+      if (!window.supabase) {
+        statusEl.textContent = "Xatolik: Supabase kutubxonasi yuklanmagan!";
+        statusEl.style.background = 'rgba(239, 68, 68, 0.2)';
+        statusEl.style.color = '#f87171';
+        return;
+      }
+
+      try {
+        const tempClient = window.supabase.createClient(url, key);
+        tempClient.from('uzbekcraft_saves').select('id').limit(1).then(({ error }) => {
+          if (error) {
+            console.error(error);
+            statusEl.textContent = `Xatolik: ${error.message || 'Ulanishda xatolik yuz berdi'}`;
+            statusEl.style.background = 'rgba(239, 68, 68, 0.2)';
+            statusEl.style.color = '#f87171';
+          } else {
+            statusEl.textContent = "Muvaffaqiyatli: Supabase ulanishi tekshirildi!";
+            statusEl.style.background = 'rgba(16, 185, 129, 0.2)';
+            statusEl.style.color = '#34d399';
+          }
+        });
+      } catch (e) {
+        statusEl.textContent = `Xatolik: ${e.message}`;
+        statusEl.style.background = 'rgba(239, 68, 68, 0.2)';
+        statusEl.style.color = '#f87171';
+      }
+    });
+
+    document.getElementById('btn-supabase-save').addEventListener('click', () => {
+      const url = document.getElementById('supabase-url').value.trim();
+      const key = document.getElementById('supabase-key').value.trim();
+      if (!url || !key) {
+        showToast("Xatolik: Barcha maydonlarni to'ldiring!");
+        return;
+      }
+      localStorage.setItem('uzbekcraft_supabase_url', url);
+      localStorage.setItem('uzbekcraft_supabase_key', key);
+      initSupabase();
+      showToast("Supabase sozlamalari saqlandi!");
+      document.getElementById('supabase-modal').classList.add('hidden');
+    });
+
+    document.getElementById('btn-supabase-disconnect').addEventListener('click', () => {
+      localStorage.removeItem('uzbekcraft_supabase_url');
+      localStorage.removeItem('uzbekcraft_supabase_key');
+      supabase = null;
+      document.getElementById('supabase-url').value = '';
+      document.getElementById('supabase-key').value = '';
+      showToast("Supabase ulanishi uzildi (Mahalliy saqlash faol).");
+      document.getElementById('supabase-modal').classList.add('hidden');
+    });
+
+    document.getElementById('btn-supabase-close').addEventListener('click', () => {
+      document.getElementById('supabase-modal').classList.add('hidden');
     });
 
     document.getElementById('btn-start-game').addEventListener('click', () => {

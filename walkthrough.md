@@ -108,3 +108,18 @@ Below is a generated visual concept showcasing the high-definition realism rende
 - **Background:** Dynamic, fluffy blocky clouds drift in a detailed blue sky.
 - **Lighting:** The sun is prominent and bright, casting a warm golden glow across the entire landscape, creating realistic atmospheric haze and sun rays filtering through the environment. The water of a nearby river reflects the sky and the sun accurately.
 - **Alternative Realism Prompt:** A photorealistic first-person view screenshot from a heavily modded Minecraft game. A warm, golden hour sun casts volumetric "god rays" and soft shadows across a lush, detailed landscape with dense, textured birch and oak forests and a winding river. In the middle distance stands a grand, intricate block-built Registan Madrasah from Samarkand, Uzbekistan, complete with its blue-tiled domes. To its right, a prominent, open-frame Eiffel Tower built of blocks rises against the partly cloudy sky. On a cobblestone path in the midground stands a detailed player model dressed in a richly embroidered, ornate royal blue and gold Uzbek-style historical tunic. Nearby, a small group of two or three simpler block figures converse. To the right, high-resolution texture pack blocks, including dark wood planks and embossed copper blocks with detailed Arabic calligraphy scripts, are placed next to the path. The bottom of the screen displays a realistic transparent Minecraft Hotbar UI with selected item icons. The entire scene uses advanced ray-tracing shaders for ultra-realistic lighting, reflections on the water, and hyper-detailed textures.
+
+---
+
+## Part 4: Supabase Cloud Save Integration
+
+We fully integrated **Supabase** to support real-time cloud saving alongside LocalStorage backups:
+
+1. **Supabase CDN and Client Setup:** Loaded the official Supabase JS SDK client dynamically and initialized it on start-up.
+2. **Cloud Save Settings Modal:** Added a dedicated settings dashboard accessed from the Main Menu where players can enter their database credentials, run diagnostics ("Tekshirish"), save connection profiles, or disconnect.
+3. **Database Schema & SQL Table (`uzbekcraft_saves`):** Defined a table to hold metadata, player positioning, yaw/pitch camera alignment, current quest milestones, and modified block positions.
+4. **Cloud Write, Sync-Merge, and Cloud Delete Functions:**
+   - **Upsert on Save:** `saveGame()` automatically replicates saves to the cloud if Supabase credentials exist.
+   - **Conflict-Resistant Syncing:** `loadSavedWorldsList()` fetches cloud saves, merges them with local LocalStorage entries (newest timestamp wins), caches them locally, and builds the UI.
+   - **Cascading Deletion:** Deleting a save deletes it from both the client storage and Supabase table simultaneously.
+
