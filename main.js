@@ -1646,8 +1646,8 @@
     const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
     const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
 
-    playerVel.x = (forward.x * -moveDir.z - right.x * moveDir.x) * speed;
-    playerVel.z = (forward.z * -moveDir.z - right.z * moveDir.x) * speed;
+    playerVel.x = (forward.x * moveDir.z - right.x * moveDir.x) * speed;
+    playerVel.z = (forward.z * moveDir.z - right.z * moveDir.x) * speed;
     playerVel.y -= 24.0 * delta;
 
     if ((keys['Space'] || keys['JumpTouch']) && isGrounded) {
