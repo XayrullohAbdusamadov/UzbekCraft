@@ -237,6 +237,7 @@
     sunLight.shadow.camera.right = 150;
     sunLight.shadow.camera.top = 150;
     sunLight.shadow.camera.bottom = -150;
+    sunLight.shadow.bias = -0.0005;
     scene.add(sunLight);
 
     // Sun mesh
@@ -1385,6 +1386,8 @@
       playerMesh.visible = false;
     }
 
+    camera.rotation.set(pitch, yaw, 0, 'YXZ');
+
     updateTargetRaycast();
     updateMiningProgress(delta);
     animateNPCs(delta);
@@ -1885,7 +1888,6 @@
         yaw -= e.movementX * 0.002;
         pitch -= e.movementY * 0.002;
         pitch = Math.max(-Math.PI / 2 + 0.05, Math.min(Math.PI / 2 - 0.05, pitch));
-        camera.rotation.set(pitch, yaw, 0, 'YXZ');
       }
     });
     // Scroll wheel for hotbar
