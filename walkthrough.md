@@ -185,3 +185,25 @@ Biz o'yindagi ikkita muhim muammoni bartaraf etdik:
 2. **Qahramon Yuzining Orqaga Qarab Qolishi (Face Orientation Alignment):**
    - Muammo: Qahramon modeli (Steve/Alpomish) yuzi uning local o'qida `+Z` tomonga (kamera tomonga) qaratib chizilgan edi. Ammo o'yinchi harakat yo'nalishi `-Z` bo'lgani sababli, 3-shaxs rejimida u yurganda yuzi kameraga qarab (orqaga qarab) harakatlanardi.
    - Yechim: `updatePlayer()` va `updateOtherPlayer()` funksiyalarida o'yinchi va boshqa onlayn o'yinchilar modellarining aylanish burchagiga `Math.PI` (180 daraja) qo'shildi (`rotation.y = yaw + Math.PI`). Endi qahramon to'g'ri oldinga qarab harakatlanadi.
+
+---
+
+## Part 9: Ctrl (Uchinchi Shaxs) Vizual, Qurol bilan Blok Qo'yish, Hayvonlar Qochishi va Yangi Ovozlar
+
+Ushbu bosqichda quyidagi yangiliklar va yaxshilanishlar amalga oshirildi:
+
+1. **Ctrl Bosilganda Qo'l va Qilichning Yashirinishi:**
+   - **Muammo:** Ctrl bosib 3-shaxs kamerasiga o'tilganda (`isCtrlHeld`), qahramon modeli paydo bo'lishiga qaramay, birinchi shaxs qo'li va qilichi ekranning o'ng chetida ko'rinib qolayotgan edi.
+   - **Yechim:** Birinchi shaxs qo'lining ko'rinish sharti yangilandi. Endi qo'l faqat `isThirdPerson` yoki `isCtrlHeld` faol bo'lmagandagina (haqiqiy birinchi shaxs rejimida) ko'rinasi.
+
+2. **Qilich yoki Kamon ushlab turganda ham Blok qo'yish (Weapon Placement Context):**
+   - **Imkoniyat:** Foydalanuvchilar slotlar orasida tez-tez almashib yurmasliklari uchun, qurol ushlab turilganda ham o'ng tugma (yoki telefondagi Qo'yish tugmasi) bosilganda blok qo'ya olish tizimi joriy etildi.
+   - **Ishlash tartibi:** Qurol ushlab turilgan paytda blok qo'yilmoqchi bo'lsa, o'yin hotbardagi birinchi blok ob'ektini (masalan, O't, Loy, Yog'och) qidirib topadi va o'sha blokni joylashtiradi. Agar hotbarda umuman blok bo'lmasa, standart O't (Grass) bloki qo'yiladi.
+
+3. **Zarba Yegan Hayvonlarning Qochishi:**
+   - **Imkoniyat:** Hayvonlar realligini oshirish maqsadida, ularga biror marta qilich urilganda yoki kamon tekkan paytda darhol o'yinchidan qarama-qarshi tomonga qarab qochish tizimi qo'shildi.
+   - **Ishlash tartibi:** Hayvon zarba yeganda uning `fleeingTimer` ko'rsatkichi 2.5 soniyaga o'rnatiladi. Ular 2.5 soniya davomida o'yinchidan teskari tomonga qarab 5.0 tezlik bilan qochishadi (odatiy tezligi 1.5 edi). Bu vaqtda ularning oyoq tashlashi ham (swingSpeed) tezlashadi hamda o'yinchiga qarab to'xtab qolishmaydi.
+
+4. **Yangi Metall Qilich Slash Ovozi:**
+   - **O'zgarish:** Avvalgi zarba ovozi oddiy shovqin (noise burst) ko'rinishida edi. U endi ikkita chastota-slaydli osillyatorlardan (sawtooth va triangle) foydalanilgan holda haqiqiy qilich metallining shig'illashi/kesishi (metallic slash/slice) ovoziga almashtirildi.
+

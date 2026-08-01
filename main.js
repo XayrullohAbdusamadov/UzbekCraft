@@ -131,21 +131,27 @@
         gain.gain.setValueAtTime(0.2 * this.sfxVolume, t); gain.gain.linearRampToValueAtTime(0.01, t + 0.12);
         osc.start(t); osc.stop(t + 0.12);
       } else if (type === 'hit') {
-        const noise = this.ctx.createBufferSource();
-        noise.buffer = createNoiseBuffer(0.08);
-        const filter = this.ctx.createBiquadFilter();
-        filter.type = 'bandpass'; filter.frequency.setValueAtTime(1200, t);
-        const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.2 * this.sfxVolume, t); gain.gain.linearRampToValueAtTime(0.01, t + 0.08);
-        noise.connect(filter); filter.connect(gain); gain.connect(this.ctx.destination);
-        noise.start(t);
-        
-        const osc = this.ctx.createOscillator();
-        const oscGain = this.ctx.createGain();
-        osc.connect(oscGain); oscGain.connect(this.ctx.destination);
-        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(180, t); osc.frequency.setValueAtTime(220, t + 0.04);
-        oscGain.gain.setValueAtTime(0.25 * this.sfxVolume, t); oscGain.gain.linearRampToValueAtTime(0.01, t + 0.08);
-        osc.start(t); osc.stop(t + 0.08);
+        const osc1 = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
+        const gainNode = this.ctx.createGain();
+
+        osc1.connect(gainNode);
+        osc2.connect(gainNode);
+        gainNode.connect(this.ctx.destination);
+
+        osc1.type = 'sawtooth';
+        osc1.frequency.setValueAtTime(800, t);
+        osc1.frequency.exponentialRampToValueAtTime(150, t + 0.15);
+
+        osc2.type = 'triangle';
+        osc2.frequency.setValueAtTime(1200, t);
+        osc2.frequency.exponentialRampToValueAtTime(300, t + 0.12);
+
+        gainNode.gain.setValueAtTime(0.3 * this.sfxVolume, t);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, t + 0.15);
+
+        osc1.start(t); osc1.stop(t + 0.15);
+        osc2.start(t); osc2.stop(t + 0.15);
       } else if (type === 'shoot') {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
@@ -1939,34 +1945,46 @@
     frameCount++;
     npcs.forEach(npc => {
       if (npc.isAnimal) {
-        // Slow look at player if nearby
-        const dx = playerPos.x - npc.position.x;
-        const dz = playerPos.z - npc.position.z;
-        const dist = Math.hypot(dx, dz);
         let isLooking = false;
+        
+        if (npc.fleeingTimer > 0) {
+          npc.fleeingTimer -= delta;
+          npc.position.x += npc.fleeingDir.x * delta * 5.0; // Run away faster!
+          npc.position.z += npc.fleeingDir.z * delta * 5.0;
+          npc.rotation.y = Math.atan2(npc.fleeingDir.x, npc.fleeingDir.z);
+        } else {
+          // Slow look at player if nearby
+          const dx = playerPos.x - npc.position.x;
+          const dz = playerPos.z - npc.position.z;
+          const dist = Math.hypot(dx, dz);
 
-        if (dist < 10) {
-          isLooking = true;
-          const targetYaw = Math.atan2(dx, dz);
-          npc.rotation.y += (targetYaw - npc.rotation.y) * 0.08;
-        }
-
-        if (!isLooking) {
-          // Animal wandering
-          npc.wanderTimer -= delta;
-          if (npc.wanderTimer <= 0) {
-            npc.wanderDir = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize();
-            npc.wanderTimer = 3 + Math.random() * 4;
+          if (dist < 10) {
+            isLooking = true;
+            const targetYaw = Math.atan2(dx, dz);
+            npc.rotation.y += (targetYaw - npc.rotation.y) * 0.08;
           }
-          npc.position.x += npc.wanderDir.x * delta * 1.5;
-          npc.position.z += npc.wanderDir.z * delta * 1.5;
-          npc.rotation.y = Math.atan2(npc.wanderDir.x, npc.wanderDir.z);
+
+          if (!isLooking) {
+            // Animal wandering
+            npc.wanderTimer -= delta;
+            if (npc.wanderTimer <= 0) {
+              npc.wanderDir = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize();
+              npc.wanderTimer = 3 + Math.random() * 4;
+            }
+            npc.position.x += npc.wanderDir.x * delta * 1.5;
+            npc.position.z += npc.wanderDir.z * delta * 1.5;
+            npc.rotation.y = Math.atan2(npc.wanderDir.x, npc.wanderDir.z);
+          }
         }
 
         // Keep within map boundaries to prevent floating in the void
         const bound = currentMapRadius - 8;
         if (Math.abs(npc.position.x) > bound || Math.abs(npc.position.z) > bound) {
-          if (npc.wanderDir) npc.wanderDir.multiplyScalar(-1);
+          if (npc.fleeingTimer > 0) {
+            npc.fleeingDir.multiplyScalar(-1);
+          } else if (npc.wanderDir) {
+            npc.wanderDir.multiplyScalar(-1);
+          }
           npc.position.x = Math.max(-bound, Math.min(bound, npc.position.x));
           npc.position.z = Math.max(-bound, Math.min(bound, npc.position.z));
         }
@@ -1977,10 +1995,11 @@
         const targetY = getGroundHeight(bx, bz, npc.position.y);
         npc.position.y += (targetY - npc.position.y) * 0.15; // Smooth interpolation to walk over hills
 
-        // Swing legs when wandering
+        // Swing legs when wandering or fleeing
         if (npc.legs && npc.legs.length >= 2) {
-          if (!isLooking && npc.wanderDir && npc.wanderDir.lengthSq() > 0) {
-            const swingSpeed = 12.0;
+          const isWalking = (npc.fleeingTimer > 0) || (!isLooking && npc.wanderDir && npc.wanderDir.lengthSq() > 0);
+          if (isWalking) {
+            const swingSpeed = npc.fleeingTimer > 0 ? 24.0 : 12.0; // Swing faster when running away!
             const angle = Math.sin(performance.now() * 0.001 * swingSpeed) * 0.5;
             npc.legs.forEach((leg, index) => {
               leg.rotation.x = (index % 2 === 0) ? angle : -angle;
@@ -2161,8 +2180,15 @@
   }
 
   function placeBlock() {
-    const blockId = hotbarBlocks[activeSlotIndex];
-    if (BLOCK_INFO[blockId] && BLOCK_INFO[blockId].isWeapon) return;
+    let blockId = hotbarBlocks[activeSlotIndex];
+    if (BLOCK_INFO[blockId] && BLOCK_INFO[blockId].isWeapon) {
+      const firstBlock = hotbarBlocks.find(b => b !== undefined && BLOCK_INFO[b] && !BLOCK_INFO[b].isWeapon);
+      if (firstBlock !== undefined) {
+        blockId = firstBlock;
+      } else {
+        blockId = BLOCKS.GRASS;
+      }
+    }
 
     raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
     const hits = raycaster.intersectObjects(scene.children.filter(c => c.isVoxelMesh));
@@ -2171,15 +2197,15 @@
       const bx = Math.round(p.x), by = Math.round(p.y), bz = Math.round(p.z);
       if (by > CHUNK_HEIGHT_MAX) { showToast(`Maksimal balandlik ${CHUNK_HEIGHT_MAX} blok!`); return; }
       const key = `${bx},${by},${bz}`;
-      worldData[key] = hotbarBlocks[activeSlotIndex];
-      modifiedBlocks[key] = hotbarBlocks[activeSlotIndex];
+      worldData[key] = blockId;
+      modifiedBlocks[key] = blockId;
       soundEngine.playSFX('place');
 
       if (supabase && multiplayerChannel) {
         multiplayerChannel.send({
           type: 'broadcast',
           event: 'block_change',
-          payload: { x: bx, y: by, z: bz, blockId: hotbarBlocks[activeSlotIndex] }
+          payload: { x: bx, y: by, z: bz, blockId: blockId }
         });
       }
 
@@ -2791,6 +2817,15 @@
     animal.health -= amount;
     soundEngine.playSFX('hit');
 
+    // Make animal flee away from player
+    const fleeDir = animal.position.clone().sub(playerPos).normalize();
+    fleeDir.y = 0;
+    if (fleeDir.lengthSq() === 0) {
+      fleeDir.set(Math.random() - 0.5, 0, Math.random() - 0.5).normalize();
+    }
+    animal.fleeingDir = fleeDir;
+    animal.fleeingTimer = 2.5;
+
     // Red flash effect
     const originalColors = [];
     animal.traverse(child => {
@@ -3094,8 +3129,10 @@
     }
 
     if (fpHandGroup) {
+      const isCtrlHeld = keys['ControlLeft'] || keys['ControlRight'] || keys['Control'];
+      const showingThirdPerson = isThirdPerson || isCtrlHeld;
       const isHudVisible = hud && !hud.classList.contains('hidden');
-      fpHandGroup.visible = !isThirdPerson && isHudVisible;
+      fpHandGroup.visible = !showingThirdPerson && isHudVisible;
     }
 
     renderer.render(scene, camera);
