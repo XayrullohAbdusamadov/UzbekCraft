@@ -232,7 +232,7 @@
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x87ceeb);
     scene.fog = new THREE.FogExp2(0x87ceeb, 0.0125); // Denser fog to mask edges
-    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 500);
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.02, 500);
     camera.position.set(0, 105, 0);
     renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -1370,12 +1370,18 @@
     }
 
     // X collision and movement
+    const r = 0.3;
     let nextPosX = playerPos.x + playerVel.x * delta;
     tempPos.copy(playerPos);
     tempPos.x = nextPosX;
     if (!checkCollision(tempPos)) {
       playerPos.x = nextPosX;
     } else {
+      if (playerVel.x > 0) {
+        playerPos.x = Math.floor(nextPosX + r) - r - 0.001;
+      } else if (playerVel.x < 0) {
+        playerPos.x = Math.floor(nextPosX - r) + 1.0 + r + 0.001;
+      }
       playerVel.x = 0;
     }
 
@@ -1386,6 +1392,11 @@
     if (!checkCollision(tempPos)) {
       playerPos.z = nextPosZ;
     } else {
+      if (playerVel.z > 0) {
+        playerPos.z = Math.floor(nextPosZ + r) - r - 0.001;
+      } else if (playerVel.z < 0) {
+        playerPos.z = Math.floor(nextPosZ - r) + 1.0 + r + 0.001;
+      }
       playerVel.z = 0;
     }
 
