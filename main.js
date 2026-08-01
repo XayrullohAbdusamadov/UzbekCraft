@@ -54,25 +54,69 @@
     }
     playSFX(type) {
       if (!this.ctx || this.sfxVolume <= 0) return;
-      const t = this.ctx.currentTime, osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
-      osc.connect(gain); gain.connect(this.ctx.destination);
+      const t = this.ctx.currentTime;
+      const createNoiseBuffer = (duration) => {
+        const size = this.ctx.sampleRate * duration;
+        const buf = this.ctx.createBuffer(1, size, this.ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < size; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+        return buf;
+      };
+
       if (type === 'dig_loop') {
-        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120 + Math.random() * 60, t);
-        gain.gain.setValueAtTime(0.12 * this.sfxVolume, t); gain.gain.linearRampToValueAtTime(0.01, t + 0.07);
-        osc.start(t); osc.stop(t + 0.07);
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = createNoiseBuffer(0.05);
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(500 + Math.random() * 300, t);
+        filter.Q.value = 2.0;
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.08 * this.sfxVolume, t);
+        gain.gain.linearRampToValueAtTime(0.005, t + 0.05);
+        noise.connect(filter); filter.connect(gain); gain.connect(this.ctx.destination);
+        noise.start(t);
       } else if (type === 'break') {
-        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(180, t); osc.frequency.exponentialRampToValueAtTime(40, t + 0.2);
-        gain.gain.setValueAtTime(0.4 * this.sfxVolume, t); gain.gain.linearRampToValueAtTime(0.01, t + 0.2);
-        osc.start(t); osc.stop(t + 0.2);
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = createNoiseBuffer(0.18);
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(320, t);
+        filter.Q.value = 1.0;
+        const noiseGain = this.ctx.createGain();
+        noiseGain.gain.setValueAtTime(0.3 * this.sfxVolume, t);
+        noiseGain.gain.linearRampToValueAtTime(0.005, t + 0.18);
+        noise.connect(filter); filter.connect(noiseGain); noiseGain.connect(this.ctx.destination);
+        noise.start(t);
+
+        const osc = this.ctx.createOscillator();
+        const thumpGain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(90, t);
+        osc.frequency.exponentialRampToValueAtTime(30, t + 0.14);
+        thumpGain.gain.setValueAtTime(0.35 * this.sfxVolume, t);
+        thumpGain.gain.linearRampToValueAtTime(0.005, t + 0.14);
+        osc.connect(thumpGain); thumpGain.connect(this.ctx.destination);
+        osc.start(t); osc.stop(t + 0.14);
       } else if (type === 'place') {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain); gain.connect(this.ctx.destination);
         osc.type = 'triangle'; osc.frequency.setValueAtTime(90, t); osc.frequency.exponentialRampToValueAtTime(180, t + 0.08);
         gain.gain.setValueAtTime(0.4 * this.sfxVolume, t); gain.gain.linearRampToValueAtTime(0.01, t + 0.08);
         osc.start(t); osc.stop(t + 0.08);
       } else if (type === 'jump') {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain); gain.connect(this.ctx.destination);
         osc.type = 'sine'; osc.frequency.setValueAtTime(150, t); osc.frequency.exponentialRampToValueAtTime(340, t + 0.15);
         gain.gain.setValueAtTime(0.25 * this.sfxVolume, t); gain.gain.linearRampToValueAtTime(0.01, t + 0.15);
         osc.start(t); osc.stop(t + 0.15);
       } else if (type === 'famous') {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.connect(gain); gain.connect(this.ctx.destination);
         osc.type = 'sine'; osc.frequency.setValueAtTime(260, t); osc.frequency.exponentialRampToValueAtTime(200, t + 0.3);
         gain.gain.setValueAtTime(0.35 * this.sfxVolume, t); gain.gain.linearRampToValueAtTime(0.01, t + 0.3);
         osc.start(t); osc.stop(t + 0.3);
