@@ -493,7 +493,7 @@
       spawnTrees(R, gY, mapType);
     }
 
-    spawnFamousFigures(gY + 1);
+    // spawnFamousFigures(gY + 1); // Famous figures removed as requested
     spawnAnimals(R, gY + 1);
 
     Object.keys(modifiedBlocks).forEach(k => { worldData[k] = modifiedBlocks[k]; });
