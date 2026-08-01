@@ -151,5 +151,25 @@ We resolved a major movement vector bug where keyboard controls for walking (W, 
    - **A** -> Move Left
    - **D** -> Move Right
 
+---
+
+## Part 7: First-Person Hand, Weapons (Sword & Bow) & Animal Hunting Tizimi
+
+We implemented blocky first-person arms, fully functional weapons, audio synthesizers, and animal combat mechanics:
+
+1. **Minecraft-style First-Person Hand:** Added a 3D blocky human arm/hand (`fpHandGroup`) attached to the camera, rendering only in first-person mode.
+   - The hand dynamically holds a scaled mini-block of the selected material, or custom-built 3D models for the **Sword** (cyan blade, guard, handle) and **Bow** (stave, bow string).
+   - Added hand animation loops including walk bobbing, combat/mining swings, and continuous mining/chipping oscillations.
+2. **Weapons in Hotbar & Inventory:** Defined `BLOCKS.SWORD` (25) and `BLOCKS.BOW` (26) with `isWeapon: true`.
+   - Initialized they directly on Slots 1 & 2 of the active hotbar.
+   - Added block placement validation inside `placeBlock()` to prevent placing weapons as blocks.
+3. **SoundEngine Synthesized Effects:** Added synthetic audio profiles for `swing` (sine pitch sweep), `shoot` (quick release sweep), `hit` (noise hit burst), and `kill` (deep sawtooth fall).
+4. **Hunting Mechanics & Arrow Physics:**
+   - **Sword Attack:** Left clicking or using the mobile break button with the Sword triggers a short-range cone search (3.5 units, ~60 degrees yaw angle) targeting nearby animals.
+   - **Bow Arrow Physics:** Left clicking or using the mobile break button with the Bow spawns a physical cylinder arrow mesh traveling at 40m/s in the camera's direction. Includes voxel block collisions and animal collision/damage triggers.
+   - **Animal Damage & Death:** When hit, animals flash bright red for 120ms. When health drops below 0, a custom death loop triggers (spinning and scaling down) before removal from the scene.
+5. **Quiet Animals & Behaviors:** Disabled all emoji quotes/toasts and greeting sounds for animals in `checkInteractions()`. Animals now move with a realistic leg-swing walk animation, and halt to look at the player when approached within 10 units.
+
+
 
 
