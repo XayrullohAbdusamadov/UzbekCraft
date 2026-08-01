@@ -148,9 +148,25 @@
   function getBlockMaterials(blockId) {
     if (blockMaterials[blockId]) return blockMaterials[blockId];
     const createMat = (map) => {
-      const mat = new THREE.MeshLambertMaterial({ map });
-      if (blockId === BLOCKS.GLASS) { mat.transparent = true; mat.opacity = 0.6; }
-      if (blockId === BLOCKS.WATER) { mat.transparent = true; mat.opacity = 0.75; }
+      let params = { map, roughness: 0.8, metalness: 0.1 };
+      if (blockId === BLOCKS.GLASS) {
+        params.transparent = true; params.opacity = 0.35; params.roughness = 0.05; params.metalness = 0.2;
+      } else if (blockId === BLOCKS.WATER) {
+        params.transparent = true; params.opacity = 0.55; params.roughness = 0.08; params.metalness = 0.1;
+      } else if (blockId === BLOCKS.GOLD || blockId === BLOCKS.DIAMOND) {
+        params.roughness = 0.15; params.metalness = 0.9;
+      } else if (blockId === BLOCKS.IRON || blockId === BLOCKS.COPPER) {
+        params.roughness = 0.3; params.metalness = 0.8;
+      } else if (blockId === BLOCKS.BLUE_TILE || blockId === BLOCKS.GLAZED_BLUE) {
+        params.roughness = 0.18; params.metalness = 0.15;
+      } else if (blockId === BLOCKS.WHITE_MARBLE) {
+        params.roughness = 0.12; params.metalness = 0.1;
+      } else if (blockId === BLOCKS.STONE || blockId === BLOCKS.DARK_STONE) {
+        params.roughness = 0.7; params.metalness = 0.1;
+      } else if (blockId === BLOCKS.DIRT || blockId === BLOCKS.SAND) {
+        params.roughness = 0.95; params.metalness = 0.0;
+      }
+      const mat = new THREE.MeshStandardMaterial(params);
       mat.onBeforeCompile = (shader) => {
         shader.uniforms.uCameraPos = { value: camera.position };
         shader.vertexShader = `uniform vec3 uCameraPos;\n${shader.vertexShader}`;
@@ -223,22 +239,25 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
     container.appendChild(renderer.domElement);
     clock = new THREE.Clock();
-    ambientLight = new THREE.HemisphereLight(0xffeedd, 0x444466, 0.8);
+    ambientLight = new THREE.HemisphereLight(0xffeedd, 0x444466, 0.85);
     scene.add(ambientLight);
-    sunLight = new THREE.DirectionalLight(0xfffaed, 1.8);
-    sunLight.position.set(100, 200, 100);
+    sunLight = new THREE.DirectionalLight(0xfffaed, 2.2);
+    sunLight.position.set(60, 150, 60);
     sunLight.castShadow = true;
-    sunLight.shadow.mapSize.set(2048, 2048);
+    sunLight.shadow.mapSize.set(4096, 4096);
     sunLight.shadow.camera.near = 0.5;
-    sunLight.shadow.camera.far = 500;
-    sunLight.shadow.camera.left = -150;
-    sunLight.shadow.camera.right = 150;
-    sunLight.shadow.camera.top = 150;
-    sunLight.shadow.camera.bottom = -150;
-    sunLight.shadow.bias = -0.0005;
+    sunLight.shadow.camera.far = 300;
+    sunLight.shadow.camera.left = -50;
+    sunLight.shadow.camera.right = 50;
+    sunLight.shadow.camera.top = 50;
+    sunLight.shadow.camera.bottom = -50;
+    sunLight.shadow.bias = -0.0002;
     scene.add(sunLight);
+    scene.add(sunLight.target);
 
     // Sun mesh
     sunMesh = new THREE.Mesh(new THREE.SphereGeometry(6, 12, 12), new THREE.MeshBasicMaterial({ color: 0xffee58 }));
@@ -1236,13 +1255,14 @@
   // ==========================================================================
 
   function updateDayNightCycle(delta) {
-    dayTime += delta * 0.003;
+    dayTime += delta * 0.002;
     if (dayTime > 1) dayTime = 0;
     const angle = dayTime * Math.PI * 2;
-    const R = 200;
-    sunLight.position.set(Math.cos(angle) * R, Math.sin(angle) * R, 0);
+    const R = 180;
+    sunLight.position.set(Math.cos(angle) * R + playerPos.x, Math.sin(angle) * R + playerPos.y, playerPos.z);
+    sunLight.target.position.copy(playerPos);
     sunMesh.position.copy(sunLight.position);
-    moonMesh.position.set(-Math.cos(angle) * R, -Math.sin(angle) * R, 0);
+    moonMesh.position.set(-Math.cos(angle) * R + playerPos.x, -Math.sin(angle) * R + playerPos.y, playerPos.z);
 
     const isDay = sunLight.position.y > 0;
     let skyR, skyG, skyB;
