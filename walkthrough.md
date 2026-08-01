@@ -123,3 +123,33 @@ We fully integrated **Supabase** to support real-time cloud saving alongside Loc
    - **Conflict-Resistant Syncing:** `loadSavedWorldsList()` fetches cloud saves, merges them with local LocalStorage entries (newest timestamp wins), caches them locally, and builds the UI.
    - **Cascading Deletion:** Deleting a save deletes it from both the client storage and Supabase table simultaneously.
 
+---
+
+## Part 5: Multiplayer Map Selection & Real-Time Syncing
+
+We added complete map selection and automatic world-syncing capabilities to the online multiplayer mode:
+
+1. **Multiplayer Map Selection Dropdown:** Added `#multiplayer-map-select` inside the `#multiplayer-modal` (in [index.html](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/index.html)), allowing players to choose their starting map when joining/hosting an online session.
+2. **Map Choice Initialization:** Updated the "Xonaga Ulanild" handler in [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js) to initialize the player's world using their selected map instead of a hardcoded map.
+3. **Real-time Map & Block Synchronization:**
+   - When a player joins a room, they send a broadcast request (`query_room_map`).
+   - Active players in the room respond with `sync_room_map`, sending the current room map name and their accumulated block edits (`modifiedBlocks`).
+   - The joining player's client receives this data, automatically updates their own map, triggers `generateWorld()` for the synced map, merges the modified blocks, and rebuilds the instanced mesh. This keeps all players in sync on the same map with the same block states.
+
+---
+
+## Part 6: Character Movement Directions (WASD) Correction
+
+We resolved a major movement vector bug where keyboard controls for walking (W, A, S, D) were inverted/incorrect:
+
+1. **Directional Sign Fix:** Updated the player velocity equations inside `updatePlayer()` in [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js) to properly compute forward and right movement vectors:
+   - Changed `forward.x * moveDir.z` to `forward.x * (-moveDir.z)`. Since `moveDir.z` is `-1` when pressing **W** (forward), negating it aligns velocity perfectly with the camera's negative Z viewing axis.
+   - Changed `- right.x * moveDir.x` to `+ right.x * moveDir.x` to match standard positive rightward displacement when pressing **D** (right).
+2. **Correct Alignment:** This alignment correctly matches movement inputs (W/A/S/D) to their intuitive directions:
+   - **W** -> Move Forward
+   - **S** -> Move Backward
+   - **A** -> Move Left
+   - **D** -> Move Right
+
+
+

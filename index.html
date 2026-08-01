@@ -218,6 +218,32 @@
           <input type="text" id="multiplayer-room-input" placeholder="Masalan: dostlar, registon" value="dostlar" style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glow); color: #fff; font-size: 0.9rem;">
         </div>
 
+        <div class="form-group" style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
+          <label for="multiplayer-map-select" style="font-weight: 600; font-size: 0.9rem; color: var(--text-light);">Xaritani tanlang:</label>
+          <select id="multiplayer-map-select" style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glow); color: #fff; font-size: 0.9rem;">
+            <option value="minecraft_classic" selected>Minecraft Klassik Dunyo</option>
+            <optgroup label="Google Earth Satellit Dunyo">
+              <option value="earth_globe">Reallashgan Yer Shari Globe</option>
+            </optgroup>
+            <optgroup label="O'zbekiston Ultra HD Xaritalar">
+              <option value="registan">Samarqand Registon Maydoni HD Mega</option>
+              <option value="ichan_qala">Xiva Ichan-Qal'a HD</option>
+              <option value="minorai_kalon">Buxoro Minorai Kalon HD</option>
+              <option value="chimgon">Chimgon Tog' Tizmasi HD Mega</option>
+              <option value="tashkent_tower">Toshkent Teleminorasi va Metropoliya HD</option>
+            </optgroup>
+            <optgroup label="Dunyo Mo'jizalari HD Obidalari">
+              <option value="pyramids">Misr — Buyuk Piramidalar va Sfinks</option>
+              <option value="eiffel">Parij — Eyfel Minorasi</option>
+              <option value="colosseum">Rim — Kolizey Oval Arenasi</option>
+              <option value="big_ben">London — Big Ben Soat Minorasi</option>
+              <option value="burj_khalifa">Dubay — Burj Xalifa</option>
+              <option value="great_wall">Xitoy — Buyuk Xitoy Devori</option>
+              <option value="taj_mahal">Hindiston — Taj Mahal Maqbarasi</option>
+            </optgroup>
+          </select>
+        </div>
+
         <div class="modal-actions" style="margin-top: 20px; display: flex; gap: 10px; width: 100%;">
           <button id="btn-multiplayer-join" class="btn btn-purple" style="flex: 1;">Xonaga Ulanish</button>
           <button id="btn-multiplayer-close" class="btn btn-dark" style="flex: 1;">Yopish</button>

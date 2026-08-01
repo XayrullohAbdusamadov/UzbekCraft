@@ -527,6 +527,8 @@
     const roomName = 'room_' + (currentWorldMeta.name || 'default').toLowerCase().replace(/\s+/g, '_');
     multiplayerChannel = supabase.channel(roomName);
     
+    let roomSynced = false;
+
     multiplayerChannel
       .on('broadcast', { event: 'player_move' }, (payload) => {
         const data = payload.payload;
@@ -536,11 +538,53 @@
       .on('broadcast', { event: 'block_change' }, (payload) => {
         const { x, y, z, blockId } = payload.payload;
         worldData[`${x},${y},${z}`] = blockId;
+        modifiedBlocks[`${x},${y},${z}`] = blockId;
         renderInstancedWorld();
+      })
+      .on('broadcast', { event: 'query_room_map' }, (payload) => {
+        if (payload.payload && payload.payload.requesterId === myPlayerId) return;
+        if (multiplayerChannel) {
+          multiplayerChannel.send({
+            type: 'broadcast',
+            event: 'sync_room_map',
+            payload: {
+              map: currentWorldMeta.map,
+              modifiedBlocks: modifiedBlocks
+            }
+          });
+        }
+      })
+      .on('broadcast', { event: 'sync_room_map' }, (payload) => {
+        if (!roomSynced) {
+          roomSynced = true;
+          const remoteMap = payload.payload.map;
+          const remoteModified = payload.payload.modifiedBlocks || {};
+          
+          // Merge modified blocks
+          Object.assign(modifiedBlocks, remoteModified);
+          
+          if (remoteMap && remoteMap !== currentWorldMeta.map) {
+            currentWorldMeta.map = remoteMap;
+            generateWorld("Uzbekistan2026", remoteMap);
+            const hudBiome = document.getElementById('hud-biome');
+            if (hudBiome) hudBiome.textContent = getMapDisplayName(remoteMap) + " (Onlayn)";
+            showToast(`Xarita "${getMapDisplayName(remoteMap)}" ga sinxronizatsiya qilindi!`);
+          } else {
+            // Apply blocks and rebuild
+            Object.keys(modifiedBlocks).forEach(k => { worldData[k] = modifiedBlocks[k]; });
+            rebuildWorldMesh();
+          }
+        }
       })
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
           showToast("Ko'p o'yinchi xonasiga ulandingiz!");
+          // Request current map state from other players
+          multiplayerChannel.send({
+            type: 'broadcast',
+            event: 'query_room_map',
+            payload: { requesterId: myPlayerId }
+          });
         }
       });
   }
@@ -1705,8 +1749,8 @@
     const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
     const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
 
-    playerVel.x = (forward.x * moveDir.z - right.x * moveDir.x) * speed;
-    playerVel.z = (forward.z * moveDir.z - right.z * moveDir.x) * speed;
+    playerVel.x = (forward.x * (-moveDir.z) + right.x * moveDir.x) * speed;
+    playerVel.z = (forward.z * (-moveDir.z) + right.z * moveDir.x) * speed;
     playerVel.y -= 24.0 * delta;
 
     if ((keys['Space'] || keys['JumpTouch']) && isGrounded) {
@@ -2313,12 +2357,13 @@
     });
     document.getElementById('btn-multiplayer-join').addEventListener('click', () => {
       const roomName = document.getElementById('multiplayer-room-input').value.trim() || "dostlar";
-      currentWorldMeta = { id: 'world_' + Date.now(), name: roomName, seed: "Uzbekistan2026", map: "registan" };
+      const map = document.getElementById('multiplayer-map-select').value || "registan";
+      currentWorldMeta = { id: 'world_' + Date.now(), name: roomName, seed: "Uzbekistan2026", map: map };
       modifiedBlocks = {};
       currentQuestState = 'not_started';
-      generateWorld("Uzbekistan2026", "registan");
+      generateWorld("Uzbekistan2026", map);
       const hudBiome = document.getElementById('hud-biome');
-      if (hudBiome) hudBiome.textContent = getMapDisplayName("registan") + " (Onlayn)";
+      if (hudBiome) hudBiome.textContent = getMapDisplayName(map) + " (Onlayn)";
       startPlayingSession();
       document.getElementById('multiplayer-modal').classList.add('hidden');
       showToast(`"${roomName}" xonasiga ulanildi!`);
