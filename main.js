@@ -124,6 +124,78 @@
         <path d="M16 5 C14 8, 14 12, 16 13 C18 12, 18 8, 16 5 Z" fill="#ffc107"/>
       </svg>`;
     }
+    if (bId === BLOCKS.LANTERN) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <!-- Hanger ring -->
+        <circle cx="16" cy="5" r="3" fill="none" stroke="#cfd8dc" stroke-width="2"/>
+        <!-- Top cap -->
+        <path d="M8 12 L24 12 L20 8 L12 8 Z" fill="#ffd600" stroke="#f57f17" stroke-width="1"/>
+        <!-- Glass body -->
+        <rect x="10" y="12" width="12" height="12" rx="1" fill="#fff9c4" opacity="0.8"/>
+        <line x1="16" y1="12" x2="16" y2="24" stroke="#ffb300" stroke-width="1.5"/>
+        <!-- Guard bars -->
+        <rect x="9" y="12" width="14" height="12" fill="none" stroke="#f57f17" stroke-width="1.5"/>
+        <!-- Bottom base -->
+        <rect x="8" y="24" width="16" height="3" fill="#ffd600"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.SOFA) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <!-- Backrest -->
+        <rect x="4" y="6" width="24" height="12" rx="2" fill="#ab47bc" stroke="#7b1fa2" stroke-width="1.5"/>
+        <!-- Left armrest -->
+        <rect x="2" y="14" width="4" height="12" rx="1" fill="#8e24aa"/>
+        <!-- Right armrest -->
+        <rect x="26" y="14" width="4" height="12" rx="1" fill="#8e24aa"/>
+        <!-- Seat cushions -->
+        <rect x="6" y="16" width="20" height="8" rx="1" fill="#ba68c8"/>
+        <!-- Legs -->
+        <rect x="5" y="26" width="3" height="3" fill="#5d4037"/>
+        <rect x="24" y="26" width="3" height="3" fill="#5d4037"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.TABLE) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <!-- Table top (inclined perspective) -->
+        <polygon points="4,12 28,12 24,18 8,18" fill="#8d6e63" stroke="#5d4037" stroke-width="1.5"/>
+        <!-- Legs -->
+        <rect x="7" y="18" width="3" height="10" fill="#5d4037"/>
+        <rect x="11" y="18" width="2" height="7" fill="#4e342e"/>
+        <rect x="19" y="18" width="2" height="7" fill="#4e342e"/>
+        <rect x="22" y="18" width="3" height="10" fill="#5d4037"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.CHAIR) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <!-- Backrest rails -->
+        <rect x="8" y="4" width="3" height="14" fill="#8d6e63"/>
+        <rect x="21" y="4" width="3" height="14" fill="#8d6e63"/>
+        <rect x="11" y="6" width="10" height="3" fill="#a1887f"/>
+        <rect x="11" y="11" width="10" height="3" fill="#a1887f"/>
+        <!-- Seat -->
+        <polygon points="6,16 26,16 23,20 9,20" fill="#a1887f" stroke="#8d6e63" stroke-width="1"/>
+        <!-- Legs -->
+        <rect x="8" y="20" width="3" height="9" fill="#5d4037"/>
+        <rect x="21" y="20" width="3" height="9" fill="#5d4037"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.FLOWER) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <!-- Flower Pot -->
+        <polygon points="11,22 21,22 19,30 13,30" fill="#bf360c" stroke="#870000" stroke-width="1"/>
+        <!-- Stem -->
+        <line x1="16" y1="22" x2="16" y2="12" stroke="#4caf50" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- Leaves -->
+        <path d="M16 18 Q12 16, 13 14 Q16 16, 16 18 Z" fill="#4caf50"/>
+        <path d="M16 16 Q20 14, 19 12 Q16 14, 16 16 Z" fill="#4caf50"/>
+        <!-- Flower Petals -->
+        <circle cx="16" cy="10" r="4" fill="#ec407a"/>
+        <circle cx="13" cy="8" r="3" fill="#e91e63"/>
+        <circle cx="19" cy="8" r="3" fill="#e91e63"/>
+        <circle cx="16" cy="6" r="3.5" fill="#f48fb1"/>
+        <circle cx="16" cy="9" r="1.5" fill="#ffeb3b"/>
+      </svg>`;
+    }
     
     // Isometric 3D block representation
     const color = BLOCK_INFO[bId]?.color || '#9e9e9e';
@@ -1903,17 +1975,23 @@
     });
 
     const boxGeo = new THREE.BoxGeometry(BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+    const torchGeo = new THREE.BoxGeometry(0.16, 0.65, 0.16);
     const dummy = new THREE.Object3D();
     Object.keys(grouped).forEach(bTypeStr => {
       const bType = Number(bTypeStr);
       const coords = grouped[bType];
       const mat = getBlockMaterials(bType);
-      const mesh = new THREE.InstancedMesh(boxGeo, mat, coords.length);
+      const geom = (bType === BLOCKS.TORCH) ? torchGeo : boxGeo;
+      const mesh = new THREE.InstancedMesh(geom, mat, coords.length);
       mesh.isVoxelMesh = true;
       mesh.castShadow = true;
       mesh.receiveShadow = true;
       coords.forEach((pos, idx) => {
-        dummy.position.copy(pos); dummy.updateMatrix();
+        dummy.position.copy(pos);
+        if (bType === BLOCKS.TORCH) {
+          dummy.position.y -= 0.18; // offset down so it sits on the floor below
+        }
+        dummy.updateMatrix();
         mesh.setMatrixAt(idx, dummy.matrix);
       });
       mesh.instanceMatrix.needsUpdate = true;
@@ -2172,16 +2250,23 @@
     // Update active arrows
     for (let i = activeArrows.length - 1; i >= 0; i--) {
       const arrow = activeArrows[i];
-      arrow.mesh.position.addScaledVector(arrow.velocity, delta);
       arrow.time += delta;
 
+      const steps = 5;
+      const stepVelocity = arrow.velocity.clone().multiplyScalar(delta / steps);
       let hitSomething = false;
-      const bx = Math.round(arrow.mesh.position.x);
-      const by = Math.round(arrow.mesh.position.y);
-      const bz = Math.round(arrow.mesh.position.z);
-      const targetBlock = worldData[`${bx},${by},${bz}`];
-      if (targetBlock && targetBlock !== BLOCKS.AIR && targetBlock !== BLOCKS.WATER) {
-        hitSomething = true;
+      
+      for (let s = 0; s < steps; s++) {
+        arrow.mesh.position.add(stepVelocity);
+        
+        const bx = Math.round(arrow.mesh.position.x);
+        const by = Math.round(arrow.mesh.position.y);
+        const bz = Math.round(arrow.mesh.position.z);
+        const targetBlock = worldData[`${bx},${by},${bz}`];
+        if (targetBlock && targetBlock !== BLOCKS.AIR && targetBlock !== BLOCKS.WATER) {
+          hitSomething = true;
+          break;
+        }
       }
 
       for (let j = animals.length - 1; j >= 0; j--) {
@@ -2203,16 +2288,23 @@
     // Update active bullets
     for (let i = activeBullets.length - 1; i >= 0; i--) {
       const bullet = activeBullets[i];
-      bullet.mesh.position.addScaledVector(bullet.velocity, delta);
       bullet.time += delta;
 
+      const steps = 5;
+      const stepVelocity = bullet.velocity.clone().multiplyScalar(delta / steps);
       let hitSomething = false;
-      const bx = Math.round(bullet.mesh.position.x);
-      const by = Math.round(bullet.mesh.position.y);
-      const bz = Math.round(bullet.mesh.position.z);
-      const targetBlock = worldData[`${bx},${by},${bz}`];
-      if (targetBlock && targetBlock !== BLOCKS.AIR && targetBlock !== BLOCKS.WATER) {
-        hitSomething = true;
+      
+      for (let s = 0; s < steps; s++) {
+        bullet.mesh.position.add(stepVelocity);
+        
+        const bx = Math.round(bullet.mesh.position.x);
+        const by = Math.round(bullet.mesh.position.y);
+        const bz = Math.round(bullet.mesh.position.z);
+        const targetBlock = worldData[`${bx},${by},${bz}`];
+        if (targetBlock && targetBlock !== BLOCKS.AIR && targetBlock !== BLOCKS.WATER) {
+          hitSomething = true;
+          break;
+        }
       }
 
       for (let j = animals.length - 1; j >= 0; j--) {
@@ -2234,22 +2326,34 @@
     // Update active torches
     for (let i = activeTorches.length - 1; i >= 0; i--) {
       const torch = activeTorches[i];
-      // Apply gravity drop for realistic throwing arc
-      torch.velocity.y -= delta * 12.0;
-      torch.mesh.position.addScaledVector(torch.velocity, delta);
+      torch.velocity.y -= delta * 12.0; // gravity
       torch.time += delta;
 
+      const steps = 5;
+      const stepVelocity = torch.velocity.clone().multiplyScalar(delta / steps);
       let hitSomething = false;
-      const bx = Math.round(torch.mesh.position.x);
-      const by = Math.round(torch.mesh.position.y);
-      const bz = Math.round(torch.mesh.position.z);
-      const key = `${bx},${by},${bz}`;
-      const targetBlock = worldData[key];
+      let hitX = 0, hitY = 0, hitZ = 0;
       
-      if (targetBlock && targetBlock !== BLOCKS.AIR && targetBlock !== BLOCKS.WATER) {
-        hitSomething = true;
+      for (let s = 0; s < steps; s++) {
+        torch.mesh.position.add(stepVelocity);
+        
+        const bx = Math.round(torch.mesh.position.x);
+        const by = Math.round(torch.mesh.position.y);
+        const bz = Math.round(torch.mesh.position.z);
+        const key = `${bx},${by},${bz}`;
+        const targetBlock = worldData[key];
+        
+        if (targetBlock && targetBlock !== BLOCKS.AIR && targetBlock !== BLOCKS.WATER) {
+          hitSomething = true;
+          hitX = bx; hitY = by; hitZ = bz;
+          break;
+        }
+      }
+      
+      if (hitSomething) {
+        const targetBlock = worldData[`${hitX},${hitY},${hitZ}`];
         if (targetBlock === BLOCKS.BOMB) {
-          triggerBombFuse(bx, by, bz);
+          triggerBombFuse(hitX, hitY, hitZ);
         } else {
           // Place a placed Torch block in the air space adjacent to impact
           const px = Math.round(torch.mesh.position.x - torch.velocity.x * delta * 0.4);
@@ -2344,10 +2448,10 @@
             const swingSpeed = npc.fleeingTimer > 0 ? 24.0 : 12.0; // Swing faster when running away!
             const angle = Math.sin(performance.now() * 0.001 * swingSpeed) * 0.5;
             npc.legs.forEach((leg, index) => {
-              leg.rotation.x = (index % 2 === 0) ? angle : -angle;
+              leg.rotation.z = (index % 2 === 0) ? angle : -angle;
             });
           } else {
-            npc.legs.forEach(leg => { leg.rotation.x = 0; });
+            npc.legs.forEach(leg => { leg.rotation.z = 0; });
           }
         }
       } else {
@@ -2524,7 +2628,7 @@
 
   function placeBlock() {
     let blockId = hotbarBlocks[activeSlotIndex];
-    if (BLOCK_INFO[blockId] && BLOCK_INFO[blockId].isWeapon) {
+    if (BLOCK_INFO[blockId] && BLOCK_INFO[blockId].isWeapon && blockId !== BLOCKS.BOMB) {
       const firstBlock = hotbarBlocks.find(b => b !== undefined && BLOCK_INFO[b] && !BLOCK_INFO[b].isWeapon);
       if (firstBlock !== undefined) {
         blockId = firstBlock;
