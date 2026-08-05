@@ -575,7 +575,7 @@
   let isGrounded = false, keys = {}, isPointerLocked = false;
   let highlightBox = null, raycaster = new THREE.Raycaster();
   let npcs = [], animals = [], spawnedFurniture = [];
-  let isSitting = false, sittingOnCoords = null;
+  let isSitting = false, sittingOnCoords = null, targetedFurniture = null;
   let isMiningHeld = false, miningStartTime = 0, miningTargetKey = null;
   const MINING_DURATION = 1.5;
   let touchJoystick = { active: false, startX: 0, startY: 0, moveX: 0, moveY: 0 };
@@ -2825,19 +2825,51 @@
         obj = obj.parent;
       }
       
+      let isFurniture = false;
+      let bType = null;
       if (coord) {
         const [cx, cy, cz] = coord.split(',').map(Number);
         bx = cx; by = cy; bz = cz;
+        bType = worldData[coord];
+        isFurniture = true;
       } else {
         const p = hit.point.clone().sub(hit.face.normal.clone().multiplyScalar(0.01));
         bx = Math.round(p.x); by = Math.round(p.y); bz = Math.round(p.z);
+        bType = worldData[`${bx},${by},${bz}`];
+        if (bType === BLOCKS.SOFA || bType === BLOCKS.CHAIR || bType === BLOCKS.TABLE) {
+          isFurniture = true;
+        }
       }
       
       highlightBox.position.set(bx, by, bz);
       highlightBox.visible = true;
+
+      const promptEl = document.getElementById('hud-interaction-container');
+      const actionBtn = document.getElementById('btn-hud-action');
+      
+      if (isFurniture && hits[0].distance < 4.0 && promptEl && actionBtn) {
+        targetedFurniture = { type: bType, x: bx, y: by, z: bz };
+        if (bType === BLOCKS.SOFA) {
+          actionBtn.textContent = "Uxlash [R]";
+          actionBtn.style.background = "#10b981";
+        } else if (bType === BLOCKS.CHAIR) {
+          actionBtn.textContent = "O'tirish [R]";
+          actionBtn.style.background = "#3b82f6";
+        } else if (bType === BLOCKS.TABLE) {
+          actionBtn.textContent = "O'tirish [R]";
+          actionBtn.style.background = "#3b82f6";
+        }
+        promptEl.classList.remove('hidden');
+      } else {
+        targetedFurniture = null;
+        if (promptEl) promptEl.classList.add('hidden');
+      }
     } else {
       highlightBox.visible = false;
       cancelMining();
+      const promptEl = document.getElementById('hud-interaction-container');
+      if (promptEl) promptEl.classList.add('hidden');
+      targetedFurniture = null;
     }
   }
 
@@ -4289,6 +4321,47 @@
     });
   }
 
+  function performFurnitureInteraction(f) {
+    if (!f) return;
+    if (f.type === BLOCKS.SOFA) {
+      const isNight = dayTime > 0.55 || dayTime < 0.20;
+      if (isNight) {
+        showToast("Uxlashga yotdingiz...");
+        
+        const fade = document.createElement('div');
+        fade.style.position = 'fixed';
+        fade.style.top = '0'; fade.style.left = '0';
+        fade.style.width = '100vw'; fade.style.height = '100vh';
+        fade.style.background = '#000';
+        fade.style.zIndex = '9999';
+        fade.style.opacity = '0';
+        fade.style.transition = 'opacity 0.3s ease';
+        document.body.appendChild(fade);
+        
+        setTimeout(() => { fade.style.opacity = '1'; }, 10);
+        
+        setTimeout(() => {
+          dayTime = 0.23; // morning time
+          playerPos.set(f.x, f.y + 0.6, f.z);
+          soundEngine.playSFX('famous');
+          showToast("Xayrli tong!");
+          setTimeout(() => {
+            fade.style.opacity = '0';
+            setTimeout(() => { document.body.removeChild(fade); }, 300);
+          }, 300);
+        }, 500);
+      } else {
+        showToast("Faqat tunda uxlash mumkin!");
+      }
+    } else if (f.type === BLOCKS.CHAIR || f.type === BLOCKS.TABLE) {
+      isSitting = true;
+      let seatOffset = 0.38;
+      if (f.type === BLOCKS.TABLE) seatOffset = 0.95;
+      sittingOnCoords = new THREE.Vector3(f.x, f.y + seatOffset, f.z);
+      showToast("O'tirdingiz. Turish uchun harakatlaning.");
+    }
+  }
+
   // ==========================================================================
   // EVENTS
   // ==========================================================================
@@ -4309,6 +4382,11 @@
       if (e.code === 'KeyE') document.getElementById('inventory-modal').classList.toggle('hidden');
       if (e.code === 'Escape') document.getElementById('pause-modal').classList.toggle('hidden');
       if (e.code === 'KeyF') { dayTime = (dayTime + 0.25) % 1; showToast("Vaqt o'tkazildi"); }
+      if (e.code === 'KeyR') {
+        if (targetedFurniture) {
+          performFurnitureInteraction(targetedFurniture);
+        }
+      }
     });
     window.addEventListener('keyup', e => keys[e.code] = false);
     window.addEventListener('mousedown', e => {
@@ -4440,6 +4518,20 @@
         renderHotbar();
       }
     }, { passive: false });
+
+    const actionBtn = document.getElementById('btn-hud-action');
+    if (actionBtn) {
+      const triggerAction = () => {
+        if (targetedFurniture) {
+          performFurnitureInteraction(targetedFurniture);
+        }
+      };
+      actionBtn.addEventListener('click', triggerAction);
+      actionBtn.addEventListener('touchstart', e => {
+        e.preventDefault();
+        triggerAction();
+      });
+    }
   }
 
   function setupMobileControls() {
