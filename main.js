@@ -17,7 +17,8 @@
     WHITE_MARBLE: 17, GLAZED_BLUE: 18, BEDROCK: 19, IRON: 20,
     DARK_STONE: 21, GLASS: 22, TERRACOTTA: 23, COPPER: 24,
     SWORD: 25, BOW: 26, BOMB: 27, SOFA: 28, TABLE: 29, CHAIR: 30, FLOWER: 31,
-    AVTOMAT: 32, TORCH: 33, BUCKET: 34, WATER_BUCKET: 35
+    AVTOMAT: 32, TORCH: 33, BUCKET: 34, WATER_BUCKET: 35,
+    AXE: 36
   };
 
   const BLOCK_INFO = {
@@ -55,7 +56,8 @@
     [BLOCKS.AVTOMAT]:     { name: "Avtomat",         color: '#607d8b', isWeapon: true },
     [BLOCKS.TORCH]:       { name: "Mashala (Olov)",  color: '#ff5722', isLuminous: true, isFurniture: true },
     [BLOCKS.BUCKET]:      { name: "Chelak",          color: '#b0bec5', isWeapon: true },
-    [BLOCKS.WATER_BUCKET]:{ name: "Suvli chelak",    color: '#29b6f6', isWeapon: true }
+    [BLOCKS.WATER_BUCKET]:{ name: "Suvli chelak",    color: '#29b6f6', isWeapon: true },
+    [BLOCKS.AXE]:         { name: "Temir Bolta",     color: '#78909c', isWeapon: true }
   };
 
   function getItemIconHTML(bId) {
@@ -74,6 +76,15 @@
         <!-- Hilt -->
         <rect x="5" y="23" width="4" height="4" fill="#795548" transform="rotate(45 7 25)"/>
         <circle cx="4" cy="28" r="2" fill="#ffd600"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.AXE) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <!-- Handle -->
+        <line x1="8" y1="24" x2="24" y2="8" stroke="#8d6e63" stroke-width="3" stroke-linecap="round"/>
+        <!-- Axe Head -->
+        <path d="M20 6 L26 12 L22 16 L18 10 Z" fill="#90a4ae" stroke="#37474f" stroke-width="1"/>
+        <path d="M22 6 L28 10 L28 14 L24 10 Z" fill="#cfd8dc"/>
       </svg>`;
     }
     if (bId === BLOCKS.BOW) {
@@ -625,7 +636,9 @@
   let meatCollectibles = [];
   let meatInventory = {
     "Qo'y": 0, "Sigir": 0, "Tulki": 0, "Bo'ri": 0, "Burgut": 0,
-    "Tuya": 0, "Ot": 0, "Eshak": 0, "Tovuq": 0, "Qoplon": 0
+    "Tuya": 0, "Ot": 0, "Eshak": 0, "Tovuq": 0, "Qoplon": 0,
+    "Jun": 0, "Yog'och": 0, "Tosh": 0, "Qora Tosh": 0, "Ko'mir": 0,
+    "Oltin": 0, "Olmos": 0, "Temir": 0, "Mis": 0
   };
 
   const MEAT_TYPES = {
@@ -638,10 +651,29 @@
     "Ot":     { name: "Ot go'shti (Qazi)", color: '#3e2723', hexColor: 0x3e2723 },
     "Eshak":  { name: "Eshak go'shti", color: '#78909c', hexColor: 0x78909c },
     "Tovuq":  { name: "Tovuq go'shti", color: '#fff9c4', hexColor: 0xfff9c4 },
-    "Qoplon": { name: "Qoplon go'shti", color: '#afb42b', hexColor: 0xafb42b }
+    "Qoplon": { name: "Qoplon go'shti", color: '#afb42b', hexColor: 0xafb42b },
+    "Jun":    { name: "Jun (Yung)", color: '#ffffff', hexColor: 0xfafafa },
+    "Yog'och":{ name: "Yog'och", color: '#8d6e63', hexColor: 0x8d6e63 },
+    "Tosh":   { name: "Tosh", color: '#9e9e9e', hexColor: 0x9e9e9e },
+    "Qora Tosh":{ name: "Qora Tosh", color: '#37474f', hexColor: 0x37474f },
+    "Ko'mir": { name: "Ko'mir", color: '#455a64', hexColor: 0x455a64 },
+    "Oltin":  { name: "Oltin", color: '#ffd600', hexColor: 0xffd600 },
+    "Olmos":  { name: "Olmos", color: '#00bcd4', hexColor: 0x00bcd4 },
+    "Temir":  { name: "Temir", color: '#b0bec5', hexColor: 0xb0bec5 },
+    "Mis":    { name: "Mis", color: '#ff7043', hexColor: 0xff7043 }
+  };
+  const RESOURCE_INFO = {
+    [BLOCKS.WOOD]:       { type: "Yog'och", name: "Yog'och", color: 0x6d4c41 },
+    [BLOCKS.STONE]:      { type: "Tosh", name: "Tosh", color: 0x9e9e9e },
+    [BLOCKS.DARK_STONE]: { type: "Qora Tosh", name: "Qora Tosh", color: 0x37474f },
+    [BLOCKS.COAL]:       { type: "Ko'mir", name: "Ko'mir", color: 0x455a64 },
+    [BLOCKS.GOLD]:       { type: "Oltin", name: "Oltin", color: 0xffd600 },
+    [BLOCKS.DIAMOND]:    { type: "Olmos", name: "Olmos", color: 0x00bcd4 },
+    [BLOCKS.IRON]:       { type: "Temir", name: "Temir", color: 0xb0bec5 },
+    [BLOCKS.COPPER]:     { type: "Mis", name: "Mis", color: 0xff7043 }
   };
   let isSitting = false, sittingOnCoords = null, targetedFurniture = null;
-  let isMiningHeld = false, miningStartTime = 0, miningTargetKey = null;
+  let isMiningHeld = false, miningStartTime = 0, miningTargetKey = null, isMiningProgress = 0;
   const MINING_DURATION = 1.5;
   let touchJoystick = { active: false, startX: 0, startY: 0, moveX: 0, moveY: 0 };
   let touchLook = { active: false, lastX: 0, lastY: 0 };
@@ -2991,6 +3023,7 @@
       const key = `${bx},${by},${bz}`;
       if (worldData[key] && worldData[key] !== BLOCKS.BEDROCK) {
         isMiningHeld = true; miningStartTime = performance.now(); miningTargetKey = key;
+        isMiningProgress = 0;
         document.getElementById('mining-progress-container').classList.remove('hidden');
       } else if (worldData[key] === BLOCKS.BEDROCK) {
         showToast("Bedrock qatlamini buzib bo'lmaydi!");
@@ -3000,18 +3033,40 @@
 
   function updateMiningProgress(delta) {
     if (!isMiningHeld || !miningTargetKey) return;
-    const elapsed = (performance.now() - miningStartTime) / 1000;
-    const pct = Math.min(100, Math.floor((elapsed / MINING_DURATION) * 100));
+    
+    // Check for Axe multiplier
+    const activeBlockId = hotbarBlocks[activeSlotIndex];
+    let miningSpeedMultiplier = 1.0;
+    
+    if (activeBlockId === BLOCKS.AXE) {
+      const targetedBlockType = worldData[miningTargetKey];
+      if (targetedBlockType === BLOCKS.WOOD || targetedBlockType === BLOCKS.LEAVES) {
+        miningSpeedMultiplier = 3.5;
+      }
+    }
+    
+    isMiningProgress += delta * miningSpeedMultiplier;
+    const pct = Math.min(100, Math.floor((isMiningProgress / MINING_DURATION) * 100));
+    
     if (Math.random() < 0.2) soundEngine.playSFX('dig_loop');
     const label = document.getElementById('mining-progress-label');
     const fill = document.getElementById('mining-progress-fill');
     if (label) label.textContent = `Buzilmoqda: ${pct}%`;
     if (fill) fill.style.width = `${pct}%`;
-    if (elapsed >= MINING_DURATION) {
+    
+    if (isMiningProgress >= MINING_DURATION) {
+      const brokenBlockType = worldData[miningTargetKey];
       removePointLightAtKey(miningTargetKey);
       worldData[miningTargetKey] = BLOCKS.AIR;
       modifiedBlocks[miningTargetKey] = BLOCKS.AIR;
       soundEngine.playSFX('break');
+
+      // Drop resource collectible if matching RESOURCE_INFO
+      if (typeof RESOURCE_INFO !== 'undefined' && RESOURCE_INFO[brokenBlockType]) {
+        const info = RESOURCE_INFO[brokenBlockType];
+        const coords = miningTargetKey.split(',').map(Number);
+        spawnResourceCollectible(coords[0], coords[1] + 0.35, coords[2], info.type, info.name, info.color);
+      }
 
       if (supabase && multiplayerChannel) {
         const coords = miningTargetKey.split(',');
@@ -3028,7 +3083,7 @@
   }
 
   function cancelMining() {
-    isMiningHeld = false; miningTargetKey = null;
+    isMiningHeld = false; miningTargetKey = null; isMiningProgress = 0;
     const bar = document.getElementById('mining-progress-container');
     if (bar) bar.classList.add('hidden');
   }
@@ -3373,19 +3428,36 @@
     const tabWeapons = document.getElementById('tab-weapons');
     const tabFurniture = document.getElementById('tab-furniture');
     const tabBlocks = document.getElementById('tab-blocks');
+    const tabCrafting = document.getElementById('tab-crafting');
 
     const switchTab = (tab) => {
       currentInventoryTab = tab;
-      [tabWeapons, tabFurniture, tabBlocks].forEach(t => t?.classList.remove('active'));
+      [tabWeapons, tabFurniture, tabBlocks, tabCrafting].forEach(t => t?.classList.remove('active'));
       if (tab === 'weapons') tabWeapons?.classList.add('active');
       else if (tab === 'furniture') tabFurniture?.classList.add('active');
       else if (tab === 'blocks') tabBlocks?.classList.add('active');
-      renderInventoryGrid();
+      else if (tab === 'crafting') tabCrafting?.classList.add('active');
+      
+      const grid = document.getElementById('inventory-grid');
+      const crafting = document.getElementById('crafting-container');
+      
+      if (tab === 'crafting') {
+        if (grid) grid.classList.add('hidden');
+        if (crafting) {
+          crafting.classList.remove('hidden');
+          updateCraftingUI();
+        }
+      } else {
+        if (grid) grid.classList.remove('hidden');
+        if (crafting) crafting.classList.add('hidden');
+        renderInventoryGrid();
+      }
     };
 
     if (tabWeapons) tabWeapons.addEventListener('click', () => switchTab('weapons'));
     if (tabFurniture) tabFurniture.addEventListener('click', () => switchTab('furniture'));
     if (tabBlocks) tabBlocks.addEventListener('click', () => switchTab('blocks'));
+    if (tabCrafting) tabCrafting.addEventListener('click', () => switchTab('crafting'));
 
     document.getElementById('btn-new-world').addEventListener('click', () => {
       document.getElementById('create-world-modal').classList.remove('hidden');
@@ -3564,6 +3636,11 @@
         setTimeout(() => { container.requestPointerLock(); }, 50);
       }
     });
+
+    const craftActionBtn = document.getElementById('btn-craft-action');
+    if (craftActionBtn) {
+      craftActionBtn.addEventListener('click', performCraft);
+    }
 
     document.getElementById('btn-pause-meats').addEventListener('click', () => {
       document.getElementById('pause-modal').classList.add('hidden');
@@ -3877,6 +3954,20 @@
       swordGroup.add(blade);
 
       fpHandGroup.add(swordGroup);
+    } else if (blockId === BLOCKS.AXE) {
+      const axeGroup = new THREE.Group();
+      axeGroup.position.set(0.18, -0.15, -0.42);
+      axeGroup.rotation.x = -Math.PI / 3;
+
+      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.3, 0.03), new THREE.MeshLambertMaterial({ color: 0x795548 }));
+      handle.position.y = 0.05;
+      axeGroup.add(handle);
+
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.08, 0.04), new THREE.MeshLambertMaterial({ color: 0x90a4ae }));
+      head.position.set(0.03, 0.15, 0);
+      axeGroup.add(head);
+
+      fpHandGroup.add(axeGroup);
     } else if (blockId === BLOCKS.BOW) {
       const bowGroup = new THREE.Group();
       bowGroup.position.set(0.18, -0.15, -0.42);
@@ -4023,6 +4114,20 @@
       swordGroup.add(blade);
 
       mesh.armR.add(swordGroup);
+    } else if (blockId === BLOCKS.AXE) {
+      const axeGroup = new THREE.Group();
+      axeGroup.position.set(0, -0.4, 0.1);
+      axeGroup.rotation.x = -Math.PI / 3;
+
+      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.4, 0.04), new THREE.MeshLambertMaterial({ color: 0x795548 }));
+      handle.position.y = 0.05;
+      axeGroup.add(handle);
+
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.1, 0.06), new THREE.MeshLambertMaterial({ color: 0x90a4ae }));
+      head.position.set(0.04, 0.2, 0);
+      axeGroup.add(head);
+
+      mesh.armR.add(axeGroup);
     } else if (blockId === BLOCKS.BOW) {
       const bowGroup = new THREE.Group();
       bowGroup.position.set(0, -0.35, 0.08);
@@ -4214,6 +4319,11 @@
         } else {
           // Spawn meat collectible!
           spawnMeatCollectible(animal.position.x, animal.position.y + 0.3, animal.position.z, animal.animalName);
+
+          // Sheep and horse ALSO drop wool!
+          if (animal.animalName === "Qo'y" || animal.animalName === "Ot") {
+            spawnWoolCollectible(animal.position.x + (Math.random() - 0.5) * 0.4, animal.position.y + 0.3, animal.position.z + (Math.random() - 0.5) * 0.4);
+          }
 
           scene.remove(animal);
           const aIdx = animals.indexOf(animal);
@@ -4467,7 +4577,7 @@
 
     let items = [];
     if (currentInventoryTab === 'weapons') {
-      items = [BLOCKS.SWORD, BLOCKS.BOW, BLOCKS.BOMB, BLOCKS.AVTOMAT];
+      items = [BLOCKS.SWORD, BLOCKS.BOW, BLOCKS.BOMB, BLOCKS.AVTOMAT, BLOCKS.AXE];
     } else if (currentInventoryTab === 'furniture') {
       items = [BLOCKS.LANTERN, BLOCKS.TORCH, BLOCKS.SOFA, BLOCKS.TABLE, BLOCKS.CHAIR, BLOCKS.FLOWER, BLOCKS.BUCKET];
     } else {
@@ -4925,7 +5035,18 @@
     }
   }
 
-  function getMeatIconHTML(colorStr) {
+  function getMeatIconHTML(colorStr, name) {
+    if (name && name.includes("Jun")) {
+      // Soft wool ball SVG
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <!-- Wool fluffy outline -->
+        <path d="M16 4 C11 4, 8 7, 8 11 C5 11, 3 14, 3 17 C3 21, 6 24, 10 24 C11 27, 14 28, 17 28 C22 28, 25 25, 25 21 C28 21, 29 18, 29 15 C29 10, 25 6, 20 6 C19 4, 17 4, 16 4 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+        <!-- Soft texture shadow lines -->
+        <path d="M9 13 C11 11, 14 12, 14 14" fill="none" stroke="#e2e8f0" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M18 20 C19 18, 22 19, 22 21" fill="none" stroke="#e2e8f0" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M12 22 C14 24, 16 23, 17 21" fill="none" stroke="#e2e8f0" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>`;
+    }
     return `<svg viewBox="0 0 32 32" width="100%" height="100%">
       <!-- Bone -->
       <path d="M6 26 L12 20 M5 25 C3 25, 3 22, 5 21 C6 21, 8 23, 7 25 M6 26 C6 28, 9 28, 10 27 C10 25, 8 24, 6 26" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
@@ -4950,7 +5071,7 @@
       
       const iconBox = document.createElement('div');
       iconBox.className = 'meat-icon-box';
-      iconBox.innerHTML = getMeatIconHTML(info.color);
+      iconBox.innerHTML = getMeatIconHTML(info.color, info.name);
       
       const name = document.createElement('div');
       name.className = 'meat-name';
@@ -4967,6 +5088,248 @@
       grid.appendChild(card);
     });
   }
+
+  // ==========================================================================
+  // CRAFTING RECIPES AND LOGIC
+  // ==========================================================================
+
+  const CRAFTING_RECIPES = [
+    {
+      result: BLOCKS.SOFA,
+      name: "Divan (Sofa)",
+      ingredients: { "Jun": 2, "Yog'och": 2 },
+      description: "Qulay dam olish uchun jun va yog'ochdan yasalgan chiroyli divan."
+    },
+    {
+      result: BLOCKS.CHAIR,
+      name: "Stul",
+      ingredients: { "Yog'och": 2 },
+      description: "O'tirish uchun oddiy va qulay yog'och stul."
+    },
+    {
+      result: BLOCKS.TABLE,
+      name: "Stol",
+      ingredients: { "Yog'och": 3 },
+      description: "Ustiga chiqish yoki jihozlar qo'yish uchun stol."
+    },
+    {
+      result: BLOCKS.TORCH,
+      name: "Mashala (Torch)",
+      ingredients: { "Yog'och": 1, "Ko'mir": 1 },
+      description: "Atrofni yoritib turadigan yorug'lik manbai."
+    },
+    {
+      result: BLOCKS.LANTERN,
+      name: "Chiroq (Lantern)",
+      ingredients: { "Temir": 2, "Ko'mir": 1 },
+      description: "Uylar va yo'llarni bezab turuvchi neonli chiroq."
+    },
+    {
+      result: BLOCKS.SWORD,
+      name: "Olmos Qilich",
+      ingredients: { "Olmos": 2, "Yog'och": 1 },
+      description: "Hayvonlarni tezroq ovlash uchun o'tkir qurol."
+    },
+    {
+      result: BLOCKS.BOW,
+      name: "Kamon",
+      ingredients: { "Yog'och": 3, "Jun": 1 },
+      description: "Uzoqdagi nishonlarni urish uchun yoy va o'q otish quroli."
+    },
+    {
+      result: BLOCKS.AXE,
+      name: "Temir Bolta",
+      ingredients: { "Temir": 3, "Yog'och": 2 },
+      description: "Daraxtlarni kesishni 3.5 barobar tezlashtiradigan anjom."
+    },
+    {
+      result: BLOCKS.PLANKS,
+      name: "Taxta",
+      ingredients: { "Yog'och": 1 },
+      description: "Qurilish materiallari uchun ishlov berilgan taxta bloki."
+    }
+  ];
+
+  let selectedRecipe = null;
+
+  function updateCraftingUI() {
+    const list = document.getElementById('crafting-guide-list');
+    const selectInfo = document.getElementById('crafting-recipe-select-info');
+    const craftBtn = document.getElementById('btn-craft-action');
+    if (!list) return;
+    
+    list.innerHTML = '';
+    
+    CRAFTING_RECIPES.forEach((recipe) => {
+      const li = document.createElement('li');
+      li.style.background = 'rgba(255, 255, 255, 0.05)';
+      li.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+      li.style.borderRadius = '8px';
+      li.style.padding = '8px';
+      li.style.cursor = 'pointer';
+      li.style.display = 'flex';
+      li.style.justifyContent = 'space-between';
+      li.style.alignItems = 'center';
+      li.style.transition = 'background 0.2s';
+      
+      if (selectedRecipe && selectedRecipe.result === recipe.result) {
+        li.style.borderColor = '#fbbf24';
+        li.style.background = 'rgba(251, 191, 36, 0.1)';
+      }
+      
+      // Check if we can craft this recipe
+      let canCraft = true;
+      Object.keys(recipe.ingredients).forEach(ing => {
+        if ((meatInventory[ing] || 0) < recipe.ingredients[ing]) {
+          canCraft = false;
+        }
+      });
+      
+      const statusIndicator = canCraft ? '🟢' : '🔴';
+      
+      li.innerHTML = `<span style="font-weight: 700; color: #fff;">${recipe.name}</span> <span style="font-size: 0.8rem;">${statusIndicator}</span>`;
+      
+      li.addEventListener('click', () => {
+        selectedRecipe = recipe;
+        updateCraftingUI();
+      });
+      
+      list.appendChild(li);
+    });
+
+    if (selectedRecipe) {
+      let ingredientsHTML = '';
+      let canCraft = true;
+      
+      Object.keys(selectedRecipe.ingredients).forEach(ing => {
+        const required = selectedRecipe.ingredients[ing];
+        const owned = meatInventory[ing] || 0;
+        const color = owned >= required ? '#10b981' : '#ef4444';
+        ingredientsHTML += `<div style="font-size: 0.85rem; color: ${color}; display: flex; justify-content: space-between; width: 100%; padding: 2px 0;">
+          <span>${ing}:</span>
+          <span><strong>${owned}/${required}</strong></span>
+        </div>`;
+        if (owned < required) canCraft = false;
+      });
+      
+      selectInfo.innerHTML = `
+        <div style="width: 42px; height: 42px; display:flex; align-items:center; justify-content:center; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 6px;">
+          ${getItemIconHTML(selectedRecipe.result)}
+        </div>
+        <h4 style="margin: 0; font-size: 1rem; color: #fff; font-family: 'Outfit', sans-serif;">${selectedRecipe.name}</h4>
+        <p style="font-size: 0.78rem; color: #94a3b8; margin: 4px 0 8px 0; text-align: center;">${selectedRecipe.description}</p>
+        <div style="width: 100%; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px; display:flex; flex-direction:column; gap:2px; align-items:flex-start;">
+          <span style="font-size: 0.8rem; color: #fbbf24; font-weight: bold; margin-bottom: 4px;">Zarur resurslar:</span>
+          ${ingredientsHTML}
+        </div>
+      `;
+      
+      if (canCraft) {
+        craftBtn.disabled = false;
+        craftBtn.classList.remove('disabled');
+        craftBtn.style.opacity = '1';
+        craftBtn.style.pointerEvents = 'auto';
+      } else {
+        craftBtn.disabled = true;
+        craftBtn.classList.add('disabled');
+        craftBtn.style.opacity = '0.5';
+        craftBtn.style.pointerEvents = 'none';
+      }
+    } else {
+      selectInfo.innerHTML = `<p style="color: #94a3b8; font-size: 0.85rem; text-align:center;">Retseptlar kitobidan biror narsani tanlang.</p>`;
+      craftBtn.disabled = true;
+      craftBtn.classList.add('disabled');
+      craftBtn.style.opacity = '0.5';
+      craftBtn.style.pointerEvents = 'none';
+    }
+  }
+
+  function performCraft() {
+    if (!selectedRecipe) return;
+    
+    let canCraft = true;
+    Object.keys(selectedRecipe.ingredients).forEach(ing => {
+      if ((meatInventory[ing] || 0) < selectedRecipe.ingredients[ing]) {
+        canCraft = false;
+      }
+    });
+    
+    if (!canCraft) {
+      showToast("Xatolik: Resurslar yetarli emas!");
+      return;
+    }
+    
+    Object.keys(selectedRecipe.ingredients).forEach(ing => {
+      meatInventory[ing] -= selectedRecipe.ingredients[ing];
+    });
+    
+    const blockId = selectedRecipe.result;
+    const existingIdx = hotbarBlocks.indexOf(blockId);
+    if (existingIdx === -1) {
+      hotbarBlocks[activeSlotIndex] = blockId;
+      showToast(`Muvaffaqiyatli yaratildi: "${BLOCK_INFO[blockId].name}" slotga joylandi!`);
+    } else {
+      showToast(`Muvaffaqiyatli yaratildi: "${BLOCK_INFO[blockId].name}"!`);
+    }
+    
+    soundEngine.playSFX('place');
+    renderHotbar();
+    updateCraftingUI();
+    saveGame();
+  }
+
+  // ==========================================================================
+  // WOOL & GENERAL RESOURCE COLLECTIBLES SPAWNER
+  // ==========================================================================
+
+  function spawnWoolCollectible(x, y, z) {
+    const group = new THREE.Group();
+    group.isMeatCollectible = true; // Use meat collectible flag to inherit updates
+    
+    // Wool block model: fluffy and soft cube
+    const woolGeom = new THREE.BoxGeometry(0.18, 0.18, 0.18);
+    const woolMat = new THREE.MeshLambertMaterial({ color: 0xfafafa });
+    const woolMesh = new THREE.Mesh(woolGeom, woolMat);
+    group.add(woolMesh);
+    
+    group.position.set(x, y, z);
+    scene.add(group);
+    
+    group.meatType = "Jun";
+    group.meatName = "Jun (Yung)";
+    group.baseY = y;
+    group.bobOffset = Math.random() * 10;
+    
+    meatCollectibles.push(group);
+  }
+
+  function spawnResourceCollectible(x, y, z, type, name, colorHex) {
+    const group = new THREE.Group();
+    group.isMeatCollectible = true; // Use meat collectible flag to inherit updates
+    
+    // Cube block drop
+    const geom = new THREE.BoxGeometry(0.15, 0.15, 0.15);
+    const mat = new THREE.MeshLambertMaterial({ color: colorHex });
+    const mesh = new THREE.Mesh(geom, mat);
+    group.add(mesh);
+    
+    group.position.set(x, y, z);
+    scene.add(group);
+    
+    group.meatType = type;
+    group.meatName = name;
+    group.baseY = y;
+    group.bobOffset = Math.random() * 10;
+    
+    meatCollectibles.push(group);
+  }
+
+  // Mobile screen lock hook
+  document.addEventListener('click', () => {
+    if (screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock('landscape').catch(() => {});
+    }
+  });
 
   window.addEventListener('DOMContentLoaded', init);
 

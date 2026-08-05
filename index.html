@@ -337,11 +337,34 @@
           <button id="tab-weapons" class="inv-tab-btn active">Qurollar</button>
           <button id="tab-furniture" class="inv-tab-btn">Anjomlar</button>
           <button id="tab-blocks" class="inv-tab-btn">Bloklar</button>
+          <button id="tab-crafting" class="inv-tab-btn">Hunarmandchilik</button>
         </div>
 
         <p class="modal-text">Tanlangan slotga joylash uchun blok/qurol ustiga bosing:</p>
         <div id="inventory-grid" class="inventory-grid">
           <!-- Dynamically populated -->
+        </div>
+
+        <!-- Crafting UI container -->
+        <div id="crafting-container" class="hidden" style="display: flex; flex-direction: column; gap: 12px; height: 300px; overflow-y: auto;">
+          <div style="display: flex; gap: 16px; flex: 1; height: 100%;">
+            <!-- Left side: Recipe Book (Yo'riqnoma) -->
+            <div class="crafting-guide" style="flex: 1.2; background: rgba(15, 23, 42, 0.6); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); overflow-y: auto; text-align: left;">
+              <h3 style="margin-top: 0; color: #fbbf24; font-family: 'Outfit', sans-serif; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">📖 Retseptlar Kitobi (Yo'riqnoma)</h3>
+              <ul id="crafting-guide-list" style="list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 8px; margin: 0;">
+                <!-- Filled dynamically -->
+              </ul>
+            </div>
+            
+            <!-- Right side: Crafting Grid / Action -->
+            <div class="crafting-action" style="flex: 1; background: rgba(15, 23, 42, 0.85); padding: 12px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap: 8px; text-align: center;">
+              <h3 style="margin-top: 0; color: #10b981; font-family: 'Outfit', sans-serif; font-size: 0.95rem;">🔨 Yaratish</h3>
+              <div id="crafting-recipe-select-info" style="text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 100%;">
+                <p style="color: #94a3b8; font-size: 0.85rem; margin: 0;">Chap tomondan yaratmoqchi bo'lgan narsangizni tanlang.</p>
+              </div>
+              <button id="btn-craft-action" class="btn btn-emerald disabled" style="width: 100%;" disabled>Yaratish</button>
+            </div>
+          </div>
         </div>
         <div class="modal-actions">
           <button id="btn-close-inventory" class="btn btn-emerald">Tayyor</button>
@@ -426,14 +449,7 @@
     <!-- DAMAGE FLASH OVERLAY -->
     <div id="damage-flash"></div>
 
-    <!-- LANDSCAPE ORIENTATION WARNING FOR MOBILE -->
-    <div id="landscape-warning">
-      <div class="warning-content">
-        <div class="rotate-icon">📱🔄</div>
-        <h2>UzbekCraft o'yinini albomniy rejimda o'ynang</h2>
-        <p>O'yin to'liq va boshqaruvlar tartibli ko'rinishi uchun iltimos telefoningizni yonboshga (landscape rejimiga) buring!</p>
-      </div>
-    </div>
+
 
   </div>
 
