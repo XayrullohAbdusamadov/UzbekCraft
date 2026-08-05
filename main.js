@@ -16,7 +16,8 @@
     PLANKS: 12, LANTERN: 13, WATER: 14, BLUE_TILE: 15, RED_BRICK: 16,
     WHITE_MARBLE: 17, GLAZED_BLUE: 18, BEDROCK: 19, IRON: 20,
     DARK_STONE: 21, GLASS: 22, TERRACOTTA: 23, COPPER: 24,
-    SWORD: 25, BOW: 26, BOMB: 27, SOFA: 28, TABLE: 29, CHAIR: 30, FLOWER: 31
+    SWORD: 25, BOW: 26, BOMB: 27, SOFA: 28, TABLE: 29, CHAIR: 30, FLOWER: 31,
+    AVTOMAT: 32, TORCH: 33
   };
 
   const BLOCK_INFO = {
@@ -50,8 +51,103 @@
     [BLOCKS.SOFA]:        { name: "Divan",           color: '#ab47bc', isFurniture: true },
     [BLOCKS.TABLE]:       { name: "Stol",            color: '#8d6e63', isFurniture: true },
     [BLOCKS.CHAIR]:       { name: "Stul",            color: '#a1887f', isFurniture: true },
-    [BLOCKS.FLOWER]:      { name: "Gul",             color: '#ec407a', isFurniture: true }
+    [BLOCKS.FLOWER]:      { name: "Gul",             color: '#ec407a', isFurniture: true },
+    [BLOCKS.AVTOMAT]:     { name: "Avtomat",         color: '#607d8b', isWeapon: true },
+    [BLOCKS.TORCH]:       { name: "Mashala (Olov)",  color: '#ff5722', isLuminous: true, isFurniture: true }
   };
+
+  function getItemIconHTML(bId) {
+    if (bId === undefined || bId === BLOCKS.AIR) return '';
+    
+    // Weapons/Tools
+    if (bId === BLOCKS.SWORD) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <!-- Blade -->
+        <path d="M28 4 L4 28 L2 26 L26 2 Z" fill="#00e5ff" stroke="#00acc1" stroke-width="1"/>
+        <path d="M28 4 L14 18 L16 16 Z" fill="#e0f7fa"/>
+        <!-- Guard -->
+        <path d="M8 20 L4 24 L5 25 L9 21 Z" fill="#37474f"/>
+        <path d="M20 8 L24 4 L25 5 L21 9 Z" fill="#37474f"/>
+        <path d="M9 19 L13 23 L11 25 L7 21 Z" fill="#ffd600"/>
+        <!-- Hilt -->
+        <rect x="5" y="23" width="4" height="4" fill="#795548" transform="rotate(45 7 25)"/>
+        <circle cx="4" cy="28" r="2" fill="#ffd600"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.BOW) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <!-- Bow Limbs -->
+        <path d="M26 6 C18 2, 8 8, 6 26" fill="none" stroke="#8d6e63" stroke-width="3" stroke-linecap="round"/>
+        <path d="M26 6 C22 10, 10 22, 6 26" fill="none" stroke="#5d4037" stroke-width="1"/>
+        <!-- String -->
+        <line x1="26" y1="6" x2="6" y2="26" stroke="#e0e0e0" stroke-width="1.5"/>
+        <!-- Arrow -->
+        <line x1="22" y1="22" x2="10" y2="10" stroke="#eeeeee" stroke-width="2"/>
+        <polygon points="10,10 14,10 10,14" fill="#cfd8dc"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.BOMB) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <!-- Red TNT Body -->
+        <rect x="3" y="6" width="26" height="22" rx="2" fill="#ef5350" stroke="#b71c1c" stroke-width="1.5"/>
+        <!-- Warning stripes -->
+        <path d="M3 6 L10 6 L3 13 Z M18 6 L25 6 L11 20 L11 28 Z M29 20 L29 27 L28 28 L21 28 Z" fill="#ffeb3b" opacity="0.85"/>
+        <!-- TNT Text -->
+        <rect x="5" y="11" width="22" height="12" fill="#ffffff" rx="1"/>
+        <text x="16" y="21" font-family="monospace" font-weight="900" font-size="10" text-anchor="middle" fill="#111111">TNT</text>
+        <!-- Fuse -->
+        <path d="M16 6 Q18 2, 22 2" fill="none" stroke="#ffb74d" stroke-width="2" stroke-linecap="round"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.AVTOMAT) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <!-- Stock -->
+        <path d="M2 14 L8 14 L8 22 L2 20 Z" fill="#8d6e63" stroke="#5d4037" stroke-width="1"/>
+        <!-- Body -->
+        <rect x="8" y="15" width="14" height="5" fill="#37474f" stroke="#212121" stroke-width="1"/>
+        <!-- Grip -->
+        <rect x="15" y="20" width="3" height="6" transform="skewX(-15)" fill="#212121"/>
+        <!-- Magazine -->
+        <path d="M11 20 Q12 25, 9 28 L12 28 Q15 24, 14 20 Z" fill="#212121"/>
+        <!-- Barrel -->
+        <rect x="22" y="16" width="7" height="2" fill="#cfd8dc"/>
+        <rect x="29" y="15" width="1" height="4" fill="#37474f"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.TORCH) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <!-- Handle -->
+        <rect x="13" y="16" width="6" height="14" rx="1" fill="#795548" stroke="#4e342e" stroke-width="1"/>
+        <rect x="12" y="13" width="8" height="4" fill="#5d4037"/>
+        <!-- Flame -->
+        <path d="M16 2 C12 6, 12 12, 16 14 C20 12, 20 6, 16 2 Z" fill="#ff3d00"/>
+        <path d="M16 5 C14 8, 14 12, 16 13 C18 12, 18 8, 16 5 Z" fill="#ffc107"/>
+      </svg>`;
+    }
+    
+    // Isometric 3D block representation
+    const color = BLOCK_INFO[bId]?.color || '#9e9e9e';
+    const adjustColor = (hex, percent) => {
+      let num = parseInt(hex.replace('#',''), 16),
+      amt = Math.round(2.55 * percent),
+      R = (num >> 16) + amt,
+      G = (num >> 8 & 0x00FF) + amt,
+      B = (num & 0x0000FF) + amt;
+      return '#' + (0x1000000 + (R<255?R<0?0:R:255)*0x10000 + (G<255?G<0?0:G:255)*0x100 + (B<255?B<0?0:B:255)).toString(16).slice(1);
+    };
+    const topColor = adjustColor(color, 15);
+    const leftColor = adjustColor(color, -10);
+    const rightColor = adjustColor(color, -25);
+    
+    return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+      <!-- Top Face -->
+      <polygon points="16,4 28,10 16,16 4,10" fill="${topColor}" stroke="rgba(255,255,255,0.2)" stroke-width="0.5"/>
+      <!-- Left Face -->
+      <polygon points="4,10 16,16 16,28 4,22" fill="${leftColor}" stroke="rgba(0,0,0,0.15)" stroke-width="0.5"/>
+      <!-- Right Face -->
+      <polygon points="16,16 28,10 28,22 16,28" fill="${rightColor}" stroke="rgba(0,0,0,0.25)" stroke-width="0.5"/>
+    </svg>`;
+  }
 
   // --- AUDIO SYNTHESIZER ---
   class SoundEngine {
@@ -214,8 +310,9 @@
       [BLOCKS.GLAZED_BLUE]: '#01579b', [BLOCKS.BEDROCK]: '#212121',
       [BLOCKS.IRON]: '#b0bec5', [BLOCKS.DARK_STONE]: '#37474f',
       [BLOCKS.GLASS]: '#80deea', [BLOCKS.TERRACOTTA]: '#bf360c', [BLOCKS.COPPER]: '#ff7043',
-      [BLOCKS.BOMB]: '#d32f2f', [BLOCKS.SOFA]: '#7b1fa2', [BLOCKS.TABLE]: '#5d4037',
-      [BLOCKS.CHAIR]: '#6d4c41', [BLOCKS.FLOWER]: '#e91e63'
+      [BLOCKS.BOMB]: '#b71c1c', [BLOCKS.SOFA]: '#7b1fa2', [BLOCKS.TABLE]: '#5d4037',
+      [BLOCKS.CHAIR]: '#6d4c41', [BLOCKS.FLOWER]: '#e91e63',
+      [BLOCKS.AVTOMAT]: '#37474f', [BLOCKS.TORCH]: '#8d6e63'
     };
     ctx.fillStyle = colors[blockId] || '#ffffff';
     ctx.fillRect(0, 0, 32, 32);
@@ -227,12 +324,42 @@
       }
     }
     if (blockId === BLOCKS.BOMB) {
+      // Bold warning stripes
+      ctx.fillStyle = '#ffcc00';
+      ctx.fillRect(0, 0, 32, 4);
+      ctx.fillRect(0, 28, 32, 4);
       ctx.fillStyle = '#111111';
-      ctx.font = 'bold 9px monospace';
+      ctx.fillRect(0, 0, 8, 4); ctx.fillRect(16, 0, 8, 4);
+      ctx.fillRect(8, 28, 8, 4); ctx.fillRect(24, 28, 8, 4);
+      
+      // Central text box
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(2, 8, 28, 16);
+      ctx.fillStyle = '#000000';
+      ctx.font = 'bold 11px Arial';
       ctx.textAlign = 'center';
       ctx.fillText('TNT', 16, 20);
-      ctx.fillStyle = '#ffeb3b';
-      ctx.fillRect(14, 4, 4, 4); // fuse base
+      
+      // Fuse base
+      ctx.fillStyle = '#8d6e63';
+      ctx.fillRect(14, 4, 4, 4);
+    }
+    if (blockId === BLOCKS.TORCH) {
+      // Draw torch detail on block face
+      ctx.fillStyle = '#ff7043'; // flame orange
+      ctx.fillRect(12, 2, 8, 12);
+      ctx.fillStyle = '#ffeb3b'; // flame yellow
+      ctx.fillRect(14, 4, 4, 6);
+      ctx.fillStyle = '#5d4037'; // handle brown
+      ctx.fillRect(13, 14, 6, 18);
+    }
+    if (blockId === BLOCKS.AVTOMAT) {
+      // Draw automatic rifle outline
+      ctx.fillStyle = '#212121';
+      ctx.fillRect(4, 14, 24, 6); // barrel/body
+      ctx.fillRect(20, 18, 4, 10); // grip
+      ctx.fillStyle = '#8d6e63'; // wooden stock
+      ctx.fillRect(2, 12, 6, 8);
     }
     if (blockId === BLOCKS.LANTERN) {
       ctx.fillStyle = '#fff9c4';
@@ -364,6 +491,8 @@
   // --- HEALTH & COMBAT STATE ---
   let health = 10;
   const MAX_HEALTH = 10;
+  let avtomatAmmo = 30;
+  let isReloading = false;
 
   // --- PLACED POINT LIGHTS FOR LANTERNS ---
   const placedLights = {};
@@ -2029,6 +2158,17 @@
       }
     });
 
+    // Continuous automatic rifle shooting
+    if (isMouseDown && hotbarBlocks[activeSlotIndex] === BLOCKS.AVTOMAT) {
+      avtomatFireTimer += delta;
+      if (avtomatFireTimer >= 0.1) { // 10 bullets per second
+        performAvtomatShoot();
+        avtomatFireTimer = 0;
+      }
+    } else {
+      avtomatFireTimer = 0.1; // reset so next click shoots instantly
+    }
+
     // Update active arrows
     for (let i = activeArrows.length - 1; i >= 0; i--) {
       const arrow = activeArrows[i];
@@ -2044,7 +2184,6 @@
         hitSomething = true;
       }
 
-      // Check animal hit
       for (let j = animals.length - 1; j >= 0; j--) {
         const animal = animals[j];
         const dist = arrow.mesh.position.distanceTo(animal.position);
@@ -2060,6 +2199,88 @@
         activeArrows.splice(i, 1);
       }
     }
+
+    // Update active bullets
+    for (let i = activeBullets.length - 1; i >= 0; i--) {
+      const bullet = activeBullets[i];
+      bullet.mesh.position.addScaledVector(bullet.velocity, delta);
+      bullet.time += delta;
+
+      let hitSomething = false;
+      const bx = Math.round(bullet.mesh.position.x);
+      const by = Math.round(bullet.mesh.position.y);
+      const bz = Math.round(bullet.mesh.position.z);
+      const targetBlock = worldData[`${bx},${by},${bz}`];
+      if (targetBlock && targetBlock !== BLOCKS.AIR && targetBlock !== BLOCKS.WATER) {
+        hitSomething = true;
+      }
+
+      for (let j = animals.length - 1; j >= 0; j--) {
+        const animal = animals[j];
+        const dist = bullet.mesh.position.distanceTo(animal.position);
+        if (dist < 1.3) {
+          hitSomething = true;
+          damageAnimal(animal, 1.0); // 1.0 dmg per bullet
+          break;
+        }
+      }
+
+      if (hitSomething || bullet.time > 1.5) {
+        scene.remove(bullet.mesh);
+        activeBullets.splice(i, 1);
+      }
+    }
+
+    // Update active torches
+    for (let i = activeTorches.length - 1; i >= 0; i--) {
+      const torch = activeTorches[i];
+      // Apply gravity drop for realistic throwing arc
+      torch.velocity.y -= delta * 12.0;
+      torch.mesh.position.addScaledVector(torch.velocity, delta);
+      torch.time += delta;
+
+      let hitSomething = false;
+      const bx = Math.round(torch.mesh.position.x);
+      const by = Math.round(torch.mesh.position.y);
+      const bz = Math.round(torch.mesh.position.z);
+      const key = `${bx},${by},${bz}`;
+      const targetBlock = worldData[key];
+      
+      if (targetBlock && targetBlock !== BLOCKS.AIR && targetBlock !== BLOCKS.WATER) {
+        hitSomething = true;
+        if (targetBlock === BLOCKS.BOMB) {
+          triggerBombFuse(bx, by, bz);
+        } else {
+          // Place a placed Torch block in the air space adjacent to impact
+          const px = Math.round(torch.mesh.position.x - torch.velocity.x * delta * 0.4);
+          const py = Math.round(torch.mesh.position.y - torch.velocity.y * delta * 0.4);
+          const pz = Math.round(torch.mesh.position.z - torch.velocity.z * delta * 0.4);
+          const prevKey = `${px},${py},${pz}`;
+          if (!worldData[prevKey] || worldData[prevKey] === BLOCKS.AIR) {
+            worldData[prevKey] = BLOCKS.TORCH;
+            modifiedBlocks[prevKey] = BLOCKS.TORCH;
+            addPointLightAt(px, py, pz);
+            rebuildWorldMesh();
+            soundEngine.playSFX('place');
+          }
+        }
+      }
+
+      for (let j = animals.length - 1; j >= 0; j--) {
+        const animal = animals[j];
+        const dist = torch.mesh.position.distanceTo(animal.position);
+        if (dist < 1.3) {
+          hitSomething = true;
+          damageAnimal(animal, 0.5);
+          break;
+        }
+      }
+
+      if (hitSomething || torch.time > 3.0) {
+        scene.remove(torch.mesh);
+        activeTorches.splice(i, 1);
+      }
+    }
   }
 
   function animateNPCs(delta) {
@@ -2072,7 +2293,7 @@
           npc.fleeingTimer -= delta;
           npc.position.x += npc.fleeingDir.x * delta * 5.0; // Run away faster!
           npc.position.z += npc.fleeingDir.z * delta * 5.0;
-          npc.rotation.y = Math.atan2(npc.fleeingDir.x, npc.fleeingDir.z);
+          npc.rotation.y = Math.atan2(npc.fleeingDir.x, npc.fleeingDir.z) - Math.PI / 2;
         } else {
           // Slow look at player if nearby
           const dx = playerPos.x - npc.position.x;
@@ -2081,7 +2302,7 @@
 
           if (dist < 10) {
             isLooking = true;
-            const targetYaw = Math.atan2(dx, dz);
+            const targetYaw = Math.atan2(dx, dz) - Math.PI / 2;
             npc.rotation.y += (targetYaw - npc.rotation.y) * 0.08;
           }
 
@@ -2094,7 +2315,7 @@
             }
             npc.position.x += npc.wanderDir.x * delta * 1.5;
             npc.position.z += npc.wanderDir.z * delta * 1.5;
-            npc.rotation.y = Math.atan2(npc.wanderDir.x, npc.wanderDir.z);
+            npc.rotation.y = Math.atan2(npc.wanderDir.x, npc.wanderDir.z) - Math.PI / 2;
           }
         }
 
@@ -2337,8 +2558,27 @@
 
       rebuildWorldMesh();
 
+      const directions = [
+        [1,0,0], [-1,0,0], [0,1,0], [0,-1,0], [0,0,1], [0,0,-1]
+      ];
       if (blockId === BLOCKS.BOMB) {
-        triggerBombFuse(bx, by, bz);
+        let hasTorchNear = false;
+        for (const [dx, dy, dz] of directions) {
+          if (worldData[`${bx+dx},${by+dy},${bz+dz}`] === BLOCKS.TORCH) {
+            hasTorchNear = true;
+            break;
+          }
+        }
+        if (hasTorchNear) {
+          triggerBombFuse(bx, by, bz);
+        }
+      } else if (blockId === BLOCKS.TORCH) {
+        for (const [dx, dy, dz] of directions) {
+          const nx = bx + dx, ny = by + dy, nz = bz + dz;
+          if (worldData[`${nx},${ny},${nz}`] === BLOCKS.BOMB) {
+            triggerBombFuse(nx, ny, nz);
+          }
+        }
       }
     }
   }
@@ -2534,6 +2774,13 @@
     soundEngine.init();
     soundEngine.startAmbientMusic();
     joinMultiplayerRoom();
+
+    const container = document.getElementById('canvas-container');
+    if (container) {
+      setTimeout(() => {
+        container.requestPointerLock();
+      }, 100);
+    }
   }
 
   function returnToMainMenu() {
@@ -2856,10 +3103,17 @@
 
   let handSwingTime = 0;
   let activeArrows = [];
+  let activeBullets = [];
+  let activeTorches = [];
   let activeParticles = [];
+  let isMouseDown = false;
+  let avtomatFireTimer = 0.12;
 
-  function triggerBombFuse(bx, by, bz) {
+  function triggerBombFuse(bx, by, bz, instant = false) {
     const key = `${bx},${by},${bz}`;
+    // If it's already triggered/removed, return
+    if (worldData[key] !== BLOCKS.BOMB) return;
+
     delete worldData[key];
     delete modifiedBlocks[key];
     rebuildWorldMesh();
@@ -2870,6 +3124,14 @@
         event: 'block_change',
         payload: { x: bx, y: by, z: bz, blockId: BLOCKS.AIR }
       });
+    }
+
+    if (instant) {
+      // Tiny randomized delay for nice sequential chain reaction effect
+      setTimeout(() => {
+        explodeBombAt(bx, by, bz);
+      }, 50 + Math.random() * 150);
+      return;
     }
 
     const tntGeo = new THREE.BoxGeometry(0.98, 0.98, 0.98);
@@ -2899,6 +3161,7 @@
 
     const radius = 3;
     const destroyedList = [];
+    const chainList = [];
 
     for (let x = bx - radius; x <= bx + radius; x++) {
       for (let y = by - radius; y <= by + radius; y++) {
@@ -2907,11 +3170,17 @@
           const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
           if (dist <= 3.2) {
             const key = `${x},${y},${z}`;
-            if (worldData[key] && worldData[key] !== BLOCKS.BEDROCK) {
-              removePointLightAtKey(key);
-              worldData[key] = BLOCKS.AIR;
-              modifiedBlocks[key] = BLOCKS.AIR;
-              destroyedList.push({ x, y, z });
+            const targetBlock = worldData[key];
+            if (targetBlock && targetBlock !== BLOCKS.BEDROCK) {
+              if (targetBlock === BLOCKS.BOMB) {
+                // Add to list to trigger chain reaction sequentially
+                chainList.push({ x, y, z });
+              } else {
+                removePointLightAtKey(key);
+                worldData[key] = BLOCKS.AIR;
+                modifiedBlocks[key] = BLOCKS.AIR;
+                destroyedList.push({ x, y, z });
+              }
             }
           }
         }
@@ -2930,6 +3199,11 @@
       });
     }
 
+    // Trigger chain reactions
+    chainList.forEach(coords => {
+      triggerBombFuse(coords.x, coords.y, coords.z, true); // true = instant/cascade
+    });
+
     const distToPlayer = playerPos.distanceTo(new THREE.Vector3(bx, by, bz));
     if (distToPlayer <= 5.0) {
       const dmg = Math.round((5.0 - distToPlayer) * 2.5);
@@ -2938,10 +3212,13 @@
       }
     }
 
+    // Spawn realistic fire/smoke explosion particles
     const particleCount = 45;
     for (let i = 0; i < particleCount; i++) {
-      const pGeo = new THREE.BoxGeometry(0.2 + Math.random() * 0.25, 0.2 + Math.random() * 0.25, 0.2 + Math.random() * 0.25);
-      const pMat = new THREE.MeshBasicMaterial({ color: 0x90a4ae, transparent: true, opacity: 0.8 });
+      const pGeo = new THREE.BoxGeometry(0.15 + Math.random() * 0.2, 0.15 + Math.random() * 0.2, 0.15 + Math.random() * 0.2);
+      // Mix of fire orange/yellow and smoke grey
+      const fireColor = Math.random() < 0.45 ? 0xff7043 : (Math.random() < 0.3 ? 0xffeb3b : 0x757575);
+      const pMat = new THREE.MeshBasicMaterial({ color: fireColor, transparent: true, opacity: 0.95 });
       const pMesh = new THREE.Mesh(pGeo, pMat);
       
       pMesh.position.set(
@@ -2954,11 +3231,11 @@
       activeParticles.push({
         mesh: pMesh,
         velocity: new THREE.Vector3(
-          (Math.random() - 0.5) * 6.0,
-          Math.random() * 4.5 + 2.0,
-          (Math.random() - 0.5) * 6.0
+          (Math.random() - 0.5) * 7.5,
+          Math.random() * 5.0 + 2.0,
+          (Math.random() - 0.5) * 7.5
         ),
-        life: 1.5
+        life: 1.2 + Math.random() * 0.6
       });
     }
   }
@@ -3033,6 +3310,47 @@
 
       bowGroup.add(center);
       fpHandGroup.add(bowGroup);
+    } else if (blockId === BLOCKS.AVTOMAT) {
+      const avtomatGroup = new THREE.Group();
+      avtomatGroup.position.set(0.16, -0.18, -0.4);
+      avtomatGroup.rotation.y = -0.15;
+      
+      const metalMat = new THREE.MeshLambertMaterial({ color: 0x37474f, roughness: 0.5, metalness: 0.8 });
+      const woodMat = new THREE.MeshLambertMaterial({ color: 0x8d6e63, roughness: 0.7 });
+      
+      const stock = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.08, 0.15), woodMat);
+      stock.position.set(-0.02, -0.02, 0.08);
+      avtomatGroup.add(stock);
+
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.06, 0.25), metalMat);
+      body.position.set(0, 0, -0.05);
+      avtomatGroup.add(body);
+      
+      const barrel = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.02, 0.18), metalMat);
+      barrel.position.set(0, 0.01, -0.2);
+      avtomatGroup.add(barrel);
+
+      const mag = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.12, 0.05), metalMat);
+      mag.position.set(0, -0.08, -0.08);
+      mag.rotation.x = -0.2;
+      avtomatGroup.add(mag);
+
+      fpHandGroup.add(avtomatGroup);
+    } else if (blockId === BLOCKS.TORCH) {
+      const torchGroup = new THREE.Group();
+      torchGroup.position.set(0.18, -0.15, -0.42);
+      torchGroup.rotation.x = -0.3;
+
+      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.2, 0.04), new THREE.MeshLambertMaterial({ color: 0x795548 }));
+      const flame = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.08, 0.05), new THREE.MeshBasicMaterial({ color: 0xff5722 }));
+      flame.position.y = 0.12;
+      torchGroup.add(handle, flame);
+      
+      const torchLight = new THREE.PointLight(0xff5722, 1.2, 5);
+      torchLight.position.set(0, 0.12, 0);
+      torchGroup.add(torchLight);
+
+      fpHandGroup.add(torchGroup);
     } else {
       // Regular block
       const color = BLOCK_INFO[blockId]?.color || '#ffffff';
@@ -3104,6 +3422,43 @@
 
       bowGroup.add(center);
       mesh.armR.add(bowGroup);
+    } else if (blockId === BLOCKS.AVTOMAT) {
+      const avtomatGroup = new THREE.Group();
+      avtomatGroup.position.set(0, -0.4, 0.12);
+      avtomatGroup.rotation.x = -Math.PI / 3;
+
+      const metalMat = new THREE.MeshLambertMaterial({ color: 0x37474f, roughness: 0.5, metalness: 0.8 });
+      const woodMat = new THREE.MeshLambertMaterial({ color: 0x8d6e63, roughness: 0.7 });
+
+      const stock = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.1, 0.18), woodMat);
+      stock.position.set(-0.02, -0.02, 0.08);
+      avtomatGroup.add(stock);
+
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.08, 0.32), metalMat);
+      body.position.set(0, 0, -0.08);
+      avtomatGroup.add(body);
+
+      const barrel = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.03, 0.22), metalMat);
+      barrel.position.set(0, 0.01, -0.28);
+      avtomatGroup.add(barrel);
+
+      const mag = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.15, 0.06), metalMat);
+      mag.position.set(0, -0.1, -0.1);
+      mag.rotation.x = -0.2;
+      avtomatGroup.add(mag);
+
+      mesh.armR.add(avtomatGroup);
+    } else if (blockId === BLOCKS.TORCH) {
+      const torchGroup = new THREE.Group();
+      torchGroup.position.set(0, -0.38, 0.1);
+      torchGroup.rotation.x = -Math.PI / 3;
+
+      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.25, 0.05), new THREE.MeshLambertMaterial({ color: 0x795548 }));
+      const flame = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.1, 0.06), new THREE.MeshBasicMaterial({ color: 0xff5722 }));
+      flame.position.y = 0.15;
+      torchGroup.add(handle, flame);
+
+      mesh.armR.add(torchGroup);
     } else {
       // Regular block
       const color = BLOCK_INFO[blockId]?.color || '#ffffff';
@@ -3249,6 +3604,96 @@
     });
   }
 
+  function reloadAvtomat() {
+    if (isReloading) return;
+    isReloading = true;
+    renderHotbar();
+    showToast("Avtomat o'qlanmoqda...");
+    
+    soundEngine.playSFX('swing');
+    setTimeout(() => { soundEngine.playSFX('place'); }, 500);
+    setTimeout(() => { soundEngine.playSFX('famous'); }, 1000);
+
+    setTimeout(() => {
+      avtomatAmmo = 30;
+      isReloading = false;
+      showToast("O'qlandi!");
+      renderHotbar();
+    }, 1500);
+  }
+
+  function performAvtomatShoot() {
+    if (isReloading) return;
+    if (avtomatAmmo <= 0) {
+      reloadAvtomat();
+      return;
+    }
+
+    avtomatAmmo--;
+    renderHotbar();
+
+    handSwingTime = 0.08;
+    soundEngine.playSFX('shoot');
+
+    const bulletGeom = new THREE.BoxGeometry(0.03, 0.03, 0.15);
+    const bulletMat = new THREE.MeshBasicMaterial({ color: 0xffeb3b });
+    const bulletMesh = new THREE.Mesh(bulletGeom, bulletMat);
+
+    const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+    
+    dir.x += (Math.random() - 0.5) * 0.015;
+    dir.y += (Math.random() - 0.5) * 0.015;
+    dir.z += (Math.random() - 0.5) * 0.015;
+    dir.normalize();
+
+    bulletMesh.position.copy(playerPos);
+    bulletMesh.position.y += 1.45;
+    bulletMesh.position.addScaledVector(dir, 0.5);
+
+    bulletMesh.lookAt(bulletMesh.position.clone().add(dir));
+    scene.add(bulletMesh);
+
+    activeBullets.push({
+      mesh: bulletMesh,
+      velocity: dir.clone().multiplyScalar(75.0),
+      time: 0
+    });
+
+    if (avtomatAmmo === 0) {
+      reloadAvtomat();
+    }
+  }
+
+  function throwTorch() {
+    handSwingTime = 0.2;
+    soundEngine.playSFX('shoot');
+
+    const torchGroup = new THREE.Group();
+    const handle = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.35, 0.08), new THREE.MeshLambertMaterial({ color: 0x795548 }));
+    handle.position.y = -0.15;
+    const flame = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.15, 0.1), new THREE.MeshBasicMaterial({ color: 0xff3d00 }));
+    flame.position.y = 0.08;
+    torchGroup.add(handle, flame);
+
+    const torchLight = new THREE.PointLight(0xff5722, 1.5, 8);
+    torchLight.position.set(0, 0.08, 0);
+    torchGroup.add(torchLight);
+
+    const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+
+    torchGroup.position.copy(playerPos);
+    torchGroup.position.y += 1.45;
+    torchGroup.position.addScaledVector(dir, 0.5);
+
+    scene.add(torchGroup);
+
+    activeTorches.push({
+      mesh: torchGroup,
+      velocity: dir.clone().multiplyScalar(22.0),
+      time: 0
+    });
+  }
+
   function renderHotbar() {
     const el = document.getElementById('hotbar');
     if (!el) return;
@@ -3256,7 +3701,13 @@
     hotbarBlocks.forEach((bId, idx) => {
       const slot = document.createElement('div');
       slot.className = `hotbar-slot ${idx === activeSlotIndex ? 'active' : ''}`;
-      slot.innerHTML = `<span class="hotbar-slot-num">${idx + 1}</span><div class="hotbar-icon" style="background:${BLOCK_INFO[bId].color};"></div>`;
+      
+      let ammoHtml = '';
+      if (bId === BLOCKS.AVTOMAT) {
+        ammoHtml = `<div class="ammo-indicator" style="position: absolute; bottom: 2px; right: 4px; font-size: 10px; font-family: monospace; font-weight: bold; color: #ffeb3b; background: rgba(0,0,0,0.6); padding: 1px 3px; border-radius: 3px; z-index: 10;">${isReloading ? 'RELOAD' : avtomatAmmo}</div>`;
+      }
+      
+      slot.innerHTML = `<span class="hotbar-slot-num">${idx + 1}</span><div class="hotbar-icon" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:4px;">${getItemIconHTML(bId)}</div>${ammoHtml}`;
       slot.addEventListener('click', () => { activeSlotIndex = idx; renderHotbar(); });
       el.appendChild(slot);
     });
@@ -3273,9 +3724,9 @@
 
     let items = [];
     if (currentInventoryTab === 'weapons') {
-      items = [BLOCKS.SWORD, BLOCKS.BOW, BLOCKS.BOMB];
+      items = [BLOCKS.SWORD, BLOCKS.BOW, BLOCKS.BOMB, BLOCKS.AVTOMAT];
     } else if (currentInventoryTab === 'furniture') {
-      items = [BLOCKS.LANTERN, BLOCKS.SOFA, BLOCKS.TABLE, BLOCKS.CHAIR, BLOCKS.FLOWER];
+      items = [BLOCKS.LANTERN, BLOCKS.TORCH, BLOCKS.SOFA, BLOCKS.TABLE, BLOCKS.CHAIR, BLOCKS.FLOWER];
     } else {
       items = [
         BLOCKS.DIAMOND, BLOCKS.GOLD, BLOCKS.IRON, BLOCKS.COPPER,
@@ -3289,7 +3740,7 @@
       if (BLOCK_INFO[bId] === undefined) return;
       const item = document.createElement('div');
       item.className = 'inv-slot-item';
-      item.innerHTML = `<div class="block-icon-box" style="background:${BLOCK_INFO[bId].color};"></div><span class="block-slot-name">${BLOCK_INFO[bId].name}</span>`;
+      item.innerHTML = `<div class="block-icon-box" style="width:48px; height:48px; display:flex; align-items:center; justify-content:center; padding:4px;">${getItemIconHTML(bId)}</div><span class="block-slot-name">${BLOCK_INFO[bId].name}</span>`;
       item.addEventListener('click', () => {
         hotbarBlocks[activeSlotIndex] = bId; renderHotbar();
         showToast(`Slot ${activeSlotIndex + 1}: "${BLOCK_INFO[bId].name}"`);
@@ -3324,18 +3775,28 @@
       if (e.target.closest('#ui-layer') && !e.target.closest('#canvas-container')) return;
       if (document.getElementById('hud').classList.contains('hidden')) return;
       if (e.button === 0) {
+        isMouseDown = true;
         const blockId = hotbarBlocks[activeSlotIndex];
         if (blockId === BLOCKS.SWORD) {
           performSwordAttack();
         } else if (blockId === BLOCKS.BOW) {
           performBowShoot();
+        } else if (blockId === BLOCKS.AVTOMAT) {
+          performAvtomatShoot();
+        } else if (blockId === BLOCKS.TORCH) {
+          throwTorch();
         } else {
           startMining();
         }
       }
       else if (e.button === 2) placeBlock();
     });
-    window.addEventListener('mouseup', e => { if (e.button === 0) cancelMining(); });
+    window.addEventListener('mouseup', e => { 
+      if (e.button === 0) {
+        isMouseDown = false;
+        cancelMining(); 
+      }
+    });
     window.addEventListener('contextmenu', e => e.preventDefault());
 
     const container = document.getElementById('canvas-container');
