@@ -3605,7 +3605,20 @@
   function explodeBombAt(bx, by, bz) {
     soundEngine.playSFX('explode');
 
-    const radius = 3;
+    let tntCount = 1;
+    const scanRadius = 6;
+    for (let x = bx - scanRadius; x <= bx + scanRadius; x++) {
+      for (let y = by - scanRadius; y <= by + scanRadius; y++) {
+        for (let z = bz - scanRadius; z <= bz + scanRadius; z++) {
+          const key = `${x},${y},${z}`;
+          if (worldData[key] === BLOCKS.BOMB) {
+            tntCount++;
+          }
+        }
+      }
+    }
+
+    const radius = Math.min(15, 3 + Math.floor(Math.sqrt(tntCount - 1) * 1.5));
     const destroyedList = [];
     const chainList = [];
 
@@ -3614,13 +3627,14 @@
         for (let z = bz - radius; z <= bz + radius; z++) {
           const dx = x - bx, dy = y - by, dz = z - bz;
           const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-          const threshold = 3.2 + (Math.random() - 0.5) * 1.5;
+          const threshold = radius + 0.2 + (Math.random() - 0.5) * 1.5;
           if (dist <= threshold) {
             const key = `${x},${y},${z}`;
             const targetBlock = worldData[key];
             if (targetBlock && targetBlock !== BLOCKS.BEDROCK) {
               if (targetBlock === BLOCKS.BOMB) {
-                // Add to list to trigger chain reaction sequentially
+                worldData[key] = BLOCKS.AIR;
+                modifiedBlocks[key] = BLOCKS.AIR;
                 chainList.push({ x, y, z });
               } else {
                 removePointLightAtKey(key);
