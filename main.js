@@ -3531,6 +3531,7 @@
       for (let y = by - radius; y <= by + radius; y++) {
         for (let z = bz - radius; z <= bz + radius; z++) {
           const dx = x - bx, dy = y - by, dz = z - bz;
+          const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
           const threshold = 3.2 + (Math.random() - 0.5) * 1.5;
           if (dist <= threshold) {
             const key = `${x},${y},${z}`;
