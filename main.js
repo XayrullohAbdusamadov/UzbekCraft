@@ -17,7 +17,7 @@
     WHITE_MARBLE: 17, GLAZED_BLUE: 18, BEDROCK: 19, IRON: 20,
     DARK_STONE: 21, GLASS: 22, TERRACOTTA: 23, COPPER: 24,
     SWORD: 25, BOW: 26, BOMB: 27, SOFA: 28, TABLE: 29, CHAIR: 30, FLOWER: 31,
-    AVTOMAT: 32, TORCH: 33
+    AVTOMAT: 32, TORCH: 33, BUCKET: 34, WATER_BUCKET: 35
   };
 
   const BLOCK_INFO = {
@@ -53,7 +53,9 @@
     [BLOCKS.CHAIR]:       { name: "Stul",            color: '#a1887f', isFurniture: true },
     [BLOCKS.FLOWER]:      { name: "Gul",             color: '#ec407a', isFurniture: true },
     [BLOCKS.AVTOMAT]:     { name: "Avtomat",         color: '#607d8b', isWeapon: true },
-    [BLOCKS.TORCH]:       { name: "Mashala (Olov)",  color: '#ff5722', isLuminous: true, isFurniture: true }
+    [BLOCKS.TORCH]:       { name: "Mashala (Olov)",  color: '#ff5722', isLuminous: true, isFurniture: true },
+    [BLOCKS.BUCKET]:      { name: "Chelak",          color: '#b0bec5', isWeapon: true },
+    [BLOCKS.WATER_BUCKET]:{ name: "Suvli chelak",    color: '#29b6f6', isWeapon: true }
   };
 
   function getItemIconHTML(bId) {
@@ -194,6 +196,20 @@
         <circle cx="19" cy="8" r="3" fill="#e91e63"/>
         <circle cx="16" cy="6" r="3.5" fill="#f48fb1"/>
         <circle cx="16" cy="9" r="1.5" fill="#ffeb3b"/>
+      </svg>`;
+    if (bId === BLOCKS.BUCKET) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <path d="M6 14 C6 4, 26 4, 26 14" fill="none" stroke="#cfd8dc" stroke-width="2"/>
+        <polygon points="8,12 24,12 20,28 12,28" fill="#b0bec5" stroke="#78909c" stroke-width="1.5"/>
+        <line x1="8" y1="17" x2="24" y2="17" stroke="#78909c" stroke-width="1.5"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.WATER_BUCKET) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <path d="M6 14 C6 4, 26 4, 26 14" fill="none" stroke="#cfd8dc" stroke-width="2"/>
+        <polygon points="8,12 24,12 20,28 12,28" fill="#b0bec5" stroke="#78909c" stroke-width="1.5"/>
+        <polygon points="9.5,13 22.5,13 21,17 11,17" fill="#29b6f6"/>
+        <line x1="8" y1="17" x2="24" y2="17" stroke="#78909c" stroke-width="1.5"/>
       </svg>`;
     }
     
@@ -1080,14 +1096,46 @@
     } else {
       const isSandy = ['pyramids', 'ichan_qala', 'desert', 'colosseum'].includes(mapType);
       const isSnowy = ['chimgon', 'everest', 'snow'].includes(mapType);
+      const isClassic = mapType === 'minecraft_classic';
+
       for (let x = -R; x <= R; x++) {
         for (let z = -R; z <= R; z++) {
-          const nx = Math.sin(x * 0.035 + 1.2) * 6 + Math.cos(z * 0.04) * 5;
-          const topY = Math.floor(BASE + nx);
+          const nx = isClassic
+            ? (Math.sin(x * 0.02) * Math.cos(z * 0.02) * 11 + Math.sin(x * 0.06) * 3)
+            : (Math.sin(x * 0.035 + 1.2) * 6 + Math.cos(z * 0.04) * 5);
+          
+          let topY = Math.floor(BASE + nx);
           worldData[`${x},0,${z}`] = BLOCKS.BEDROCK;
-          for (let y = topY - 5; y <= topY; y++) {
-            if (y === topY) worldData[`${x},${y},${z}`] = isSandy ? BLOCKS.SAND : (isSnowy ? BLOCKS.SNOW : BLOCKS.GRASS);
-            else worldData[`${x},${y},${z}`] = isSandy ? BLOCKS.SAND : BLOCKS.DIRT;
+
+          const lakeNoise = isClassic ? (Math.sin(x * 0.04) * Math.cos(z * 0.04)) : 0;
+          const isLake = isClassic && (lakeNoise < -0.42);
+
+          if (isLake) {
+            const lakeDepth = Math.floor(BASE - 4);
+            const waterLevel = Math.floor(BASE - 1);
+            for (let y = lakeDepth - 2; y <= waterLevel; y++) {
+              if (y === waterLevel) {
+                worldData[`${x},${y},${z}`] = BLOCKS.WATER;
+              } else if (y >= waterLevel - 2) {
+                worldData[`${x},${y},${z}`] = BLOCKS.SAND;
+              } else {
+                worldData[`${x},${y},${z}`] = BLOCKS.DIRT;
+              }
+            }
+          } else {
+            const hasSandyBorder = isClassic && (lakeNoise < -0.36);
+            for (let y = topY - 5; y <= topY; y++) {
+              if (y === topY) {
+                const bType = hasSandyBorder ? BLOCKS.SAND : (isSandy ? BLOCKS.SAND : (isSnowy ? BLOCKS.SNOW : BLOCKS.GRASS));
+                worldData[`${x},${y},${z}`] = bType;
+                
+                if (isClassic && bType === BLOCKS.GRASS && Math.random() < 0.015) {
+                  worldData[`${x},${y+1},${z}`] = BLOCKS.FLOWER;
+                }
+              } else {
+                worldData[`${x},${y},${z}`] = isSandy ? BLOCKS.SAND : BLOCKS.DIRT;
+              }
+            }
           }
         }
       }
@@ -1635,7 +1683,9 @@
   }
 
   function spawnTrees(R, baseY, mapType) {
-    for (let i = 0; i < 30; i++) {
+    const isClassic = mapType === 'minecraft_classic';
+    const numTrees = isClassic ? 75 : 30;
+    for (let i = 0; i < numTrees; i++) {
       const tx = Math.round((Math.random() - 0.5) * R * 1.5);
       const tz = Math.round((Math.random() - 0.5) * R * 1.5);
       // Find ground level
@@ -3716,6 +3766,26 @@
       torchGroup.add(torchLight);
 
       fpHandGroup.add(torchGroup);
+    } else if (blockId === BLOCKS.BUCKET || blockId === BLOCKS.WATER_BUCKET) {
+      const bucketGroup = new THREE.Group();
+      bucketGroup.position.set(0.18, -0.16, -0.42);
+      bucketGroup.rotation.set(0.1, -0.1, 0);
+
+      const metalMat = new THREE.MeshStandardMaterial({ color: 0xb0bec5, roughness: 0.3, metalness: 0.8 });
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.16, 0.14), metalMat);
+      bucketGroup.add(body);
+      
+      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.02, 0.16), metalMat);
+      handle.position.y = 0.09;
+      bucketGroup.add(handle);
+
+      if (blockId === BLOCKS.WATER_BUCKET) {
+        const waterMat = new THREE.MeshStandardMaterial({ color: 0x1e88e5, roughness: 0.1, transparent: true, opacity: 0.8 });
+        const water = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.03, 0.12), waterMat);
+        water.position.y = 0.06;
+        bucketGroup.add(water);
+      }
+      fpHandGroup.add(bucketGroup);
     } else {
       // Regular block
       const color = BLOCK_INFO[blockId]?.color || '#ffffff';
@@ -3824,6 +3894,26 @@
       torchGroup.add(handle, flame);
 
       mesh.armR.add(torchGroup);
+    } else if (blockId === BLOCKS.BUCKET || blockId === BLOCKS.WATER_BUCKET) {
+      const bucketGroup = new THREE.Group();
+      bucketGroup.position.set(0, -0.4, 0.1);
+      bucketGroup.rotation.x = -Math.PI / 3;
+
+      const metalMat = new THREE.MeshLambertMaterial({ color: 0xb0bec5, roughness: 0.3, metalness: 0.8 });
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.22, 0.18), metalMat);
+      bucketGroup.add(body);
+      
+      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.03, 0.2), metalMat);
+      handle.position.y = 0.12;
+      bucketGroup.add(handle);
+
+      if (blockId === BLOCKS.WATER_BUCKET) {
+        const waterMat = new THREE.MeshLambertMaterial({ color: 0x1e88e5, roughness: 0.1, transparent: true, opacity: 0.8 });
+        const water = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.04, 0.16), waterMat);
+        water.position.y = 0.08;
+        bucketGroup.add(water);
+      }
+      mesh.armR.add(bucketGroup);
     } else {
       // Regular block
       const color = BLOCK_INFO[blockId]?.color || '#ffffff';
@@ -4059,6 +4149,82 @@
     });
   }
 
+  function performBucketAction() {
+    const blockId = hotbarBlocks[activeSlotIndex];
+    raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+    const hits = raycaster.intersectObjects(scene.children.filter(c => c.isVoxelMesh || c.isFurnitureMesh), true);
+    
+    if (hits.length > 0 && hits[0].distance < 6.0) {
+      const hit = hits[0];
+      
+      let hitCoord = null;
+      let obj = hit.object;
+      while (obj && obj !== scene) {
+        if (obj.isFurnitureMesh && obj.blockCoord) {
+          hitCoord = obj.blockCoord;
+          break;
+        }
+        obj = obj.parent;
+      }
+      
+      if (!hitCoord) {
+        const p = hit.point.clone().sub(hit.face.normal.clone().multiplyScalar(0.01));
+        hitCoord = `${Math.round(p.x)},${Math.round(p.y)},${Math.round(p.z)}`;
+      }
+      
+      const [hx, hy, hz] = hitCoord.split(',').map(Number);
+      const clickedBlock = worldData[hitCoord];
+
+      if (blockId === BLOCKS.BUCKET) {
+        if (clickedBlock === BLOCKS.WATER) {
+          removePointLightAtKey(hitCoord);
+          worldData[hitCoord] = BLOCKS.AIR;
+          modifiedBlocks[hitCoord] = BLOCKS.AIR;
+          rebuildWorldMesh();
+          
+          hotbarBlocks[activeSlotIndex] = BLOCKS.WATER_BUCKET;
+          renderHotbar();
+          soundEngine.playSFX('swing');
+          showToast("Suv yig'ildi!");
+        } else {
+          showToast("Faqat suv yig'ish mumkin!");
+        }
+      } else if (blockId === BLOCKS.WATER_BUCKET) {
+        if (clickedBlock === BLOCKS.GRASS || clickedBlock === BLOCKS.DIRT || clickedBlock === BLOCKS.SAND) {
+          const bx = hx, by = hy + 1, bz = hz;
+          
+          const treeH = 4 + Math.floor(Math.random() * 2);
+          for (let h = 0; h < treeH; h++) {
+            const wKey = `${bx},${by + h},${bz}`;
+            worldData[wKey] = BLOCKS.WOOD;
+            modifiedBlocks[wKey] = BLOCKS.WOOD;
+          }
+          for (let dx = -2; dx <= 2; dx++) {
+            for (let dz = -2; dz <= 2; dz++) {
+              for (let dy = -1; dy <= 2; dy++) {
+                if (Math.abs(dx) + Math.abs(dz) <= 3) {
+                  const lKey = `${bx + dx},${by + treeH + dy},${bz + dz}`;
+                  if (!worldData[lKey] || worldData[lKey] === BLOCKS.AIR) {
+                    worldData[lKey] = BLOCKS.LEAVES;
+                    modifiedBlocks[lKey] = BLOCKS.LEAVES;
+                  }
+                }
+              }
+            }
+          }
+          rebuildWorldMesh();
+          soundEngine.playSFX('place');
+          
+          hotbarBlocks[activeSlotIndex] = BLOCKS.BUCKET;
+          renderHotbar();
+          showToast("Daraxt ekildi!");
+        } else {
+          showToast("Daraxt ekish uchun o't yoki tuproqni bosing!");
+        }
+      }
+    }
+  }
+
   function renderHotbar() {
     const el = document.getElementById('hotbar');
     if (!el) return;
@@ -4091,7 +4257,7 @@
     if (currentInventoryTab === 'weapons') {
       items = [BLOCKS.SWORD, BLOCKS.BOW, BLOCKS.BOMB, BLOCKS.AVTOMAT];
     } else if (currentInventoryTab === 'furniture') {
-      items = [BLOCKS.LANTERN, BLOCKS.TORCH, BLOCKS.SOFA, BLOCKS.TABLE, BLOCKS.CHAIR, BLOCKS.FLOWER];
+      items = [BLOCKS.LANTERN, BLOCKS.TORCH, BLOCKS.SOFA, BLOCKS.TABLE, BLOCKS.CHAIR, BLOCKS.FLOWER, BLOCKS.BUCKET];
     } else {
       items = [
         BLOCKS.DIAMOND, BLOCKS.GOLD, BLOCKS.IRON, BLOCKS.COPPER,
@@ -4107,8 +4273,17 @@
       item.className = 'inv-slot-item';
       item.innerHTML = `<div class="block-icon-box" style="width:48px; height:48px; display:flex; align-items:center; justify-content:center; padding:4px;">${getItemIconHTML(bId)}</div><span class="block-slot-name">${BLOCK_INFO[bId].name}</span>`;
       item.addEventListener('click', () => {
-        hotbarBlocks[activeSlotIndex] = bId; renderHotbar();
-        showToast(`Slot ${activeSlotIndex + 1}: "${BLOCK_INFO[bId].name}"`);
+        const existingIdx = hotbarBlocks.indexOf(bId);
+        if (existingIdx !== -1) {
+          const temp = hotbarBlocks[activeSlotIndex];
+          hotbarBlocks[activeSlotIndex] = bId;
+          hotbarBlocks[existingIdx] = temp;
+          showToast(`Slot ${activeSlotIndex + 1} va Slot ${existingIdx + 1} o'rni almashdi!`);
+        } else {
+          hotbarBlocks[activeSlotIndex] = bId;
+          showToast(`Slot ${activeSlotIndex + 1}: "${BLOCK_INFO[bId].name}"`);
+        }
+        renderHotbar();
       });
       grid.appendChild(item);
     });
@@ -4150,6 +4325,8 @@
           performAvtomatShoot();
         } else if (blockId === BLOCKS.TORCH) {
           throwTorch();
+        } else if (blockId === BLOCKS.BUCKET || blockId === BLOCKS.WATER_BUCKET) {
+          performBucketAction();
         } else {
           startMining();
         }
