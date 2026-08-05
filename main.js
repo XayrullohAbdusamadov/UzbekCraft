@@ -3840,17 +3840,32 @@
       bucketGroup.rotation.set(0.1, -0.1, 0);
 
       const metalMat = new THREE.MeshStandardMaterial({ color: 0xb0bec5, roughness: 0.3, metalness: 0.8 });
-      const body = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.16, 0.14), metalMat);
-      bucketGroup.add(body);
       
-      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.02, 0.16), metalMat);
-      handle.position.y = 0.09;
-      bucketGroup.add(handle);
+      const bottom = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.02, 0.12), metalMat);
+      bottom.position.y = -0.07;
+      
+      const w1 = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.02), metalMat);
+      w1.position.set(0, 0.02, 0.07);
+      const w2 = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.02), metalMat);
+      w2.position.set(0, 0.02, -0.07);
+      const w3 = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.16, 0.12), metalMat);
+      w3.position.set(0.07, 0.02, 0);
+      const w4 = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.16, 0.12), metalMat);
+      w4.position.set(-0.07, 0.02, 0);
+      
+      const h1 = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.12, 0.02), metalMat);
+      h1.position.set(0.07, 0.15, 0);
+      const h2 = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.12, 0.02), metalMat);
+      h2.position.set(-0.07, 0.15, 0);
+      const h3 = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.02, 0.02), metalMat);
+      h3.position.set(0, 0.20, 0);
+      
+      bucketGroup.add(bottom, w1, w2, w3, w4, h1, h2, h3);
 
       if (blockId === BLOCKS.WATER_BUCKET) {
         const waterMat = new THREE.MeshStandardMaterial({ color: 0x1e88e5, roughness: 0.1, transparent: true, opacity: 0.8 });
-        const water = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.03, 0.12), waterMat);
-        water.position.y = 0.06;
+        const water = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.12), waterMat);
+        water.position.y = 0.02;
         bucketGroup.add(water);
       }
       fpHandGroup.add(bucketGroup);
@@ -3966,19 +3981,35 @@
       const bucketGroup = new THREE.Group();
       bucketGroup.position.set(0, -0.4, 0.1);
       bucketGroup.rotation.x = -Math.PI / 3;
+      bucketGroup.scale.set(1.2, 1.2, 1.2); // scale it up slightly
 
       const metalMat = new THREE.MeshLambertMaterial({ color: 0xb0bec5, roughness: 0.3, metalness: 0.8 });
-      const body = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.22, 0.18), metalMat);
-      bucketGroup.add(body);
       
-      const handle = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.03, 0.2), metalMat);
-      handle.position.y = 0.12;
-      bucketGroup.add(handle);
+      const bottom = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.02, 0.12), metalMat);
+      bottom.position.y = -0.07;
+      
+      const w1 = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.02), metalMat);
+      w1.position.set(0, 0.02, 0.07);
+      const w2 = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.02), metalMat);
+      w2.position.set(0, 0.02, -0.07);
+      const w3 = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.16, 0.12), metalMat);
+      w3.position.set(0.07, 0.02, 0);
+      const w4 = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.16, 0.12), metalMat);
+      w4.position.set(-0.07, 0.02, 0);
+      
+      const h1 = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.12, 0.02), metalMat);
+      h1.position.set(0.07, 0.15, 0);
+      const h2 = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.12, 0.02), metalMat);
+      h2.position.set(-0.07, 0.15, 0);
+      const h3 = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.02, 0.02), metalMat);
+      h3.position.set(0, 0.20, 0);
+      
+      bucketGroup.add(bottom, w1, w2, w3, w4, h1, h2, h3);
 
       if (blockId === BLOCKS.WATER_BUCKET) {
         const waterMat = new THREE.MeshLambertMaterial({ color: 0x1e88e5, roughness: 0.1, transparent: true, opacity: 0.8 });
-        const water = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.04, 0.16), waterMat);
-        water.position.y = 0.08;
+        const water = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.12), waterMat);
+        water.position.y = 0.02;
         bucketGroup.add(water);
       }
       mesh.armR.add(bucketGroup);
