@@ -1097,39 +1097,47 @@
       const isSandy = ['pyramids', 'ichan_qala', 'desert', 'colosseum'].includes(mapType);
       const isSnowy = ['chimgon', 'everest', 'snow'].includes(mapType);
       const isClassic = mapType === 'minecraft_classic';
+      const isNature = mapType === 'nature_valley';
 
       for (let x = -R; x <= R; x++) {
         for (let z = -R; z <= R; z++) {
-          const nx = isClassic
-            ? (Math.sin(x * 0.02) * Math.cos(z * 0.02) * 11 + Math.sin(x * 0.06) * 3)
-            : (Math.sin(x * 0.035 + 1.2) * 6 + Math.cos(z * 0.04) * 5);
+          let nx = 0;
+          if (isClassic) {
+            nx = Math.sin(x * 0.02) * Math.cos(z * 0.02) * 11 + Math.sin(x * 0.06) * 3;
+          } else if (isNature) {
+            nx = Math.sin(x * 0.025) * Math.cos(z * 0.025) * 15 + Math.sin(x * 0.08) * 4;
+          } else {
+            nx = Math.sin(x * 0.035 + 1.2) * 6 + Math.cos(z * 0.04) * 5;
+          }
           
           let topY = Math.floor(BASE + nx);
           worldData[`${x},0,${z}`] = BLOCKS.BEDROCK;
 
-          const lakeNoise = isClassic ? (Math.sin(x * 0.04) * Math.cos(z * 0.04)) : 0;
-          const isLake = isClassic && (lakeNoise < -0.42);
+          const lakeNoise = (isClassic || isNature) ? (Math.sin(x * 0.04) * Math.cos(z * 0.04)) : 0;
+          const riverNoise = isNature ? (Math.sin(x * 0.03 + z * 0.03) + Math.cos(x * 0.02 - z * 0.05)) : 0;
+          
+          const isLake = (isClassic && lakeNoise < -0.42) || (isNature && (lakeNoise < -0.3 || Math.abs(riverNoise) < 0.25));
 
           if (isLake) {
-            const lakeDepth = Math.floor(BASE - 4);
+            const lakeDepth = Math.floor(BASE - 5);
             const waterLevel = Math.floor(BASE - 1);
             for (let y = lakeDepth - 2; y <= waterLevel; y++) {
               if (y === waterLevel) {
                 worldData[`${x},${y},${z}`] = BLOCKS.WATER;
               } else if (y >= waterLevel - 2) {
-                worldData[`${x},${y},${z}`] = BLOCKS.SAND;
+                worldData[`${x},${y},${z}`] = (isNature && Math.random() < 0.5) ? BLOCKS.DIRT : BLOCKS.SAND;
               } else {
                 worldData[`${x},${y},${z}`] = BLOCKS.DIRT;
               }
             }
           } else {
-            const hasSandyBorder = isClassic && (lakeNoise < -0.36);
+            const hasSandyBorder = (isClassic || isNature) && (lakeNoise < -0.36 || Math.abs(riverNoise) < 0.35);
             for (let y = topY - 5; y <= topY; y++) {
               if (y === topY) {
-                const bType = hasSandyBorder ? BLOCKS.SAND : (isSandy ? BLOCKS.SAND : (isSnowy ? BLOCKS.SNOW : BLOCKS.GRASS));
+                const bType = hasSandyBorder ? (isNature ? BLOCKS.DIRT : BLOCKS.SAND) : (isSandy ? BLOCKS.SAND : (isSnowy ? BLOCKS.SNOW : BLOCKS.GRASS));
                 worldData[`${x},${y},${z}`] = bType;
                 
-                if (isClassic && bType === BLOCKS.GRASS && Math.random() < 0.015) {
+                if ((isClassic || isNature) && bType === BLOCKS.GRASS && Math.random() < (isNature ? 0.04 : 0.015)) {
                   worldData[`${x},${y+1},${z}`] = BLOCKS.FLOWER;
                 }
               } else {
@@ -1684,16 +1692,29 @@
 
   function spawnTrees(R, baseY, mapType) {
     const isClassic = mapType === 'minecraft_classic';
-    const numTrees = isClassic ? 75 : 30;
+    const isNature = mapType === 'nature_valley';
+    const numTrees = isNature ? 350 : (isClassic ? 75 : 30);
+    const numFlowers = isNature ? 600 : (isClassic ? 150 : 50);
+
     for (let i = 0; i < numTrees; i++) {
       const tx = Math.round((Math.random() - 0.5) * R * 1.5);
       const tz = Math.round((Math.random() - 0.5) * R * 1.5);
-      // Find ground level
       const groundY = getGroundHeight(tx, tz, baseY) - 1;
       const treeH = 4 + Math.floor(Math.random() * 4);
       for (let h = 1; h <= treeH; h++) setB(tx, groundY + h, tz, BLOCKS.WOOD);
       for (let dx = -2; dx <= 2; dx++) for (let dz = -2; dz <= 2; dz++) for (let dy = -1; dy <= 2; dy++) {
         if (Math.abs(dx) + Math.abs(dz) <= 3) setB(tx + dx, groundY + treeH + dy, tz + dz, BLOCKS.LEAVES);
+      }
+    }
+
+    for (let i = 0; i < numFlowers; i++) {
+      const tx = Math.round((Math.random() - 0.5) * R * 1.5);
+      const tz = Math.round((Math.random() - 0.5) * R * 1.5);
+      const groundY = getGroundHeight(tx, tz, baseY) - 1;
+      
+      const groundBlock = worldData[`${tx},${groundY},${tz}`];
+      if (groundBlock === BLOCKS.GRASS || groundBlock === BLOCKS.DIRT) {
+        setB(tx, groundY + 1, tz, BLOCKS.FLOWER);
       }
     }
   }
