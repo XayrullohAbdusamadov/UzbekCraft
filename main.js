@@ -338,25 +338,36 @@
         gain.gain.setValueAtTime(0.35 * this.sfxVolume, t); gain.gain.linearRampToValueAtTime(0.01, t + 0.35);
         osc.start(t); osc.stop(t + 0.35);
       } else if (type === 'explode') {
+        const duration = 1.25;
         const noise = this.ctx.createBufferSource();
-        noise.buffer = createNoiseBuffer(0.45);
+        noise.buffer = createNoiseBuffer(duration);
+        
         const filter = this.ctx.createBiquadFilter();
-        filter.type = 'lowpass'; filter.frequency.setValueAtTime(250, t);
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(650, t);
+        filter.frequency.exponentialRampToValueAtTime(15, t + duration);
+        
         const gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.85 * this.sfxVolume, t);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
-        noise.connect(filter); filter.connect(gain); gain.connect(this.ctx.destination);
+        gain.gain.setValueAtTime(1.4 * this.sfxVolume, t);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+        
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
         noise.start(t);
         
         const osc = this.ctx.createOscillator();
         const oscGain = this.ctx.createGain();
-        osc.connect(oscGain); oscGain.connect(this.ctx.destination);
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(120, t);
-        osc.frequency.linearRampToValueAtTime(40, t + 0.35);
-        oscGain.gain.setValueAtTime(0.6 * this.sfxVolume, t);
-        oscGain.gain.linearRampToValueAtTime(0.001, t + 0.35);
-        osc.start(t); osc.stop(t + 0.35);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(160, t);
+        osc.frequency.exponentialRampToValueAtTime(25, t + 0.7);
+        oscGain.gain.setValueAtTime(1.8 * this.sfxVolume, t);
+        oscGain.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+        
+        osc.connect(oscGain);
+        oscGain.connect(this.ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.7);
       }
     }
     startAmbientMusic() {
@@ -548,6 +559,7 @@
   let isGrounded = false, keys = {}, isPointerLocked = false;
   let highlightBox = null, raycaster = new THREE.Raycaster();
   let npcs = [], animals = [], spawnedFurniture = [];
+  let isSitting = false, sittingOnCoords = null;
   let isMiningHeld = false, miningStartTime = 0, miningTargetKey = null;
   const MINING_DURATION = 1.5;
   let touchJoystick = { active: false, startX: 0, startY: 0, moveX: 0, moveY: 0 };
@@ -2244,6 +2256,19 @@
   }
 
   function updatePlayer(delta) {
+    if (isSitting && sittingOnCoords) {
+      playerPos.copy(sittingOnCoords);
+      playerVel.set(0, 0, 0);
+      isGrounded = true;
+      if (keys['KeyW'] || keys['KeyS'] || keys['KeyA'] || keys['KeyD'] || keys['Space'] || keys['JumpTouch'] || touchJoystick.active) {
+        isSitting = false;
+        sittingOnCoords = null;
+        playerPos.y += 0.6; // Stand up
+        showToast("Turdingiz");
+      }
+      return;
+    }
+
     const speed = 8.0;
     const moveDir = new THREE.Vector3();
     if (keys['KeyW']) moveDir.z -= 1;
@@ -3506,8 +3531,8 @@
       for (let y = by - radius; y <= by + radius; y++) {
         for (let z = bz - radius; z <= bz + radius; z++) {
           const dx = x - bx, dy = y - by, dz = z - bz;
-          const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-          if (dist <= 3.2) {
+          const threshold = 3.2 + (Math.random() - 0.5) * 1.5;
+          if (dist <= threshold) {
             const key = `${x},${y},${z}`;
             const targetBlock = worldData[key];
             if (targetBlock && targetBlock !== BLOCKS.BEDROCK) {
@@ -4129,20 +4154,21 @@
         }
       }
       else if (e.button === 2) {
-        // Check Sofa sleep interaction
+        // Check Sofa sleep or sitting interaction
         raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
         const interactTargets = scene.children.filter(c => c.isVoxelMesh || c.isFurnitureMesh);
         const hits = raycaster.intersectObjects(interactTargets, true);
         
-        let hitSofa = null;
+        let hitFurniture = null;
         if (hits.length > 0 && hits[0].distance < 4.0) {
           let obj = hits[0].object;
           while (obj && obj !== scene) {
             if (obj.isFurnitureMesh && obj.blockCoord) {
               const coord = obj.blockCoord;
               const [fx, fy, fz] = coord.split(',').map(Number);
-              if (worldData[coord] === BLOCKS.SOFA) {
-                hitSofa = { x: fx, y: fy, z: fz };
+              const bType = worldData[coord];
+              if (bType === BLOCKS.SOFA || bType === BLOCKS.CHAIR || bType === BLOCKS.TABLE) {
+                hitFurniture = { type: bType, x: fx, y: fy, z: fz };
               }
               break;
             }
@@ -4150,9 +4176,9 @@
           }
         }
         
-        if (hitSofa) {
-          const isNight = dayTime > 0.55 || dayTime < 0.20;
-          if (isNight) {
+        if (hitFurniture) {
+          if (hitFurniture.type === BLOCKS.SOFA && (dayTime > 0.55 || dayTime < 0.20)) {
+            // Sleep on Sofa
             showToast("Uxlashga yotdingiz...");
             
             // Visual fade-to-black transition overlay
@@ -4170,7 +4196,7 @@
             
             setTimeout(() => {
               dayTime = 0.23; // morning time
-              playerPos.set(hitSofa.x, hitSofa.y + 1.2, hitSofa.z);
+              playerPos.set(hitFurniture.x, hitFurniture.y + 0.6, hitFurniture.z);
               soundEngine.playSFX('famous');
               showToast("Xayrli tong!");
               setTimeout(() => {
@@ -4179,7 +4205,14 @@
               }, 300);
             }, 500);
           } else {
-            showToast("Faqat tunda uxlash mumkin!");
+            // Sit on Sofa, Chair, or Table
+            isSitting = true;
+            let seatOffset = 0.25;
+            if (hitFurniture.type === BLOCKS.CHAIR) seatOffset = 0.38;
+            else if (hitFurniture.type === BLOCKS.TABLE) seatOffset = 0.95;
+            
+            sittingOnCoords = new THREE.Vector3(hitFurniture.x, hitFurniture.y + seatOffset, hitFurniture.z);
+            showToast(hitFurniture.type === BLOCKS.TABLE ? "Stol ustiga chiqdingiz" : "O'tirdingiz. Turish uchun harakatlaning.");
           }
         } else {
           placeBlock();
