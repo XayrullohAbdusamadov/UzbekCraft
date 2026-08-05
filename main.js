@@ -547,7 +547,7 @@
   let yaw = 0, pitch = 0;
   let isGrounded = false, keys = {}, isPointerLocked = false;
   let highlightBox = null, raycaster = new THREE.Raycaster();
-  let npcs = [], animals = [];
+  let npcs = [], animals = [], spawnedFurniture = [];
   let isMiningHeld = false, miningStartTime = 0, miningTargetKey = null;
   const MINING_DURATION = 1.5;
   let touchJoystick = { active: false, startX: 0, startY: 0, moveX: 0, moveY: 0 };
@@ -1949,16 +1949,186 @@
   }
 
   // ==========================================================================
+  // FURNITURE DETAILED 3D MODELS
+  // ==========================================================================
+
+  function createSofaMesh() {
+    const group = new THREE.Group();
+    const sofaColor = 0xab47bc; // purple
+    const woodColor = 0x5d4037; // dark brown
+    
+    const matSofa = new THREE.MeshStandardMaterial({ color: sofaColor, roughness: 0.65 });
+    const matWood = new THREE.MeshStandardMaterial({ color: woodColor, roughness: 0.8 });
+
+    // Seat base
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(0.96, 0.35, 0.72), matSofa);
+    seat.position.y = -0.15;
+    seat.castShadow = true; seat.receiveShadow = true;
+    group.add(seat);
+
+    // Backrest
+    const back = new THREE.Mesh(new THREE.BoxGeometry(0.96, 0.68, 0.16), matSofa);
+    back.position.set(0, 0.2, -0.28);
+    back.castShadow = true; back.receiveShadow = true;
+    group.add(back);
+
+    // Armrests
+    const armL = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.52, 0.72), matSofa);
+    armL.position.set(-0.4, 0.05, 0);
+    armL.castShadow = true; armL.receiveShadow = true;
+    group.add(armL);
+
+    const armR = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.52, 0.72), matSofa);
+    armR.position.set(0.4, 0.05, 0);
+    armR.castShadow = true; armR.receiveShadow = true;
+    group.add(armR);
+
+    // 4 legs
+    const legW = 0.06, legH = 0.15;
+    const legOffsets = [
+      [-0.42, -0.35, -0.3], [0.42, -0.35, -0.3],
+      [-0.42, -0.35, 0.3], [0.42, -0.35, 0.3]
+    ];
+    legOffsets.forEach(([lx, ly, lz]) => {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(legW, legH, legW), matWood);
+      leg.position.set(lx, ly, lz);
+      leg.castShadow = true;
+      group.add(leg);
+    });
+
+    return group;
+  }
+
+  function createChairMesh() {
+    const group = new THREE.Group();
+    const cushionColor = 0xa1887f; // light brown
+    const woodColor = 0x5d4037; // dark brown
+    
+    const matCushion = new THREE.MeshStandardMaterial({ color: cushionColor, roughness: 0.7 });
+    const matWood = new THREE.MeshStandardMaterial({ color: woodColor, roughness: 0.85 });
+
+    // Seat
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.08, 0.65), matCushion);
+    seat.position.y = -0.12;
+    seat.castShadow = true; seat.receiveShadow = true;
+    group.add(seat);
+
+    // Backrest
+    const back = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.55, 0.08), matWood);
+    back.position.set(0, 0.28, -0.28);
+    back.castShadow = true; back.receiveShadow = true;
+    group.add(back);
+
+    // 4 legs
+    const legW = 0.06, legH = 0.45;
+    const legOffsets = [
+      [-0.26, -0.32, -0.26], [0.26, -0.32, -0.26],
+      [-0.26, -0.32, 0.26], [0.26, -0.32, 0.26]
+    ];
+    legOffsets.forEach(([lx, ly, lz]) => {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(legW, legH, legW), matWood);
+      leg.position.set(lx, ly, lz);
+      leg.castShadow = true;
+      group.add(leg);
+    });
+
+    return group;
+  }
+
+  function createTableMesh() {
+    const group = new THREE.Group();
+    const woodColor = 0x8d6e63; // table top
+    const legColor = 0x5d4037; // dark legs
+    
+    const matTop = new THREE.MeshStandardMaterial({ color: woodColor, roughness: 0.8 });
+    const matLeg = new THREE.MeshStandardMaterial({ color: legColor, roughness: 0.85 });
+
+    // Table top
+    const top = new THREE.Mesh(new THREE.BoxGeometry(0.96, 0.08, 0.96), matTop);
+    top.position.y = 0.44;
+    top.castShadow = true; top.receiveShadow = true;
+    group.add(top);
+
+    // 4 long legs
+    const legW = 0.08, legH = 0.9;
+    const legOffsets = [
+      [-0.42, -0.05, -0.42], [0.42, -0.05, -0.42],
+      [-0.42, -0.05, 0.42], [0.42, -0.05, 0.42]
+    ];
+    legOffsets.forEach(([lx, ly, lz]) => {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(legW, legH, legW), matLeg);
+      leg.position.set(lx, ly, lz);
+      leg.castShadow = true;
+      group.add(leg);
+    });
+
+    return group;
+  }
+
+  function createFlowerMesh() {
+    const group = new THREE.Group();
+    
+    const matPot = new THREE.MeshStandardMaterial({ color: 0xbf360c, roughness: 0.9 }); // terracotta
+    const matStem = new THREE.MeshStandardMaterial({ color: 0x4caf50, roughness: 0.6 }); // green
+    const matPetals = new THREE.MeshBasicMaterial({ color: 0xe91e63 }); // hot pink/red
+
+    // Clay pot
+    const pot = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.35, 0.35), matPot);
+    pot.position.y = -0.325;
+    pot.castShadow = true;
+    group.add(pot);
+
+    // Stem
+    const stem = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.42, 0.04), matStem);
+    stem.position.y = 0.06;
+    stem.castShadow = true;
+    group.add(stem);
+
+    // Petals (Rose buds shape)
+    const petalsOffsets = [
+      [0, 0.28, 0], [0.08, 0.28, 0.08], [-0.08, 0.28, -0.08],
+      [-0.08, 0.28, 0.08], [0.08, 0.28, -0.08], [0, 0.36, 0]
+    ];
+    petalsOffsets.forEach(([px, py, pz]) => {
+      const petal = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.12, 0.12), matPetals);
+      petal.position.set(px, py, pz);
+      group.add(petal);
+    });
+
+    return group;
+  }
+
+  // ==========================================================================
   // RENDER WORLD
   // ==========================================================================
 
   function renderInstancedWorld() {
     scene.children.filter(c => c.isVoxelMesh).forEach(c => scene.remove(c));
+    spawnedFurniture.forEach(m => scene.remove(m));
+    spawnedFurniture = [];
+
     const grouped = {};
     Object.keys(worldData).forEach(key => {
       const bType = worldData[key];
       if (bType === BLOCKS.AIR) return;
       const [x, y, z] = key.split(',').map(Number);
+      
+      // Filter out furniture blocks to render as custom 3D composite meshes
+      if (bType === BLOCKS.SOFA || bType === BLOCKS.TABLE || bType === BLOCKS.CHAIR || bType === BLOCKS.FLOWER) {
+        let fMesh;
+        if (bType === BLOCKS.SOFA) fMesh = createSofaMesh();
+        else if (bType === BLOCKS.TABLE) fMesh = createTableMesh();
+        else if (bType === BLOCKS.CHAIR) fMesh = createChairMesh();
+        else if (bType === BLOCKS.FLOWER) fMesh = createFlowerMesh();
+        
+        fMesh.position.set(x, y, z);
+        fMesh.isFurnitureMesh = true;
+        fMesh.blockCoord = `${x},${y},${z}`;
+        scene.add(fMesh);
+        spawnedFurniture.push(fMesh);
+        return; // skip instanced cube grouping
+      }
+
       const top = worldData[`${x},${y+1},${z}`];
       const bot = worldData[`${x},${y-1},${z}`];
       const px = worldData[`${x+1},${y},${z}`];
@@ -2565,10 +2735,30 @@
 
   function updateTargetRaycast() {
     raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-    const hits = raycaster.intersectObjects(scene.children.filter(c => c.isVoxelMesh));
+    const hits = raycaster.intersectObjects(scene.children.filter(c => c.isVoxelMesh || c.isFurnitureMesh), true);
     if (hits.length > 0 && hits[0].distance < 7.0) {
-      const p = hits[0].point.clone().sub(hits[0].face.normal.clone().multiplyScalar(0.01));
-      highlightBox.position.set(Math.round(p.x), Math.round(p.y), Math.round(p.z));
+      const hit = hits[0];
+      let bx, by, bz;
+      
+      let obj = hit.object;
+      let coord = null;
+      while (obj && obj !== scene) {
+        if (obj.isFurnitureMesh && obj.blockCoord) {
+          coord = obj.blockCoord;
+          break;
+        }
+        obj = obj.parent;
+      }
+      
+      if (coord) {
+        const [cx, cy, cz] = coord.split(',').map(Number);
+        bx = cx; by = cy; bz = cz;
+      } else {
+        const p = hit.point.clone().sub(hit.face.normal.clone().multiplyScalar(0.01));
+        bx = Math.round(p.x); by = Math.round(p.y); bz = Math.round(p.z);
+      }
+      
+      highlightBox.position.set(bx, by, bz);
       highlightBox.visible = true;
     } else {
       highlightBox.visible = false;
@@ -2578,10 +2768,30 @@
 
   function startMining() {
     raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-    const hits = raycaster.intersectObjects(scene.children.filter(c => c.isVoxelMesh));
+    const hits = raycaster.intersectObjects(scene.children.filter(c => c.isVoxelMesh || c.isFurnitureMesh), true);
     if (hits.length > 0 && hits[0].distance < 7.0) {
-      const p = hits[0].point.clone().sub(hits[0].face.normal.clone().multiplyScalar(0.01));
-      const key = `${Math.round(p.x)},${Math.round(p.y)},${Math.round(p.z)}`;
+      const hit = hits[0];
+      let bx, by, bz;
+      
+      let obj = hit.object;
+      let coord = null;
+      while (obj && obj !== scene) {
+        if (obj.isFurnitureMesh && obj.blockCoord) {
+          coord = obj.blockCoord;
+          break;
+        }
+        obj = obj.parent;
+      }
+      
+      if (coord) {
+        const [cx, cy, cz] = coord.split(',').map(Number);
+        bx = cx; by = cy; bz = cz;
+      } else {
+        const p = hit.point.clone().sub(hit.face.normal.clone().multiplyScalar(0.01));
+        bx = Math.round(p.x); by = Math.round(p.y); bz = Math.round(p.z);
+      }
+      
+      const key = `${bx},${by},${bz}`;
       if (worldData[key] && worldData[key] !== BLOCKS.BEDROCK) {
         isMiningHeld = true; miningStartTime = performance.now(); miningTargetKey = key;
         document.getElementById('mining-progress-container').classList.remove('hidden');
@@ -2638,10 +2848,29 @@
     }
 
     raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-    const hits = raycaster.intersectObjects(scene.children.filter(c => c.isVoxelMesh));
+    const hits = raycaster.intersectObjects(scene.children.filter(c => c.isVoxelMesh || c.isFurnitureMesh), true);
     if (hits.length > 0 && hits[0].distance < 7.0) {
-      const p = hits[0].point.clone().add(hits[0].face.normal.clone().multiplyScalar(0.5));
-      const bx = Math.round(p.x), by = Math.round(p.y), bz = Math.round(p.z);
+      const hit = hits[0];
+      let bx, by, bz;
+      
+      let obj = hit.object;
+      let coord = null;
+      while (obj && obj !== scene) {
+        if (obj.isFurnitureMesh && obj.blockCoord) {
+          coord = obj.blockCoord;
+          break;
+        }
+        obj = obj.parent;
+      }
+      
+      if (coord) {
+        const p = hit.point.clone().add(hit.face.normal.clone().multiplyScalar(0.5));
+        bx = Math.round(p.x); by = Math.round(p.y); bz = Math.round(p.z);
+      } else {
+        const p = hit.point.clone().add(hit.face.normal.clone().multiplyScalar(0.5));
+        bx = Math.round(p.x); by = Math.round(p.y); bz = Math.round(p.z);
+      }
+      
       if (by > CHUNK_HEIGHT_MAX) { showToast(`Maksimal balandlik ${CHUNK_HEIGHT_MAX} blok!`); return; }
       const key = `${bx},${by},${bz}`;
       worldData[key] = blockId;
@@ -3106,7 +3335,13 @@
     document.getElementById('btn-prompt-save').addEventListener('click', () => { saveGame(); returnToMainMenu(); });
     document.getElementById('btn-prompt-nosave').addEventListener('click', returnToMainMenu);
     document.getElementById('btn-prompt-cancel').addEventListener('click', () => document.getElementById('save-prompt-modal').classList.add('hidden'));
-    document.getElementById('btn-close-inventory').addEventListener('click', () => document.getElementById('inventory-modal').classList.add('hidden'));
+    document.getElementById('btn-close-inventory').addEventListener('click', () => {
+      document.getElementById('inventory-modal').classList.add('hidden');
+      const container = document.getElementById('canvas-container');
+      if (container) {
+        setTimeout(() => { container.requestPointerLock(); }, 50);
+      }
+    });
 
     document.getElementById('btn-dialogue-next').addEventListener('click', () => {
       if (activeNpc && activeNpc.npcName === "Ulug'bek") {
@@ -3893,7 +4128,63 @@
           startMining();
         }
       }
-      else if (e.button === 2) placeBlock();
+      else if (e.button === 2) {
+        // Check Sofa sleep interaction
+        raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+        const interactTargets = scene.children.filter(c => c.isVoxelMesh || c.isFurnitureMesh);
+        const hits = raycaster.intersectObjects(interactTargets, true);
+        
+        let hitSofa = null;
+        if (hits.length > 0 && hits[0].distance < 4.0) {
+          let obj = hits[0].object;
+          while (obj && obj !== scene) {
+            if (obj.isFurnitureMesh && obj.blockCoord) {
+              const coord = obj.blockCoord;
+              const [fx, fy, fz] = coord.split(',').map(Number);
+              if (worldData[coord] === BLOCKS.SOFA) {
+                hitSofa = { x: fx, y: fy, z: fz };
+              }
+              break;
+            }
+            obj = obj.parent;
+          }
+        }
+        
+        if (hitSofa) {
+          const isNight = dayTime > 0.55 || dayTime < 0.20;
+          if (isNight) {
+            showToast("Uxlashga yotdingiz...");
+            
+            // Visual fade-to-black transition overlay
+            const fade = document.createElement('div');
+            fade.style.position = 'fixed';
+            fade.style.top = '0'; fade.style.left = '0';
+            fade.style.width = '100vw'; fade.style.height = '100vh';
+            fade.style.background = '#000';
+            fade.style.zIndex = '9999';
+            fade.style.opacity = '0';
+            fade.style.transition = 'opacity 0.3s ease';
+            document.body.appendChild(fade);
+            
+            setTimeout(() => { fade.style.opacity = '1'; }, 10);
+            
+            setTimeout(() => {
+              dayTime = 0.23; // morning time
+              playerPos.set(hitSofa.x, hitSofa.y + 1.2, hitSofa.z);
+              soundEngine.playSFX('famous');
+              showToast("Xayrli tong!");
+              setTimeout(() => {
+                fade.style.opacity = '0';
+                setTimeout(() => { document.body.removeChild(fade); }, 300);
+              }, 300);
+            }, 500);
+          } else {
+            showToast("Faqat tunda uxlash mumkin!");
+          }
+        } else {
+          placeBlock();
+        }
+      }
     });
     window.addEventListener('mouseup', e => { 
       if (e.button === 0) {
