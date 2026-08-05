@@ -197,6 +197,7 @@
         <circle cx="16" cy="6" r="3.5" fill="#f48fb1"/>
         <circle cx="16" cy="9" r="1.5" fill="#ffeb3b"/>
       </svg>`;
+    }
     if (bId === BLOCKS.BUCKET) {
       return `<svg viewBox="0 0 32 32" width="100%" height="100%">
         <path d="M6 14 C6 4, 26 4, 26 14" fill="none" stroke="#cfd8dc" stroke-width="2"/>
