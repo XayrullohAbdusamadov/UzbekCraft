@@ -252,3 +252,40 @@ Biz telefon foydalanuvchilarining o'yin tajribasini yaxshilash uchun quyidagi o'
    - **Ogohlantirish mazmuni:** "O'yin to'liq va boshqaruvlar tartibli ko'rinishi uchun iltimos telefoningizni yonboshga (landscape rejimiga) buring!".
    - Telefon yonboshga burilishi bilanoq ogohlantirish avtomatik yo'qolib, o'yin to'liq ekranli keng holatda davom etadi.
 
+---
+
+## Part 12: Hayvon O'lim Ovozi, Go'sht Tushishi, Yig'ish va Alohida Go'shtlar Menyusi
+
+Biz hayvonlarni ovlash tizimini yanada realistik va qiziqarli qilish uchun quyidagi imkoniyatlarni qo'shdik:
+
+1. **Yangi va Premium Hayvon O'lim Ovozi:**
+   - **O'zgarish:** Eski `kill` ovozi o'rniga triangle + sawtooth osillyatorlari va lowpass filtrli shovqin (noise buffer) sweeps aralashmasidan tashkil topgan batafsil nolayotgan/so'nayotgan premium o'lim ovozi sintez qilindi.
+   - **Yig'ish Ovoz Effekti (`pickup`):** Go'sht yig'ib olinganida chiroyli retro arpeggio (D5 -> A5) tovush effekti chaladigan qilindi.
+
+2. **Hayvonga Mos Alohida Go'sht Tushish Tizimi:**
+   - Har bir hayvon o'lganida uning turiga xos bo'lgan go'sht turi yerdan 3D formatda paydo bo'ladi.
+   - **Go'sht turlari va ranglari:**
+     - Qo'y -> Qo'y go'shti (Och qizil)
+     - Sigir -> Mol go'shti (To'q qizil)
+     - Tulki -> Tulki go'shti (To'q sariq)
+     - Bo'ri -> Bo'ri go'shti (Kulrang)
+     - Burgut -> Burgut go'shti (Jigarrang)
+     - Tuya -> Tuya go'shti (Sarg'ish)
+     - Ot -> Ot go'shti (Qazi) (To'q jigarrang)
+     - Eshak -> Eshak go'shti (Moviy-kulrang)
+     - Tovuq -> Tovuq go'shti (Och sariq)
+     - Qoplon -> Qoplon go'shti (Yashil-sariq)
+   - **3D Vizual Model:** Tushgan go'sht Minecraft uslubida 3D ko'rinishda (qizil/jigarrang go'sht qismi va unga birikkan oq suyak bo'lagi) yer ustida aylanib, yuqoriga va pastga mayin tebranib (bobbing) turadi.
+
+3. **Go'shtlarni Avtomatik Yig'ish (Pickup):**
+   - O'yinchi 1.6 metr masofagacha yaqinlashganda go'sht avtomatik yig'ib olinadi, pickup tovushi eshitiladi va ekranda toast xabar chiqadi (masalan, `+1 Qo'y go'shti olindi!`).
+
+4. **Alohida Go'shtlar Menyusi (`meats-modal`):**
+   - **Pauza menyusiga** maxsus **Ovlangan Go'shtlar** tugmasi qo'shildi.
+   - O'yinchilar shuningdek o'yin davomida istalgan payt **M** klavishini bosib ushbu menyuni ochishlari/yopishlari mumkin.
+   - Menyuda barcha hayvonlardan to'plangan go'shtlar soni chiroyli glassmorphism uslubidagi kartochkalar va unga mos keladigan go'sht SVG piktogrammalari yordamida ko'rsatiladi.
+
+5. **Saqlash va Yuklash (Save/Load):**
+   - O'yin saqlanganda yig'ilgan barcha go'shtlar mahalliy `localStorage` ga va Supabase bulutli ma'lumotlar bazasidagi `quest_state` ustuniga xavfsiz tarzda sinxronizatsiya qilinadi va yuklanganda avtomatik tiklanadi.
+
+

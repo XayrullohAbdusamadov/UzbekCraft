@@ -347,13 +347,59 @@
         osc.type = 'sine'; osc.frequency.setValueAtTime(600, t); osc.frequency.exponentialRampToValueAtTime(150, t + 0.1);
         gain.gain.setValueAtTime(0.18 * this.sfxVolume, t); gain.gain.linearRampToValueAtTime(0.01, t + 0.1);
         osc.start(t); osc.stop(t + 0.1);
-      } else if (type === 'kill') {
+      } else if (type === 'pickup') {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.connect(gain); gain.connect(this.ctx.destination);
-        osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, t); osc.frequency.exponentialRampToValueAtTime(50, t + 0.35);
-        gain.gain.setValueAtTime(0.35 * this.sfxVolume, t); gain.gain.linearRampToValueAtTime(0.01, t + 0.35);
-        osc.start(t); osc.stop(t + 0.35);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, t); // D5
+        osc.frequency.setValueAtTime(880, t + 0.08); // A5
+        gain.gain.setValueAtTime(0.2 * this.sfxVolume, t);
+        gain.gain.linearRampToValueAtTime(0.001, t + 0.22);
+        osc.start(t); osc.stop(t + 0.22);
+      } else if (type === 'kill') {
+        // Detailed whimpering animal cry followed by a dissolving pitch fall
+        const osc1 = this.ctx.createOscillator();
+        const osc2 = this.ctx.createOscillator();
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = createNoiseBuffer(0.55);
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(800, t);
+        filter.frequency.exponentialRampToValueAtTime(80, t + 0.55);
+
+        const gainOsc = this.ctx.createGain();
+        const gainNoise = this.ctx.createGain();
+
+        osc1.connect(gainOsc);
+        osc2.connect(gainOsc);
+        gainOsc.connect(this.ctx.destination);
+
+        noise.connect(filter);
+        filter.connect(gainNoise);
+        gainNoise.connect(this.ctx.destination);
+
+        osc1.type = 'triangle';
+        osc1.frequency.setValueAtTime(320, t);
+        osc1.frequency.linearRampToValueAtTime(450, t + 0.12);
+        osc1.frequency.exponentialRampToValueAtTime(90, t + 0.5);
+
+        osc2.type = 'sawtooth';
+        osc2.frequency.setValueAtTime(160, t);
+        osc2.frequency.linearRampToValueAtTime(225, t + 0.12);
+        osc2.frequency.exponentialRampToValueAtTime(45, t + 0.5);
+
+        gainOsc.gain.setValueAtTime(0.35 * this.sfxVolume, t);
+        gainOsc.gain.linearRampToValueAtTime(0.45 * this.sfxVolume, t + 0.12);
+        gainOsc.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+
+        gainNoise.gain.setValueAtTime(0.15 * this.sfxVolume, t);
+        gainNoise.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+
+        osc1.start(t); osc1.stop(t + 0.5);
+        osc2.start(t); osc2.stop(t + 0.5);
+        noise.start(t);
       } else if (type === 'explode') {
         const duration = 1.25;
         const noise = this.ctx.createBufferSource();
@@ -576,6 +622,24 @@
   let isGrounded = false, keys = {}, isPointerLocked = false;
   let highlightBox = null, raycaster = new THREE.Raycaster();
   let npcs = [], animals = [], spawnedFurniture = [];
+  let meatCollectibles = [];
+  let meatInventory = {
+    "Qo'y": 0, "Sigir": 0, "Tulki": 0, "Bo'ri": 0, "Burgut": 0,
+    "Tuya": 0, "Ot": 0, "Eshak": 0, "Tovuq": 0, "Qoplon": 0
+  };
+
+  const MEAT_TYPES = {
+    "Qo'y":   { name: "Qo'y go'shti", color: '#ff8a80', hexColor: 0xff8a80 },
+    "Sigir":  { name: "Mol go'shti", color: '#d50000', hexColor: 0xd50000 },
+    "Tulki":  { name: "Tulki go'shti", color: '#ffab40', hexColor: 0xffab40 },
+    "Bo'ri":  { name: "Bo'ri go'shti", color: '#90a4ae', hexColor: 0x90a4ae },
+    "Burgut": { name: "Burgut go'shti", color: '#5d4037', hexColor: 0x5d4037 },
+    "Tuya":   { name: "Tuya go'shti", color: '#ffd180', hexColor: 0xffd180 },
+    "Ot":     { name: "Ot go'shti (Qazi)", color: '#3e2723', hexColor: 0x3e2723 },
+    "Eshak":  { name: "Eshak go'shti", color: '#78909c', hexColor: 0x78909c },
+    "Tovuq":  { name: "Tovuq go'shti", color: '#fff9c4', hexColor: 0xfff9c4 },
+    "Qoplon": { name: "Qoplon go'shti", color: '#afb42b', hexColor: 0xafb42b }
+  };
   let isSitting = false, sittingOnCoords = null, targetedFurniture = null;
   let isMiningHeld = false, miningStartTime = 0, miningTargetKey = null;
   const MINING_DURATION = 1.5;
@@ -1071,8 +1135,12 @@
   function generateWorld(seed, mapType) {
     // Clear
     Object.keys(worldData).forEach(k => delete worldData[k]);
-    scene.children.filter(c => c.isVoxelMesh || c.isNpc || c.isAnimal).forEach(c => scene.remove(c));
+    scene.children.filter(c => c.isVoxelMesh || c.isNpc || c.isAnimal || c.isMeatCollectible).forEach(c => scene.remove(c));
     npcs = []; animals = [];
+    if (meatCollectibles) {
+      meatCollectibles.forEach(c => scene.remove(c));
+      meatCollectibles = [];
+    }
 
     currentMapRadius = (mapType === 'earth_globe' || mapType === 'chimgon' || mapType === 'great_wall') ? 140 : 110;
     const R = currentMapRadius;
@@ -3075,7 +3143,8 @@
       timestamp: Date.now(),
       playerPos: { x: playerPos.x, y: playerPos.y, z: playerPos.z },
       yaw, pitch, dayTime, hotbarBlocks, skin: playerSkin, modifiedBlocks,
-      questState: currentQuestState
+      questState: currentQuestState,
+      meatInventory
     };
     let saves = JSON.parse(localStorage.getItem('uzbekcraft_saves') || '[]');
     const idx = saves.findIndex(s => s.id === data.id);
@@ -3096,7 +3165,7 @@
         hotbar_blocks: data.hotbarBlocks,
         skin: data.skin,
         modified_blocks: data.modifiedBlocks,
-        quest_state: data.questState
+        quest_state: data.questState + "|" + JSON.stringify(data.meatInventory || {})
       };
       supabase.from('uzbekcraft_saves').upsert([dbData]).then(({ error }) => {
         if (error) {
@@ -3220,7 +3289,27 @@
     modifiedBlocks = saveData.modifiedBlocks || {};
     dayTime = saveData.dayTime || 0.25;
     playerSkin = saveData.skin || 'temur';
-    currentQuestState = saveData.questState || 'not_started';
+    
+    // Parse questState and meatInventory
+    if (saveData.questState && saveData.questState.includes('|')) {
+      const parts = saveData.questState.split('|');
+      currentQuestState = parts[0];
+      try {
+        meatInventory = JSON.parse(parts[1]);
+      } catch(e) {
+        meatInventory = saveData.meatInventory || {
+          "Qo'y": 0, "Sigir": 0, "Tulki": 0, "Bo'ri": 0, "Burgut": 0,
+          "Tuya": 0, "Ot": 0, "Eshak": 0, "Tovuq": 0, "Qoplon": 0
+        };
+      }
+    } else {
+      currentQuestState = saveData.questState || 'not_started';
+      meatInventory = saveData.meatInventory || {
+        "Qo'y": 0, "Sigir": 0, "Tulki": 0, "Bo'ri": 0, "Burgut": 0,
+        "Tuya": 0, "Ot": 0, "Eshak": 0, "Tovuq": 0, "Qoplon": 0
+      };
+    }
+
     generateWorld(saveData.seed || 'Uzbekistan2026', saveData.map || 'registan');
     playerPos.set(saveData.playerPos.x, saveData.playerPos.y, saveData.playerPos.z);
     yaw = saveData.yaw || 0; pitch = saveData.pitch || 0;
@@ -3431,6 +3520,10 @@
       currentWorldMeta = { id: 'world_' + Date.now(), name, seed, map };
       modifiedBlocks = {};
       currentQuestState = 'not_started';
+      meatInventory = {
+        "Qo'y": 0, "Sigir": 0, "Tulki": 0, "Bo'ri": 0, "Burgut": 0,
+        "Tuya": 0, "Ot": 0, "Eshak": 0, "Tovuq": 0, "Qoplon": 0
+      };
       generateWorld(seed, map);
       document.getElementById('hud-biome').textContent = getMapDisplayName(map);
       startPlayingSession();
@@ -3466,6 +3559,23 @@
     document.getElementById('btn-prompt-cancel').addEventListener('click', () => document.getElementById('save-prompt-modal').classList.add('hidden'));
     document.getElementById('btn-close-inventory').addEventListener('click', () => {
       document.getElementById('inventory-modal').classList.add('hidden');
+      const container = document.getElementById('canvas-container');
+      if (container) {
+        setTimeout(() => { container.requestPointerLock(); }, 50);
+      }
+    });
+
+    document.getElementById('btn-pause-meats').addEventListener('click', () => {
+      document.getElementById('pause-modal').classList.add('hidden');
+      const meatsModal = document.getElementById('meats-modal');
+      if (meatsModal) {
+        meatsModal.classList.remove('hidden');
+        updateMeatMenuUI();
+      }
+    });
+
+    document.getElementById('btn-close-meats').addEventListener('click', () => {
+      document.getElementById('meats-modal').classList.add('hidden');
       const container = document.getElementById('canvas-container');
       if (container) {
         setTimeout(() => { container.requestPointerLock(); }, 50);
@@ -4102,6 +4212,9 @@
           animal.scale.multiplyScalar(0.85);
           requestAnimationFrame(deathAnimate);
         } else {
+          // Spawn meat collectible!
+          spawnMeatCollectible(animal.position.x, animal.position.y + 0.3, animal.position.z, animal.animalName);
+
           scene.remove(animal);
           const aIdx = animals.indexOf(animal);
           if (aIdx >= 0) animals.splice(aIdx, 1);
@@ -4447,6 +4560,22 @@
       }
       if (e.code === 'KeyV') { isThirdPerson = !isThirdPerson; showToast(isThirdPerson ? "3-shaxs" : "1-shaxs"); }
       if (e.code === 'KeyE') document.getElementById('inventory-modal').classList.toggle('hidden');
+      if (e.code === 'KeyM') {
+        const hud = document.getElementById('hud');
+        if (hud && !hud.classList.contains('hidden')) {
+          const meatsModal = document.getElementById('meats-modal');
+          if (meatsModal) {
+            meatsModal.classList.toggle('hidden');
+            if (!meatsModal.classList.contains('hidden')) {
+              updateMeatMenuUI();
+              if (document.pointerLockElement) document.exitPointerLock();
+            } else {
+              const container = document.getElementById('canvas-container');
+              if (container) container.requestPointerLock();
+            }
+          }
+        }
+      }
       if (e.code === 'Escape') document.getElementById('pause-modal').classList.toggle('hidden');
       if (e.code === 'KeyF') { dayTime = (dayTime + 0.25) % 1; showToast("Vaqt o'tkazildi"); }
       if (e.code === 'KeyR') {
@@ -4709,6 +4838,7 @@
       updatePlayer(delta);
       updateDayNightCycle(delta);
       animateFirstPersonHand(delta);
+      updateMeatCollectibles(delta);
     }
 
     // Update active particles
@@ -4736,6 +4866,106 @@
     const fpsEl = document.getElementById('hud-fps');
     if (fpsEl && frameCount % 30 === 0) fpsEl.textContent = Math.round(1 / Math.max(0.001, delta));
     frameCount++;
+  }
+
+  // ==========================================================================
+  // MEATS INVENTORY AND COLLECTIBLES HELPERS
+  // ==========================================================================
+
+  function spawnMeatCollectible(x, y, z, animalName) {
+    const info = MEAT_TYPES[animalName] || { name: "Yovvoyi go'sht", color: '#e0e0e0', hexColor: 0xe0e0e0 };
+    
+    const group = new THREE.Group();
+    group.isMeatCollectible = true;
+    
+    // Minecraft style steak body
+    const meatGeom = new THREE.BoxGeometry(0.24, 0.14, 0.2);
+    const meatMat = new THREE.MeshLambertMaterial({ color: info.hexColor });
+    const meatMesh = new THREE.Mesh(meatGeom, meatMat);
+    group.add(meatMesh);
+
+    // Bone protrusion
+    const boneGeom = new THREE.BoxGeometry(0.08, 0.08, 0.12);
+    const boneMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+    const boneMesh = new THREE.Mesh(boneGeom, boneMat);
+    boneMesh.position.set(0.12, 0, 0);
+    group.add(boneMesh);
+    
+    group.position.set(x, y, z);
+    scene.add(group);
+    
+    group.meatType = animalName;
+    group.meatName = info.name;
+    group.baseY = y;
+    group.bobOffset = Math.random() * 10;
+    
+    meatCollectibles.push(group);
+  }
+
+  function updateMeatCollectibles(delta) {
+    const pickupRange = 1.6;
+    for (let i = meatCollectibles.length - 1; i >= 0; i--) {
+      const c = meatCollectibles[i];
+      c.rotation.y += 1.5 * delta;
+      c.bobOffset += delta * 2.0;
+      c.position.y = c.baseY + Math.sin(c.bobOffset) * 0.08;
+      
+      const dist = playerPos.distanceTo(c.position);
+      if (dist <= pickupRange) {
+        const mType = c.meatType;
+        meatInventory[mType] = (meatInventory[mType] || 0) + 1;
+        soundEngine.playSFX('pickup');
+        showToast(`+1 ${c.meatName} olindi!`);
+        
+        scene.remove(c);
+        meatCollectibles.splice(i, 1);
+        
+        updateMeatMenuUI();
+      }
+    }
+  }
+
+  function getMeatIconHTML(colorStr) {
+    return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+      <!-- Bone -->
+      <path d="M6 26 L12 20 M5 25 C3 25, 3 22, 5 21 C6 21, 8 23, 7 25 M6 26 C6 28, 9 28, 10 27 C10 25, 8 24, 6 26" fill="#ffffff" stroke="#e2e8f0" stroke-width="1"/>
+      <!-- Main Meat body -->
+      <path d="M10 22 C14 18, 10 14, 18 10 C24 6, 28 8, 29 12 C30 16, 28 24, 22 27 C16 30, 8 26, 10 22 Z" fill="${colorStr}" stroke="rgba(0,0,0,0.15)" stroke-width="1"/>
+      <!-- Fat/Texture details -->
+      <path d="M18 13 C20 11, 22 12, 23 15 M15 18 C17 17, 19 19, 20 21" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+    </svg>`;
+  }
+
+  function updateMeatMenuUI() {
+    const grid = document.getElementById('meats-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    
+    Object.keys(MEAT_TYPES).forEach(animal => {
+      const info = MEAT_TYPES[animal];
+      const count = meatInventory[animal] || 0;
+      
+      const card = document.createElement('div');
+      card.className = 'meat-card';
+      
+      const iconBox = document.createElement('div');
+      iconBox.className = 'meat-icon-box';
+      iconBox.innerHTML = getMeatIconHTML(info.color);
+      
+      const name = document.createElement('div');
+      name.className = 'meat-name';
+      name.textContent = info.name;
+      
+      const countBadge = document.createElement('span');
+      countBadge.className = 'meat-count' + (count === 0 ? ' empty' : '');
+      countBadge.textContent = `${count} dona`;
+      
+      card.appendChild(iconBox);
+      card.appendChild(name);
+      card.appendChild(countBadge);
+      
+      grid.appendChild(card);
+    });
   }
 
   window.addEventListener('DOMContentLoaded', init);

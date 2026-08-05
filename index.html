@@ -280,6 +280,7 @@
         <div class="menu-buttons">
           <button id="btn-resume-game" class="btn btn-emerald">Davom Etish</button>
           <button id="btn-save-game" class="btn btn-gold">O'yinni Saqlash</button>
+          <button id="btn-pause-meats" class="btn btn-purple">Ovlangan Go'shtlar</button>
           <button id="btn-pause-settings" class="btn btn-blue">Sozlamalar</button>
           <button id="btn-main-menu" class="btn btn-red">Bosh Menyuga Chiqish</button>
         </div>
@@ -308,6 +309,20 @@
           <button id="btn-dialogue-next" class="btn btn-emerald">Keyingi</button>
           <button id="btn-dialogue-quest" class="btn btn-gold hidden">Vazifani Qabul Qilish</button>
           <button id="btn-dialogue-close" class="btn btn-dark">Yopish</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEATS INVENTORY MODAL -->
+    <div id="meats-modal" class="modal-overlay hidden">
+      <div class="modal-card modal-large">
+        <h2 class="modal-title">Ovlangan Go'shtlar</h2>
+        <p class="modal-text">Hayvonlarni ovlab to'plagan go'shtlaringiz ro'yxati (ochish: M klavishi):</p>
+        <div id="meats-grid" class="meats-grid">
+          <!-- Dynamically populated -->
+        </div>
+        <div class="modal-actions">
+          <button id="btn-close-meats" class="btn btn-emerald">Yopish</button>
         </div>
       </div>
     </div>
