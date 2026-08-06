@@ -325,6 +325,20 @@
           <button id="btn-close-meats" class="btn btn-emerald">Yopish</button>
         </div>
       </div>
+    <!-- ROBLOX-STYLE MISSIONS MODAL -->
+    <div id="modal-missions" class="modal-overlay hidden">
+      <div class="modal-card modal-large">
+        <h2 class="modal-title" style="margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 8px;">📜 Roblox Uslubidagi Missiyalar</h2>
+        <p class="modal-text" style="margin-bottom: 16px; color: #94a3b8;">Vazifalarni bajarib qimmatbaho mukofotlar va resurslarni qo'lga kiriting!</p>
+        
+        <div id="missions-list-container" class="missions-list-container" style="display: flex; flex-direction: column; gap: 12px; max-height: 340px; overflow-y: auto; padding-right: 4px;">
+          <!-- Filled dynamically via main.js -->
+        </div>
+
+        <div class="modal-actions" style="margin-top: 16px;">
+          <button id="btn-close-missions" class="btn btn-emerald">Yopish</button>
+        </div>
+      </div>
     </div>
 
     <!-- INVENTORY MODAL -->
@@ -337,6 +351,7 @@
           <button id="tab-weapons" class="inv-tab-btn active"><span class="tab-icon">⚔️</span> Qurollar</button>
           <button id="tab-furniture" class="inv-tab-btn"><span class="tab-icon">🛋️</span> Anjomlar</button>
           <button id="tab-blocks" class="inv-tab-btn"><span class="tab-icon">🧱</span> Bloklar</button>
+          <button id="tab-food" class="inv-tab-btn"><span class="tab-icon">🍎</span> Oziq-Ovqatlar</button>
           <button id="tab-crafting" class="inv-tab-btn"><span class="tab-icon">🔨</span> Hunarmandchilik</button>
         </div>
 
@@ -410,11 +425,27 @@
           <div class="stat-badge biome-badge"><span id="hud-biome">Xarita: Google Earth Globe</span></div>
         </div>
         <div class="bar-right">
+          <button id="btn-hud-missions" class="hud-btn btn-mission-hud" title="Missiyalar [M]">📜 Missiyalar</button>
           <!-- Compass Widget -->
           <div id="compass-badge" class="stat-badge compass-badge">N (0°)</div>
           <div class="stat-badge time-badge">
             <span id="hud-time-icon"></span> <span id="hud-time-text">Kun (12:00)</span>
           </div>
+        </div>
+      </div>
+
+      <!-- Floating Roblox-Style Mission Tracker Widget -->
+      <div id="hud-mission-tracker" class="hud-mission-tracker">
+        <div class="mission-widget-header">
+          <span class="mission-badge-icon">📜</span>
+          <span id="hud-mission-title">Missiya 1: Quruvchi</span>
+        </div>
+        <div class="mission-widget-body">
+          <div class="mission-step-text" id="hud-mission-step">15 ta blok qo'ying (0/15)</div>
+          <div class="mission-progress-track">
+            <div id="hud-mission-bar-fill" class="mission-progress-fill" style="width: 0%;"></div>
+          </div>
+          <button id="btn-hud-claim-mission" class="btn-claim-mission hidden">Mukofotni Olish! 🎉</button>
         </div>
       </div>
 
@@ -447,9 +478,14 @@
 
       <!-- Hotbar Toolbar -->
       <div id="hotbar-container">
-        <!-- Health Hearts Bar -->
-        <div id="hud-health" class="health-hearts-bar">
-          <!-- Hearts generated dynamically -->
+        <!-- Status Bars: Health & Hunger -->
+        <div class="hud-status-bars">
+          <div id="hud-health" class="health-hearts-bar">
+            <!-- Hearts generated dynamically -->
+          </div>
+          <div id="hud-hunger" class="hunger-bar">
+            <!-- 10 Hunger drumsticks generated dynamically -->
+          </div>
         </div>
         <div id="hotbar" class="hotbar-slots">
           <!-- 9 hotbar slots populated dynamically -->

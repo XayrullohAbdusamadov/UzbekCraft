@@ -18,46 +18,64 @@
     DARK_STONE: 21, GLASS: 22, TERRACOTTA: 23, COPPER: 24,
     SWORD: 25, BOW: 26, BOMB: 27, SOFA: 28, TABLE: 29, CHAIR: 30, FLOWER: 31,
     AVTOMAT: 32, TORCH: 33, BUCKET: 34, WATER_BUCKET: 35,
-    AXE: 36
+    AVTOMAT: 32, TORCH: 33, BUCKET: 34, WATER_BUCKET: 35,
+    AXE: 36, APPLE: 37, BREAD: 38, COOKED_MEAT: 39, MEAT_MUTTON: 40,
+    PICKAXE: 41, SHOVEL: 42, HOE: 43, CRAFTING_TABLE: 44, FURNACE: 45,
+    CHEST: 46, OBSIDIAN: 47, GLOWSTONE: 48, PUMPKIN: 49, HAY_BALE: 50, MOSSY_STONE: 51
   };
 
   const BLOCK_INFO = {
-    [BLOCKS.GRASS]:       { name: "O't",            color: '#4caf50' },
-    [BLOCKS.DIRT]:        { name: "Tuproq",          color: '#795548' },
-    [BLOCKS.STONE]:       { name: "Tosh",            color: '#9e9e9e' },
-    [BLOCKS.SAND]:        { name: "Qum",             color: '#fdd835' },
-    [BLOCKS.SNOW]:        { name: "Qor",             color: '#eceff1' },
-    [BLOCKS.WOOD]:        { name: "Yog'och",         color: '#6d4c41' },
-    [BLOCKS.LEAVES]:      { name: "Barg",            color: '#388e3c' },
-    [BLOCKS.CACTUS]:      { name: "Kaktus",          color: '#2e7d32' },
-    [BLOCKS.COAL]:        { name: "Ko'mir",          color: '#455a64' },
-    [BLOCKS.GOLD]:        { name: "Oltin",           color: '#ffd600' },
-    [BLOCKS.DIAMOND]:     { name: "Olmos",           color: '#00bcd4' },
-    [BLOCKS.PLANKS]:      { name: "Taxta",           color: '#a1887f' },
-    [BLOCKS.LANTERN]:     { name: "Chiroq",          color: '#ff9800', isLuminous: true },
-    [BLOCKS.WATER]:       { name: "Suv",             color: '#1e88e5' },
-    [BLOCKS.BLUE_TILE]:   { name: "Moviy Koshin",    color: '#29b6f6' },
-    [BLOCKS.RED_BRICK]:   { name: "G'isht",         color: '#c62828' },
-    [BLOCKS.WHITE_MARBLE]:{ name: "Oq Mramor",       color: '#f5f5f5' },
-    [BLOCKS.GLAZED_BLUE]: { name: "Zangori Koshin",  color: '#0288d1' },
-    [BLOCKS.BEDROCK]:     { name: "Bedrock",         color: '#212121' },
-    [BLOCKS.IRON]:        { name: "Temir",           color: '#b0bec5' },
-    [BLOCKS.DARK_STONE]:  { name: "Qora Tosh",       color: '#37474f' },
-    [BLOCKS.GLASS]:       { name: "Shisha",          color: '#80deea' },
-    [BLOCKS.TERRACOTTA]:  { name: "Terrakota",       color: '#bf360c' },
-    [BLOCKS.COPPER]:      { name: "Mis",             color: '#ff7043' },
-    [BLOCKS.SWORD]:       { name: "Qilich",          color: '#00bcd4', isWeapon: true },
-    [BLOCKS.BOW]:         { name: "Kamon",           color: '#8d6e63', isWeapon: true },
-    [BLOCKS.BOMB]:        { name: "Bomba",           color: '#ef5350', isWeapon: true },
-    [BLOCKS.SOFA]:        { name: "Divan",           color: '#ab47bc', isFurniture: true },
-    [BLOCKS.TABLE]:       { name: "Stol",            color: '#8d6e63', isFurniture: true },
-    [BLOCKS.CHAIR]:       { name: "Stul",            color: '#a1887f', isFurniture: true },
-    [BLOCKS.FLOWER]:      { name: "Gul",             color: '#ec407a', isFurniture: true },
-    [BLOCKS.AVTOMAT]:     { name: "Avtomat",         color: '#607d8b', isWeapon: true },
-    [BLOCKS.TORCH]:       { name: "Mashala (Olov)",  color: '#ff5722', isLuminous: true, isFurniture: true },
-    [BLOCKS.BUCKET]:      { name: "Chelak",          color: '#b0bec5', isWeapon: true },
-    [BLOCKS.WATER_BUCKET]:{ name: "Suvli chelak",    color: '#29b6f6', isWeapon: true },
-    [BLOCKS.AXE]:         { name: "Temir Bolta",     color: '#78909c', isWeapon: true }
+    [BLOCKS.GRASS]:          { name: "O't",                 color: '#4caf50' },
+    [BLOCKS.DIRT]:           { name: "Tuproq",               color: '#795548' },
+    [BLOCKS.STONE]:          { name: "Tosh",                 color: '#9e9e9e' },
+    [BLOCKS.SAND]:           { name: "Qum",                  color: '#fdd835' },
+    [BLOCKS.SNOW]:           { name: "Qor",                  color: '#eceff1' },
+    [BLOCKS.WOOD]:           { name: "Yog'och",              color: '#6d4c41' },
+    [BLOCKS.LEAVES]:         { name: "Barg",                 color: '#388e3c' },
+    [BLOCKS.CACTUS]:         { name: "Kaktus",               color: '#2e7d32' },
+    [BLOCKS.COAL]:           { name: "Ko'mir",               color: '#455a64' },
+    [BLOCKS.GOLD]:           { name: "Oltin",                color: '#ffd600' },
+    [BLOCKS.DIAMOND]:        { name: "Olmos",                color: '#00bcd4' },
+    [BLOCKS.PLANKS]:         { name: "Taxta",                color: '#a1887f' },
+    [BLOCKS.LANTERN]:        { name: "Chiroq",               color: '#ff9800', isLuminous: true },
+    [BLOCKS.WATER]:          { name: "Suv",                  color: '#1e88e5' },
+    [BLOCKS.BLUE_TILE]:      { name: "Moviy Koshin",         color: '#29b6f6' },
+    [BLOCKS.RED_BRICK]:      { name: "G'isht",              color: '#c62828' },
+    [BLOCKS.WHITE_MARBLE]:   { name: "Oq Mramor",            color: '#f5f5f5' },
+    [BLOCKS.GLAZED_BLUE]:    { name: "Zangori Koshin",       color: '#0288d1' },
+    [BLOCKS.BEDROCK]:        { name: "Bedrock",              color: '#212121' },
+    [BLOCKS.IRON]:           { name: "Temir",                color: '#b0bec5' },
+    [BLOCKS.DARK_STONE]:     { name: "Qora Tosh",            color: '#37474f' },
+    [BLOCKS.GLASS]:          { name: "Shisha",               color: '#80deea' },
+    [BLOCKS.TERRACOTTA]:     { name: "Terrakota",            color: '#bf360c' },
+    [BLOCKS.COPPER]:         { name: "Mis",                  color: '#ff7043' },
+    [BLOCKS.SWORD]:          { name: "Qilich",               color: '#00bcd4', isWeapon: true },
+    [BLOCKS.BOW]:            { name: "Kamon",                color: '#8d6e63', isWeapon: true },
+    [BLOCKS.BOMB]:           { name: "Bomba",                color: '#ef5350', isWeapon: true },
+    [BLOCKS.SOFA]:           { name: "Divan",                color: '#ab47bc', isFurniture: true },
+    [BLOCKS.TABLE]:          { name: "Stol",                 color: '#8d6e63', isFurniture: true },
+    [BLOCKS.CHAIR]:          { name: "Stul",                 color: '#a1887f', isFurniture: true },
+    [BLOCKS.FLOWER]:         { name: "Gul",                  color: '#ec407a', isFurniture: true },
+    [BLOCKS.AVTOMAT]:        { name: "Avtomat",              color: '#607d8b', isWeapon: true },
+    [BLOCKS.TORCH]:          { name: "Mashala (Olov)",       color: '#ff5722', isLuminous: true, isFurniture: true },
+    [BLOCKS.BUCKET]:         { name: "Chelak",               color: '#b0bec5', isWeapon: true },
+    [BLOCKS.WATER_BUCKET]:   { name: "Suvli chelak",         color: '#29b6f6', isWeapon: true },
+    [BLOCKS.AXE]:            { name: "Temir Bolta",          color: '#78909c', isWeapon: true },
+    [BLOCKS.APPLE]:          { name: "Olma",                 color: '#ef5350', isWeapon: true, isFood: true, hungerRestore: 25 },
+    [BLOCKS.BREAD]:          { name: "Non",                  color: '#ffa726', isWeapon: true, isFood: true, hungerRestore: 30 },
+    [BLOCKS.COOKED_MEAT]:    { name: "Qovurilgan go'sht",    color: '#8d6e63', isWeapon: true, isFood: true, hungerRestore: 40 },
+    [BLOCKS.MEAT_MUTTON]:    { name: "Qo'y go'shti",         color: '#e57373', isWeapon: true, isFood: true, hungerRestore: 30 },
+    [BLOCKS.PICKAXE]:        { name: "Temir Kirka",          color: '#78909c', isWeapon: true, isPickaxe: true },
+    [BLOCKS.SHOVEL]:         { name: "Temir Kurak",          color: '#78909c', isWeapon: true, isShovel: true },
+    [BLOCKS.HOE]:            { name: "Temir Ketmon",         color: '#78909c', isWeapon: true, isHoe: true },
+    [BLOCKS.CRAFTING_TABLE]: { name: "Hunarmandchilik stoli",color: '#8d6e63', isFurniture: true },
+    [BLOCKS.FURNACE]:        { name: "Pechka (Furnace)",     color: '#546e7a', isFurniture: true },
+    [BLOCKS.CHEST]:          { name: "Sandiq (Chest)",       color: '#a1887f', isFurniture: true },
+    [BLOCKS.OBSIDIAN]:       { name: "Obsidian",             color: '#1a102f' },
+    [BLOCKS.GLOWSTONE]:      { name: "Nurlanuvchi Tosh",     color: '#ffb300', isLuminous: true },
+    [BLOCKS.PUMPKIN]:        { name: "Qovoq (Pumpkin)",      color: '#ef6c00', isFurniture: true },
+    [BLOCKS.HAY_BALE]:       { name: "Somon Taxlami",        color: '#fbc02d' },
+    [BLOCKS.MOSSY_STONE]:    { name: "Moxli Tosh",           color: '#558b2f' }
   };
 
   function getItemIconHTML(bId) {
@@ -222,6 +240,68 @@
         <polygon points="8,12 24,12 20,28 12,28" fill="#b0bec5" stroke="#78909c" stroke-width="1.5"/>
         <polygon points="9.5,13 22.5,13 21,17 11,17" fill="#29b6f6"/>
         <line x1="8" y1="17" x2="24" y2="17" stroke="#78909c" stroke-width="1.5"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.APPLE) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <path d="M16 4 C18 2, 22 4, 20 8 Z" fill="#4caf50"/>
+        <line x1="16" y1="4" x2="16" y2="10" stroke="#5d4037" stroke-width="2"/>
+        <path d="M16 10 C10 10, 5 14, 5 20 C5 26, 11 29, 16 27 C21 29, 27 26, 27 20 C27 14, 22 10, 16 10 Z" fill="#ef5350" stroke="#b71c1c" stroke-width="1.5"/>
+        <circle cx="11" cy="15" r="2" fill="#ffffff" opacity="0.6"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.BREAD) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <ellipse cx="16" cy="18" rx="13" ry="8" fill="#ffa726" stroke="#e65100" stroke-width="1.5"/>
+        <path d="M9 16 L12 20 M14 15 L17 19 M19 14 L22 18" stroke="#ffe0b2" stroke-width="2" stroke-linecap="round"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.COOKED_MEAT) {
+      return getMeatIconHTML('#8d6e63', "Qovurilgan go'sht");
+    }
+    if (bId === BLOCKS.MEAT_MUTTON) {
+      return getMeatIconHTML('#e57373', "Qo'y go'shti");
+    }
+    if (bId === BLOCKS.PICKAXE) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <line x1="8" y1="24" x2="24" y2="8" stroke="#8d6e63" stroke-width="3" stroke-linecap="round"/>
+        <path d="M12 6 C16 4, 26 4, 26 12 L22 14 C22 9, 17 8, 14 10 Z" fill="#90a4ae" stroke="#37474f" stroke-width="1"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.SHOVEL) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <line x1="8" y1="24" x2="22" y2="10" stroke="#8d6e63" stroke-width="3" stroke-linecap="round"/>
+        <polygon points="20,6 26,12 22,16 16,10" fill="#90a4ae" stroke="#37474f" stroke-width="1"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.HOE) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <line x1="8" y1="24" x2="22" y2="10" stroke="#8d6e63" stroke-width="3" stroke-linecap="round"/>
+        <path d="M22 10 L28 8 L24 16 L20 12 Z" fill="#90a4ae" stroke="#37474f" stroke-width="1"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.CHEST) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <rect x="4" y="8" width="24" height="18" rx="2" fill="#a1887f" stroke="#4e342e" stroke-width="1.5"/>
+        <line x1="4" y1="14" x2="28" y2="14" stroke="#4e342e" stroke-width="1.5"/>
+        <rect x="14" y="12" width="4" height="5" fill="#ffd600" stroke="#f57f17" stroke-width="1"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.FURNACE) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <rect x="4" y="6" width="24" height="20" rx="2" fill="#546e7a" stroke="#263238" stroke-width="1.5"/>
+        <circle cx="16" cy="18" r="5" fill="#ff5722" stroke="#b71c1c" stroke-width="1"/>
+        <circle cx="16" cy="18" r="2.5" fill="#ffeb3b"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.PUMPKIN) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <rect x="14" y="3" width="4" height="4" fill="#388e3c"/>
+        <rect x="4" y="7" width="24" height="20" rx="4" fill="#ef6c00" stroke="#e65100" stroke-width="1.5"/>
+        <polygon points="10,12 13,15 7,15" fill="#212121"/>
+        <polygon points="22,12 25,15 19,15" fill="#212121"/>
+        <polygon points="16,16 18,18 14,18" fill="#212121"/>
+        <path d="M9 22 L11 20 L13 22 L15 20 L17 22 L19 20 L21 22 L23 20" fill="none" stroke="#212121" stroke-width="1.5"/>
       </svg>`;
     }
     
@@ -442,6 +522,21 @@
         oscGain.connect(this.ctx.destination);
         osc.start(t);
         osc.stop(t + 0.7);
+      } else if (type === 'eat') {
+        for (let i = 0; i < 3; i++) {
+          const tSub = t + i * 0.08;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(320 + Math.random() * 120, tSub);
+          osc.frequency.linearRampToValueAtTime(110, tSub + 0.07);
+          gain.gain.setValueAtTime(0.6 * this.sfxVolume, tSub);
+          gain.gain.exponentialRampToValueAtTime(0.01, tSub + 0.07);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(tSub);
+          osc.stop(tSub + 0.07);
+        }
       }
     }
     startAmbientMusic() {
@@ -469,7 +564,12 @@
       [BLOCKS.GLASS]: '#80deea', [BLOCKS.TERRACOTTA]: '#bf360c', [BLOCKS.COPPER]: '#ff7043',
       [BLOCKS.BOMB]: '#b71c1c', [BLOCKS.SOFA]: '#7b1fa2', [BLOCKS.TABLE]: '#5d4037',
       [BLOCKS.CHAIR]: '#6d4c41', [BLOCKS.FLOWER]: '#e91e63',
-      [BLOCKS.AVTOMAT]: '#37474f', [BLOCKS.TORCH]: '#8d6e63'
+      [BLOCKS.AVTOMAT]: '#37474f', [BLOCKS.TORCH]: '#8d6e63',
+      [BLOCKS.CRAFTING_TABLE]: '#8d6e63', [BLOCKS.FURNACE]: '#546e7a',
+      [BLOCKS.CHEST]: '#a1887f', [BLOCKS.OBSIDIAN]: '#1a102f',
+      [BLOCKS.GLOWSTONE]: '#ffb300', [BLOCKS.PUMPKIN]: '#ef6c00',
+      [BLOCKS.HAY_BALE]: side === 'top' ? '#fbc02d' : '#f57f17',
+      [BLOCKS.MOSSY_STONE]: '#558b2f'
     };
     ctx.fillStyle = colors[blockId] || '#ffffff';
     ctx.fillRect(0, 0, 32, 32);
@@ -619,7 +719,7 @@
   let orbitYaw = 0, orbitPitch = 0;
   let activeSlotIndex = 0;
   let currentInventoryTab = 'weapons';
-  let hotbarBlocks = [25, 36, 26, 1, 2, 6, 3, 12, 13];
+  let hotbarBlocks = [25, 41, 36, 42, 1, 2, 3, 6, 37];
   let worldData = {}, modifiedBlocks = {};
   let currentMapRadius = 250;
   let currentWorldMeta = { name: "Mening Dunyoim", seed: "Uzbekistan2026", map: "minecraft_classic" };
@@ -639,10 +739,17 @@
     const inv = {
       "Qo'y": 0, "Sigir": 0, "Tulki": 0, "Bo'ri": 0, "Burgut": 0,
       "Tuya": 0, "Ot": 0, "Eshak": 0, "Tovuq": 0, "Qoplon": 0,
-      "Jun": 0, "Yog'och": 0, "Tosh": 0, "Qora Tosh": 0, "Ko'mir": 0,
+      "Jun": 0, "Jun (Yung)": 0, "Qo'y go'shti": 0, "Mol go'shti": 0,
+      "Tulki go'shti": 0, "Bo'ri go'shti": 0, "Burgut go'shti": 0, "Tuya go'shti": 0,
+      "Ot go'shti (Qazi)": 0, "Eshak go'shti": 0, "Tovuq go'shti": 0, "Qoplon go'shti": 0,
+      "Olma": 0, "Non": 0, "Qovurilgan go'sht": 0,
+      "Yog'och": 0, "Tosh": 0, "Qora Tosh": 0, "Ko'mir": 0,
       "Oltin": 0, "Olmos": 0, "Temir": 0, "Mis": 0,
       "Taxta": 0, "Chiroq": 0, "Mashala (Olov)": 0, "Divan": 0,
       "Stol": 0, "Stul": 0, "Qilich": 0, "Kamon": 0, "Temir Bolta": 0,
+      "Temir Kirka": 0, "Temir Kurak": 0, "Temir Ketmon": 0,
+      "Hunarmandchilik stoli": 0, "Pechka (Furnace)": 0, "Sandiq (Chest)": 0,
+      "Obsidian": 0, "Nurlanuvchi Tosh": 0, "Qovoq (Pumpkin)": 0, "Somon Taxlami": 0, "Moxli Tosh": 0,
       "Bomba": 0, "Avtomat": 0, "Chelak": 0, "Suvli chelak": 0,
       "O't": 0, "Tuproq": 0, "Qum": 0, "Qor": 0, "Barg": 0, "Kaktus": 0,
       "Suv": 0, "Moviy Koshin": 0, "G'isht": 0, "Oq Mramor": 0,
@@ -660,7 +767,14 @@
       inv["Mashala (Olov)"] = 10;
       inv["Qilich"] = 1;
       inv["Temir Bolta"] = 1;
+      inv["Temir Kirka"] = 1;
+      inv["Temir Kurak"] = 1;
+      inv["Temir Ketmon"] = 1;
       inv["Kamon"] = 1;
+      inv["Olma"] = 5;
+      inv["Non"] = 5;
+      inv["Qovurilgan go'sht"] = 3;
+      inv["Qo'y go'shti"] = 5;
     }
     return inv;
   }
@@ -711,14 +825,198 @@
   const otherPlayers = {};
   let broadcastCounter = 0;
 
-  // --- HEALTH & COMBAT STATE ---
+  // --- HEALTH & COMBAT & HUNGER STATE ---
   let health = 10;
   const MAX_HEALTH = 10;
+  let playerHunger = 100;
+  const MAX_HUNGER = 100;
+  let hungerTimer = 0;
+  let starvationTimer = 0;
+  let healthRegenTimer = 0;
   let avtomatAmmo = 30;
   let isReloading = false;
 
   // --- PLACED POINT LIGHTS FOR LANTERNS ---
   const placedLights = {};
+
+  // --- ROBLOX QUEST ENGINE ---
+  const ROBLOX_MISSIONS = [
+    {
+      id: "m1",
+      title: "Missiya 1: Quruvchi (The Builder)",
+      desc: "Dunyo bo'ylab 15 ta har qanday blok joylashtiring",
+      type: "place_blocks",
+      target: 15,
+      rewardText: "+10 Olma 🍎, +5 Non 🥖",
+      rewardItems: [
+        { name: "Olma", count: 10 },
+        { name: "Non", count: 5 }
+      ]
+    },
+    {
+      id: "m2",
+      title: "Missiya 2: Yog'och Kestiruvchi (Tree Chopper)",
+      desc: "Bolta yoki qo'l bilan 10 ta Yog'och blokini kesing",
+      type: "chop_wood",
+      target: 10,
+      rewardText: "+1 Temir Bolta 🪓, +5 Qovurilgan go'sht 🍖",
+      rewardItems: [
+        { name: "Temir Bolta", count: 1 },
+        { name: "Qovurilgan go'sht", count: 5 }
+      ]
+    },
+    {
+      id: "m3",
+      title: "Missiya 3: Ma'dan Konchisi (Ore Hunter)",
+      desc: "Kirka bilan 5 ta Ko'mir yoki Temir ma'danini qazing",
+      type: "mine_ores",
+      target: 5,
+      rewardText: "+1 Olmos 💎, +3 Oltin 🪙",
+      rewardItems: [
+        { name: "Olmos", count: 1 },
+        { name: "Oltin", count: 3 }
+      ]
+    },
+    {
+      id: "m4",
+      title: "Missiya 4: Ovchi va Oziqlanuvchi (Hunter)",
+      desc: "2 ta hayvonni ovlang yoki taom yeb ochlikni tiklang",
+      type: "hunt_or_eat",
+      target: 2,
+      rewardText: "+1 Kamon 🏹, +10 O'q",
+      rewardItems: [
+        { name: "Kamon", count: 1 }
+      ]
+    },
+    {
+      id: "m5",
+      title: "Missiya 5: Obida Tadqiqotchisi (Explorer)",
+      desc: "Boshlang'ich nuqtadan 150 metr uzoqlikka sayohat qiling",
+      type: "explore_dist",
+      target: 150,
+      rewardText: "+1 Sandiq 📦, +2 Glowstone ✨",
+      rewardItems: [
+        { name: "Sandiq (Chest)", count: 1 },
+        { name: "Nurlanuvchi Tosh", count: 2 }
+      ]
+    }
+  ];
+
+  let currentMissionIndex = 0;
+  let userQuestsProgress = {
+    m1: 0, m2: 0, m3: 0, m4: 0, m5: 0,
+    claimed: { m1: false, m2: false, m3: false, m4: false, m5: false }
+  };
+
+  function updateMissionProgress(type, amount = 1) {
+    const curMission = ROBLOX_MISSIONS[currentMissionIndex];
+    if (!curMission || userQuestsProgress.claimed[curMission.id]) return;
+
+    if (curMission.type === type) {
+      userQuestsProgress[curMission.id] = Math.min(curMission.target, (userQuestsProgress[curMission.id] || 0) + amount);
+      renderHUDMissionTracker();
+    }
+  }
+
+  function renderHUDMissionTracker() {
+    const curMission = ROBLOX_MISSIONS[currentMissionIndex];
+    const elTitle = document.getElementById('hud-mission-title');
+    const elStep = document.getElementById('hud-mission-step');
+    const elFill = document.getElementById('hud-mission-bar-fill');
+    const btnClaim = document.getElementById('btn-hud-claim-mission');
+
+    if (!curMission) {
+      if (elTitle) elTitle.textContent = "Barcha Missiyalar Bajarildi! 🏆";
+      if (elStep) elStep.textContent = "Siz barcha roblox vazifalarini bajardingiz!";
+      if (elFill) elFill.style.width = "100%";
+      if (btnClaim) btnClaim.classList.add('hidden');
+      return;
+    }
+
+    const currentVal = userQuestsProgress[curMission.id] || 0;
+    const pct = Math.min(100, Math.floor((currentVal / curMission.target) * 100));
+
+    if (elTitle) elTitle.textContent = curMission.title;
+    if (elStep) elStep.textContent = `${curMission.desc} (${currentVal}/${curMission.target})`;
+    if (elFill) elFill.style.width = `${pct}%`;
+
+    if (currentVal >= curMission.target && !userQuestsProgress.claimed[curMission.id]) {
+      if (btnClaim) btnClaim.classList.remove('hidden');
+    } else {
+      if (btnClaim) btnClaim.classList.add('hidden');
+    }
+  }
+
+  function claimMissionReward(mId) {
+    const mission = ROBLOX_MISSIONS.find(m => m.id === mId);
+    if (!mission || userQuestsProgress.claimed[mId]) return;
+
+    const val = userQuestsProgress[mId] || 0;
+    if (val < mission.target) return;
+
+    userQuestsProgress.claimed[mId] = true;
+
+    // Grant rewards
+    mission.rewardItems.forEach(item => {
+      meatInventory[item.name] = (meatInventory[item.name] || 0) + item.count;
+    });
+
+    soundEngine.playSFX('powerup');
+    showToast(`🎉 MISSIYA BAJARILDI! Mukofot olindi: ${mission.rewardText}`);
+
+    // Advance to next uncompleted mission
+    if (currentMissionIndex < ROBLOX_MISSIONS.length - 1) {
+      currentMissionIndex++;
+    }
+
+    renderHUDMissionTracker();
+    renderMissionsModal();
+    renderHotbar();
+    renderInventoryGrid();
+  }
+
+  function renderMissionsModal() {
+    const container = document.getElementById('missions-list-container');
+    if (!container) return;
+    container.innerHTML = '';
+
+    ROBLOX_MISSIONS.forEach((m) => {
+      const val = userQuestsProgress[m.id] || 0;
+      const isDone = val >= m.target;
+      const isClaimed = userQuestsProgress.claimed[m.id];
+      const pct = Math.min(100, Math.floor((val / m.target) * 100));
+
+      const card = document.createElement('div');
+      card.className = `mission-card ${isDone ? 'completed' : ''} ${isClaimed ? 'claimed' : ''}`;
+
+      let btnHtml = '';
+      if (isClaimed) {
+        btnHtml = `<span style="color:#10b981; font-weight:bold; font-size:13px;">Olingan ✓</span>`;
+      } else if (isDone) {
+        btnHtml = `<button class="btn-claim-mission" onclick="window.claimMission('${m.id}')">Mukofotni Olish! 🎉</button>`;
+      } else {
+        btnHtml = `<span style="color:#94a3b8; font-size:12px; font-weight:bold;">${val}/${m.target}</span>`;
+      }
+
+      card.innerHTML = `
+        <div class="mission-info">
+          <div class="mission-title">${m.title}</div>
+          <div style="font-size:12px; color:#cbd5e1;">${m.desc}</div>
+          <div class="mission-reward">🎁 Mukofot: ${m.rewardText}</div>
+          <div class="mission-progress-track" style="width: 180px; margin-top:4px;">
+            <div class="mission-progress-fill" style="width: ${pct}%;"></div>
+          </div>
+        </div>
+        <div>${btnHtml}</div>
+      `;
+
+      container.appendChild(card);
+    });
+  }
+
+  window.claimMission = function(mId) {
+    claimMissionReward(mId);
+  };
 
   const svgHeartFull = `<svg viewBox="0 0 24 24" width="18" height="18" style="margin-right:2px;display:inline-block;vertical-align:middle;"><path fill="#ef4444" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
   const svgHeartHalf = `<svg viewBox="0 0 24 24" width="18" height="18" style="margin-right:2px;display:inline-block;vertical-align:middle;"><defs><linearGradient id="grad-half"><stop offset="50%" stop-color="#ef4444" /><stop offset="50%" stop-color="#4b5563" /></linearGradient></defs><path fill="url(#grad-half)" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
@@ -738,6 +1036,55 @@
         el.innerHTML += svgHeartEmpty;
       }
     }
+  }
+
+  function updateHungerUI() {
+    const el = document.getElementById('hud-hunger');
+    if (!el) return;
+    el.innerHTML = '';
+    const totalDrumsticks = 10;
+    const isWarning = playerHunger <= 30;
+
+    for (let i = 0; i < totalDrumsticks; i++) {
+      const val = playerHunger - i * 10;
+      let stateClass = 'empty';
+      if (val >= 5) {
+        stateClass = 'full';
+      }
+      const warningClass = (isWarning && val > 0) ? ' warning' : '';
+      el.innerHTML += `<span class="hunger-icon ${stateClass}${warningClass}">🍗</span>`;
+    }
+  }
+
+  function eatFood(blockId) {
+    const bInfo = BLOCK_INFO[blockId];
+    if (!bInfo) return false;
+
+    const count = meatInventory[bInfo.name] || 0;
+    if (count <= 0) {
+      showToast(`"${bInfo.name}" tugagan!`);
+      return false;
+    }
+
+    if (playerHunger >= MAX_HUNGER && health >= MAX_HEALTH) {
+      showToast("Qorningiz to'q!");
+      return false;
+    }
+
+    meatInventory[bInfo.name] -= 1;
+    const restoreAmount = bInfo.hungerRestore || 30;
+    playerHunger = Math.min(MAX_HUNGER, playerHunger + restoreAmount);
+
+    if (health < MAX_HEALTH) {
+      health = Math.min(MAX_HEALTH, health + 1);
+      updateHealthUI();
+    }
+
+    soundEngine.playSFX('eat');
+    updateHungerUI();
+    renderHotbar();
+    showToast(`+${restoreAmount} Ochlik tiklandi! ("${bInfo.name}" yeyildi)`);
+    return true;
   }
 
   function damageLocalPlayer(amount) {
@@ -760,7 +1107,9 @@
   function respawnPlayer() {
     showToast("Siz halok bo'ldingiz! Qaytadan tug'ilish...");
     health = MAX_HEALTH;
+    playerHunger = MAX_HUNGER;
     updateHealthUI();
+    updateHungerUI();
     playerPos.set(0, 95, 0);
     playerVel.set(0, 0, 0);
   }
@@ -1298,10 +1647,98 @@
 
     // spawnFamousFigures(gY + 1); // Famous figures removed as requested
     spawnAnimals(R, gY + 1);
+    spawnDecorationsAndOres(R, gY, mapType);
 
     Object.keys(modifiedBlocks).forEach(k => { worldData[k] = modifiedBlocks[k]; });
     renderInstancedWorld();
     playerPos.set(5, gY + 20, 30);
+  }
+
+  function spawnDecorationsAndOres(R, gY, mapType) {
+    const isGreen = !['pyramids', 'colosseum', 'snow', 'everest'].includes(mapType);
+    
+    // 1. Pumpkin Patches
+    if (isGreen) {
+      const pumpkinCount = 20;
+      for (let i = 0; i < pumpkinCount; i++) {
+        const px = Math.floor((Math.random() - 0.5) * (R * 1.5));
+        const pz = Math.floor((Math.random() - 0.5) * (R * 1.5));
+        for (let y = gY + 30; y >= gY - 5; y--) {
+          const b = worldData[`${px},${y},${pz}`];
+          if (b === BLOCKS.GRASS) {
+            setB(px, y + 1, pz, BLOCKS.PUMPKIN);
+            if (Math.random() < 0.5) setB(px + 1, y + 1, pz, BLOCKS.PUMPKIN);
+            break;
+          }
+        }
+      }
+    }
+
+    // 2. Hay Bales near landmarks / squares
+    const hayCount = 15;
+    for (let i = 0; i < hayCount; i++) {
+      const hx = Math.floor((Math.random() - 0.5) * (R * 1.2));
+      const hz = Math.floor((Math.random() - 0.5) * (R * 1.2));
+      for (let y = gY + 25; y >= gY - 5; y--) {
+        const b = worldData[`${hx},${y},${hz}`];
+        if (b && b !== BLOCKS.AIR && b !== BLOCKS.WATER) {
+          setB(hx, y + 1, hz, BLOCKS.HAY_BALE);
+          setB(hx, y + 2, hz, BLOCKS.HAY_BALE);
+          if (Math.random() < 0.6) setB(hx + 1, y + 1, hz, BLOCKS.HAY_BALE);
+          break;
+        }
+      }
+    }
+
+    // 3. Mossy Stone Boulders
+    const mossCount = 25;
+    for (let i = 0; i < mossCount; i++) {
+      const mx = Math.floor((Math.random() - 0.5) * (R * 1.6));
+      const mz = Math.floor((Math.random() - 0.5) * (R * 1.6));
+      for (let y = gY + 30; y >= gY - 5; y--) {
+        const b = worldData[`${mx},${y},${mz}`];
+        if (b && b !== BLOCKS.AIR && b !== BLOCKS.WATER) {
+          fillBox(mx, y + 1, mz, mx + 1, y + 2, mz + 1, BLOCKS.MOSSY_STONE);
+          break;
+        }
+      }
+    }
+
+    // 4. Exposed Ore Veins & Obsidian in Stone Cliff/Ground
+    const oreTypes = [BLOCKS.COAL, BLOCKS.IRON, BLOCKS.GOLD, BLOCKS.DIAMOND, BLOCKS.OBSIDIAN];
+    const oreCount = 35;
+    for (let i = 0; i < oreCount; i++) {
+      const ox = Math.floor((Math.random() - 0.5) * (R * 1.6));
+      const oz = Math.floor((Math.random() - 0.5) * (R * 1.6));
+      const ore = oreTypes[Math.floor(Math.random() * oreTypes.length)];
+      for (let y = gY + 15; y >= gY - 15; y--) {
+        const b = worldData[`${ox},${y},${oz}`];
+        if (b === BLOCKS.STONE || b === BLOCKS.DARK_STONE || b === BLOCKS.DIRT) {
+          setB(ox, y, oz, ore);
+          if (Math.random() < 0.5) setB(ox + 1, y, oz, ore);
+          if (Math.random() < 0.5) setB(ox, y - 1, oz, ore);
+          break;
+        }
+      }
+    }
+
+    // 5. Glowstone Posts at historical square corners
+    const glowPosts = [
+      { x: -18, z: -18 }, { x: 18, z: -18 }, { x: -18, z: 18 }, { x: 18, z: 18 },
+      { x: -35, z: -35 }, { x: 35, z: -35 }, { x: -35, z: 35 }, { x: 35, z: 35 }
+    ];
+    glowPosts.forEach(p => {
+      for (let y = gY + 25; y >= gY - 5; y--) {
+        const b = worldData[`${p.x},${y},${p.z}`];
+        if (b && b !== BLOCKS.AIR && b !== BLOCKS.WATER) {
+          setB(p.x, y + 1, p.z, BLOCKS.WOOD);
+          setB(p.x, y + 2, p.z, BLOCKS.WOOD);
+          setB(p.x, y + 3, p.z, BLOCKS.GLOWSTONE);
+          placedLights[`${p.x},${y+3},${p.z}`] = true;
+          break;
+        }
+      }
+    });
   }
 
   // Helper: set block
@@ -2454,6 +2891,40 @@
   }
 
   function updatePlayer(delta) {
+    // --- HUNGER DEPLETION & STARVATION ---
+    hungerTimer += delta;
+    if (hungerTimer >= 5.0) {
+      hungerTimer = 0;
+      if (playerHunger > 0) {
+        playerHunger = Math.max(0, playerHunger - 1);
+        updateHungerUI();
+      }
+    }
+
+    if (playerHunger === 0) {
+      starvationTimer += delta;
+      if (starvationTimer >= 3.5) {
+        starvationTimer = 0;
+        damageLocalPlayer(2);
+        showToast("Siz ochlikdan ziyon ko'ryapsiz!");
+      }
+    } else {
+      starvationTimer = 0;
+    }
+
+    if (playerHunger >= 80 && health < MAX_HEALTH) {
+      healthRegenTimer += delta;
+      if (healthRegenTimer >= 4.0) {
+        healthRegenTimer = 0;
+        health = Math.min(MAX_HEALTH, health + 1);
+        playerHunger = Math.max(0, playerHunger - 1);
+        updateHealthUI();
+        updateHungerUI();
+      }
+    } else {
+      healthRegenTimer = 0;
+    }
+
     if (isSitting && sittingOnCoords) {
       playerPos.copy(sittingOnCoords);
       playerVel.set(0, 0, 0);
@@ -2585,9 +3056,12 @@
     const el_compass = document.getElementById('compass-badge');
     const el_pos = document.getElementById('hud-pos');
     if (el_compass) el_compass.textContent = `${dirs[Math.floor((deg + 22.5) / 45) % 8]}`;
-    if (el_pos) el_pos.textContent = `X:${Math.round(playerPos.x)} Y:${Math.round(playerPos.y)} Z:${Math.round(playerPos.z)}`;
-
     checkInteractions();
+
+    const distFromSpawn = Math.hypot(playerPos.x, playerPos.z);
+    if (distFromSpawn >= 150) {
+      updateMissionProgress('explore_dist', Math.floor(distFromSpawn));
+    }
 
     // --- MULTIPLAYER REALTIME UPDATE ---
     if (supabase && multiplayerChannel) {
@@ -3060,14 +3534,21 @@
   function updateMiningProgress(delta) {
     if (!isMiningHeld || !miningTargetKey) return;
     
-    // Check for Axe multiplier
     const activeBlockId = hotbarBlocks[activeSlotIndex];
+    const targetedBlockType = worldData[miningTargetKey];
     let miningSpeedMultiplier = 1.0;
     
     if (activeBlockId === BLOCKS.AXE) {
-      const targetedBlockType = worldData[miningTargetKey];
-      if (targetedBlockType === BLOCKS.WOOD || targetedBlockType === BLOCKS.LEAVES) {
-        miningSpeedMultiplier = 3.5;
+      if (targetedBlockType === BLOCKS.WOOD || targetedBlockType === BLOCKS.LEAVES || targetedBlockType === BLOCKS.PLANKS || targetedBlockType === BLOCKS.CRAFTING_TABLE || targetedBlockType === BLOCKS.CHEST) {
+        miningSpeedMultiplier = 4.0;
+      }
+    } else if (activeBlockId === BLOCKS.PICKAXE) {
+      if (targetedBlockType === BLOCKS.STONE || targetedBlockType === BLOCKS.COAL || targetedBlockType === BLOCKS.GOLD || targetedBlockType === BLOCKS.DIAMOND || targetedBlockType === BLOCKS.IRON || targetedBlockType === BLOCKS.COPPER || targetedBlockType === BLOCKS.DARK_STONE || targetedBlockType === BLOCKS.BLUE_TILE || targetedBlockType === BLOCKS.RED_BRICK || targetedBlockType === BLOCKS.WHITE_MARBLE || targetedBlockType === BLOCKS.GLAZED_BLUE || targetedBlockType === BLOCKS.TERRACOTTA || targetedBlockType === BLOCKS.FURNACE || targetedBlockType === BLOCKS.OBSIDIAN || targetedBlockType === BLOCKS.GLOWSTONE || targetedBlockType === BLOCKS.MOSSY_STONE) {
+        miningSpeedMultiplier = 4.0;
+      }
+    } else if (activeBlockId === BLOCKS.SHOVEL) {
+      if (targetedBlockType === BLOCKS.DIRT || targetedBlockType === BLOCKS.GRASS || targetedBlockType === BLOCKS.SAND || targetedBlockType === BLOCKS.SNOW || targetedBlockType === BLOCKS.HAY_BALE) {
+        miningSpeedMultiplier = 4.0;
       }
     }
     
@@ -3086,6 +3567,13 @@
       worldData[miningTargetKey] = BLOCKS.AIR;
       modifiedBlocks[miningTargetKey] = BLOCKS.AIR;
       soundEngine.playSFX('break');
+
+      if (brokenBlockType === BLOCKS.WOOD) {
+        updateMissionProgress('chop_wood', 1);
+      }
+      if (brokenBlockType === BLOCKS.COAL || brokenBlockType === BLOCKS.IRON || brokenBlockType === BLOCKS.GOLD || brokenBlockType === BLOCKS.DIAMOND) {
+        updateMissionProgress('mine_ores', 1);
+      }
 
       // Drop resource collectible for broken blocks
       let dropType = null;
@@ -3135,6 +3623,11 @@
   function placeBlock() {
     let blockId = hotbarBlocks[activeSlotIndex];
     let bInfo = BLOCK_INFO[blockId];
+    
+    if (bInfo && bInfo.isFood) {
+      eatFood(blockId);
+      return;
+    }
     
     if (bInfo && bInfo.isWeapon && blockId !== BLOCKS.BOMB) {
       const firstBlock = hotbarBlocks.find(b => {
@@ -3190,6 +3683,7 @@
       worldData[key] = blockId;
       modifiedBlocks[key] = blockId;
       soundEngine.playSFX('place');
+      updateMissionProgress('place_blocks', 1);
 
       // Consume the block count
       if (bInfo && !bInfo.isWeapon) {
@@ -3267,7 +3761,7 @@
       playerPos: { x: playerPos.x, y: playerPos.y, z: playerPos.z },
       yaw, pitch, dayTime, hotbarBlocks, skin: playerSkin, modifiedBlocks,
       questState: currentQuestState,
-      meatInventory
+      meatInventory, playerHunger
     };
     let saves = JSON.parse(localStorage.getItem('uzbekcraft_saves') || '[]');
     const idx = saves.findIndex(s => s.id === data.id);
@@ -3412,6 +3906,8 @@
     modifiedBlocks = saveData.modifiedBlocks || {};
     dayTime = saveData.dayTime || 0.25;
     playerSkin = saveData.skin || 'temur';
+    playerHunger = saveData.playerHunger !== undefined ? saveData.playerHunger : 100;
+    updateHungerUI();
     
     // Parse questState and meatInventory
     if (saveData.questState && saveData.questState.includes('|')) {
@@ -3486,18 +3982,49 @@
     renderHotbar();
     renderInventoryGrid();
     updateHealthUI();
+    updateHungerUI();
+    renderHUDMissionTracker();
+
+    const btnMissionsHUD = document.getElementById('btn-hud-missions');
+    const btnCloseMissions = document.getElementById('btn-close-missions');
+    const btnClaimHUD = document.getElementById('btn-hud-claim-mission');
+
+    if (btnMissionsHUD) {
+      btnMissionsHUD.addEventListener('click', () => {
+        if (document.pointerLockElement) document.exitPointerLock();
+        renderMissionsModal();
+        document.getElementById('modal-missions').classList.remove('hidden');
+      });
+    }
+
+    if (btnCloseMissions) {
+      btnCloseMissions.addEventListener('click', () => {
+        document.getElementById('modal-missions').classList.add('hidden');
+        const container = document.getElementById('canvas-container');
+        if (container) setTimeout(() => container.requestPointerLock(), 50);
+      });
+    }
+
+    if (btnClaimHUD) {
+      btnClaimHUD.addEventListener('click', () => {
+        const cur = ROBLOX_MISSIONS[currentMissionIndex];
+        if (cur) claimMissionReward(cur.id);
+      });
+    }
 
     const tabWeapons = document.getElementById('tab-weapons');
     const tabFurniture = document.getElementById('tab-furniture');
     const tabBlocks = document.getElementById('tab-blocks');
+    const tabFood = document.getElementById('tab-food');
     const tabCrafting = document.getElementById('tab-crafting');
 
     const switchTab = (tab) => {
       currentInventoryTab = tab;
-      [tabWeapons, tabFurniture, tabBlocks, tabCrafting].forEach(t => t?.classList.remove('active'));
+      [tabWeapons, tabFurniture, tabBlocks, tabFood, tabCrafting].forEach(t => t?.classList.remove('active'));
       if (tab === 'weapons') tabWeapons?.classList.add('active');
       else if (tab === 'furniture') tabFurniture?.classList.add('active');
       else if (tab === 'blocks') tabBlocks?.classList.add('active');
+      else if (tab === 'food') tabFood?.classList.add('active');
       else if (tab === 'crafting') tabCrafting?.classList.add('active');
       
       const grid = document.getElementById('inventory-grid');
@@ -3519,6 +4046,7 @@
     if (tabWeapons) tabWeapons.addEventListener('click', () => switchTab('weapons'));
     if (tabFurniture) tabFurniture.addEventListener('click', () => switchTab('furniture'));
     if (tabBlocks) tabBlocks.addEventListener('click', () => switchTab('blocks'));
+    if (tabFood) tabFood.addEventListener('click', () => switchTab('food'));
     if (tabCrafting) tabCrafting.addEventListener('click', () => switchTab('crafting'));
 
     document.getElementById('btn-new-world').addEventListener('click', () => {
@@ -4367,6 +4895,7 @@
 
     if (animal.health <= 0) {
       soundEngine.playSFX('kill');
+      updateMissionProgress('hunt_or_eat', 1);
       // Spin and scale down death animation
       let deathTimer = 0;
       function deathAnimate() {
@@ -4756,14 +5285,74 @@
     if (!grid) return;
     grid.innerHTML = '';
 
+    if (currentInventoryTab === 'food') {
+      const foodItemsList = [
+        { id: BLOCKS.APPLE, name: "Olma" },
+        { id: BLOCKS.BREAD, name: "Non" },
+        { id: BLOCKS.COOKED_MEAT, name: "Qovurilgan go'sht" },
+        { id: BLOCKS.MEAT_MUTTON, name: "Qo'y go'shti" },
+        { name: "Mol go'shti", color: "#d32f2f" },
+        { name: "Tulki go'shti", color: "#f57c00" },
+        { name: "Bo'ri go'shti", color: "#757575" },
+        { name: "Burgut go'shti", color: "#8d6e63" },
+        { name: "Tuya go'shti", color: "#fbc02d" },
+        { name: "Ot go'shti (Qazi)", color: "#5d4037" },
+        { name: "Eshak go'shti", color: "#78909c" },
+        { name: "Tovuq go'shti", color: "#fff59d" },
+        { name: "Qoplon go'shti", color: "#afb42b" },
+        { name: "Jun (Yung)", color: "#ffffff" }
+      ];
+
+      foodItemsList.forEach(itemInfo => {
+        const bId = itemInfo.id;
+        const itemName = itemInfo.name;
+        const count = meatInventory[itemName] || 0;
+        
+        const item = document.createElement('div');
+        item.className = 'inv-slot-item';
+        item.style.position = 'relative';
+        
+        if (count === 0) item.style.opacity = '0.5';
+        
+        const countHtml = `<div class="block-count-indicator">${count}</div>`;
+        const iconHtml = bId !== undefined ? getItemIconHTML(bId) : getMeatIconHTML(itemInfo.color || '#e57373', itemName);
+
+        item.innerHTML = `<div class="block-icon-box" style="width:48px; height:48px; display:flex; align-items:center; justify-content:center; padding:4px;">${iconHtml}</div><span class="block-slot-name">${itemName}</span>${countHtml}`;
+
+        item.addEventListener('click', () => {
+          const targetId = bId !== undefined ? bId : BLOCKS.MEAT_MUTTON;
+          const existingIdx = hotbarBlocks.indexOf(targetId);
+          if (existingIdx !== -1) {
+            const temp = hotbarBlocks[activeSlotIndex];
+            hotbarBlocks[activeSlotIndex] = targetId;
+            hotbarBlocks[existingIdx] = temp;
+            showToast(`Slot ${activeSlotIndex + 1} va Slot ${existingIdx + 1} o'rni almashdi!`);
+          } else {
+            hotbarBlocks[activeSlotIndex] = targetId;
+            showToast(`Slot ${activeSlotIndex + 1}: "${itemName}"`);
+          }
+          renderHotbar();
+        });
+
+        item.addEventListener('mouseenter', (e) => {
+          showMinecraftTooltip(e, itemName, `Oziq-ovqat • Soni: ${count}`);
+        });
+        item.addEventListener('mousemove', moveMinecraftTooltip);
+        item.addEventListener('mouseleave', hideMinecraftTooltip);
+
+        grid.appendChild(item);
+      });
+      return;
+    }
+
     let items = [];
     if (currentInventoryTab === 'weapons') {
-      items = [BLOCKS.SWORD, BLOCKS.BOW, BLOCKS.BOMB, BLOCKS.AVTOMAT, BLOCKS.AXE];
+      items = [BLOCKS.SWORD, BLOCKS.BOW, BLOCKS.AXE, BLOCKS.PICKAXE, BLOCKS.SHOVEL, BLOCKS.HOE, BLOCKS.BOMB, BLOCKS.AVTOMAT];
     } else if (currentInventoryTab === 'furniture') {
-      items = [BLOCKS.LANTERN, BLOCKS.TORCH, BLOCKS.SOFA, BLOCKS.TABLE, BLOCKS.CHAIR, BLOCKS.FLOWER, BLOCKS.BUCKET];
+      items = [BLOCKS.CRAFTING_TABLE, BLOCKS.FURNACE, BLOCKS.CHEST, BLOCKS.PUMPKIN, BLOCKS.LANTERN, BLOCKS.TORCH, BLOCKS.SOFA, BLOCKS.TABLE, BLOCKS.CHAIR, BLOCKS.FLOWER, BLOCKS.BUCKET];
     } else {
       items = [
-        BLOCKS.DIAMOND, BLOCKS.GOLD, BLOCKS.IRON, BLOCKS.COPPER,
+        BLOCKS.DIAMOND, BLOCKS.GOLD, BLOCKS.IRON, BLOCKS.COPPER, BLOCKS.OBSIDIAN, BLOCKS.GLOWSTONE, BLOCKS.HAY_BALE, BLOCKS.MOSSY_STONE,
         BLOCKS.BLUE_TILE, BLOCKS.WHITE_MARBLE, BLOCKS.GLAZED_BLUE, BLOCKS.RED_BRICK, BLOCKS.DARK_STONE, BLOCKS.TERRACOTTA,
         BLOCKS.GLASS, BLOCKS.WATER, BLOCKS.GRASS, BLOCKS.DIRT, BLOCKS.STONE, BLOCKS.SAND, BLOCKS.SNOW, BLOCKS.WOOD,
         BLOCKS.LEAVES, BLOCKS.PLANKS, BLOCKS.CACTUS, BLOCKS.COAL
@@ -4892,11 +5481,11 @@
       if (e.code === 'KeyM') {
         const hud = document.getElementById('hud');
         if (hud && !hud.classList.contains('hidden')) {
-          const meatsModal = document.getElementById('meats-modal');
-          if (meatsModal) {
-            meatsModal.classList.toggle('hidden');
-            if (!meatsModal.classList.contains('hidden')) {
-              updateMeatMenuUI();
+          const missionModal = document.getElementById('modal-missions');
+          if (missionModal) {
+            missionModal.classList.toggle('hidden');
+            if (!missionModal.classList.contains('hidden')) {
+              renderMissionsModal();
               if (document.pointerLockElement) document.exitPointerLock();
             } else {
               const container = document.getElementById('canvas-container');

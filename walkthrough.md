@@ -356,3 +356,102 @@ Using principles from **Minecraft Resource Pack Design** and **Modern Web UI Des
    - **File modified:** [index.html](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/index.html)
    - Added icons to all inventory tabs: **Qurollar** ⚔️, **Anjomlar** 🛋️, **Bloklar** 🧱, **Hunarmandchilik** 🔨.
 
+---
+
+## Part 15: Minecraft-Style Hunger System, Food & Supplies Tab, and Eating Mechanics
+
+We implemented a full Minecraft Java Edition **Hunger & Food System**:
+
+1. **"Oziq-Ovqatlar" (Food & Supplies) Inventory Tab:**
+   - **Files modified:** [index.html](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/index.html), [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - Added the `#tab-food` inventory tab button (**🍎 Oziq-Ovqatlar**).
+   - Displays all edible food items and collected animal drops:
+     - **Olma (Apple)**, **Non (Bread)**, **Qovurilgan go'sht**, **Jun (Yung)**
+     - Meats from hunted animals: **Qo'y go'shti**, **Mol go'shti**, **Tulki go'shti**, **Bo'ri go'shti**, **Burgut go'shti**, **Tuya go'shti**, **Ot go'shti (Qazi)**, **Eshak go'shti**, **Tovuq go'shti**, **Qoplon go'shti**.
+   - All collected animal drops automatically display their real-time quantity counts inside the grid.
+
+2. **Minecraft HUD Hunger Bar (`#hud-hunger`):**
+   - **Files modified:** [index.html](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/index.html), [style.css](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/style.css), [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - Positioned directly above the hotbar next to health hearts (`.hud-status-bars`).
+   - Renders 10 drumstick icons (`🍗`) representing 100 max hunger.
+   - **Visual Alert:** When hunger drops below 30%, drumstick icons flash red with a pulsating warning animation (`@keyframes hunger-alert-pulse`).
+
+3. **Hunger Depletion, Starvation & Regeneration:**
+   - **File modified:** [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - Hunger decreases by -1 point every 5 seconds.
+   - **Starvation Damage:** When hunger drops to 0%, the player takes periodic damage (-1 heart every 3.5 seconds) with a red damage screen flash.
+   - **Health Regeneration:** When hunger is high (>80%), health slowly regenerates over time (+0.5 heart every 4 seconds).
+
+4. **Eating Mechanics & Audio:**
+   - **File modified:** [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - Holding a food item in hand and clicking triggers `eatFood()`.
+   - Synthesizes a crunching/chewing audio effect (`soundEngine.playSFX('eat')`).
+   - Consumes 1 count of that food item from `meatInventory` and restores +25 to +40 hunger points.
+
+---
+
+## Part 16: Full Minecraft Tools Suite, Iconic Blocks, 4x Tool Mining Multipliers & Map Landscape Decoration
+
+We added all core Minecraft tools, iconic blocks, tool speed multipliers, and enriched world generation across all maps:
+
+1. **Complete Minecraft Tools Suite:**
+   - **File modified:** [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - **Pickaxe (`BLOCKS.PICKAXE` ⛏️):** Built for mining Stone, Ores, Bricks, Marble, and Obsidian at 4x speed!
+   - **Shovel (`BLOCKS.SHOVEL` 🪵):** Built for digging Dirt, Grass, Sand, Snow, and Hay Bales at 4x speed!
+   - **Hoe (`BLOCKS.HOE` 🚜):** Agricultural farming tool.
+   - **Axe (`BLOCKS.AXE` 🪓):** Built for chopping Wood, Leaves, Planks, Workbench, and Chests at 4x speed!
+
+2. **Iconic Minecraft Blocks:**
+   - **File modified:** [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - **Crafting Table (`BLOCKS.CRAFTING_TABLE` 🪵):** Classic wooden workbench.
+   - **Furnace (`BLOCKS.FURNACE` 🌋):** Smelting furnace block.
+   - **Chest (`BLOCKS.CHEST` 📦):** Storage chest block.
+   - **Obsidian (`BLOCKS.OBSIDIAN` ⬛):** Volcanic rock block.
+   - **Glowstone (`BLOCKS.GLOWSTONE` ✨):** Bright glowing nether stone.
+   - **Pumpkin (`BLOCKS.PUMPKIN` 🎃):** Carved pumpkin block.
+   - **Hay Bale (`BLOCKS.HAY_BALE` 🌾):** Straw bale block.
+   - **Mossy Stone (`BLOCKS.MOSSY_STONE` 🌿):** Ancient mossy cobblestone block.
+
+3. **Tool-Specific 4x Mining Speed Multipliers:**
+   - **File modified:** [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - Updated `updateMiningProgress()`:
+     - Equipped Pickaxe -> 4x mining speed on Stone/Ores/Bricks/Obsidian.
+     - Equipped Shovel -> 4x digging speed on Dirt/Grass/Sand/Snow.
+     - Equipped Axe -> 4x chopping speed on Wood/Leaves/Planks.
+
+4. **Rich Minecraft World Generation (`spawnDecorationsAndOres`):**
+   - **File modified:** [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - **Pumpkin Fields:** Clusters of wild pumpkins spawned on grass hills.
+   - **Hay Bales:** Stacked straw bales placed around historical monuments and settlements.
+   - **Mossy Boulders:** Ancient mossy cobblestone clusters embedded near rivers and cliffs.
+   - **Exposed Ore Veins:** Natural veins of Diamond, Gold, Iron, Coal, and Obsidian exposed on stone cliff faces.
+   - **Glowstone Lamp Posts:** Glowing lamp posts framing historical squares (Registon, Ichan Qala, Eiffel Tower).
+
+---
+
+## Part 17: Roblox-Style Quest & Mission Engine, Universal All-Map Decorations & Visual Lighting Upgrades
+
+1. **Roblox-Style Quest & Mission System:**
+   - **Files modified:** [index.html](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/index.html), [style.css](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/style.css), [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - Top-right **HUD Mission Tracker Widget (`#hud-mission-tracker`)** dynamically displays current active goal, step counter, progress bar, and claim reward button.
+   - **Missions Modal (`#modal-missions`):** Toggled with key **`[M]`** or top toolbar button **`📜 Missiyalar`**, rendering Roblox-style mission cards:
+     - 🏗️ **Missiya 1: Quruvchi:** Place 15 blocks (Reward: +10 Apples, +5 Bread).
+     - 🪓 **Missiya 2: Yog'och Kestiruvchi:** Chop 10 Wood blocks (Reward: +1 Iron Axe, +5 Cooked Meat).
+     - ⛏️ **Missiya 3: Ma'dan Konchisi:** Mine 5 Coal/Iron ores (Reward: +1 Diamond, +3 Gold).
+     - 🏹 **Missiya 4: Ovchi:** Hunt 2 animals & Eat food (Reward: +1 Bow).
+     - 🧭 **Missiya 5: Obida Tadqiqotchisi:** Explore 150m from spawn (Reward: +1 Chest, +2 Glowstone).
+
+2. **Universal Decoration Across ALL 14 Maps:**
+   - **File modified:** [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - **Desert Maps (Pyramids, Ichan Qala, Colosseum, Burj Khalifa):** Sandstone ruins, glowing desert lanterns, cactus patches, and buried gold veins.
+   - **Snow Maps (Chimgon, Everest):** Snow pine trees, ice crystal pillars (`BLUE_TILE`), snow lanterns, and mountain diamond deposits.
+   - **Green Maps (Registan, Minora, Tashkent tower, Classic, Nature, Eiffel, Big Ben, Taj Mahal, Great Wall, Earth Globe):** Pumpkin fields, hay bale stacks, mossy boulders, and glowing street posts.
+
+3. **Graphics & Visual Enhancements:**
+   - **File modified:** [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - ACESFilmic tone mapping and directional shadow soft filtering.
+   - Night-time glowing firefly particle sparks around Glowstone lamps & Torches.
+
+
+
+
