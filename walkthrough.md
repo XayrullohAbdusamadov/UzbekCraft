@@ -452,6 +452,35 @@ We added all core Minecraft tools, iconic blocks, tool speed multipliers, and en
    - ACESFilmic tone mapping and directional shadow soft filtering.
    - Night-time glowing firefly particle sparks around Glowstone lamps & Torches.
 
+---
+
+## Part 18: Premium Quests Board, Detailed 3D Voxel Animals, Perpetual Fleeing AI & Mobile Responsiveness
+
+1. **Qiziqarli Topshiriqlar (Quests Board Card):**
+   - **Files modified:** [index.html](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/index.html), [style.css](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/style.css), [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - Renamed "Roblox missiyalari" to "Qiziqarli topshiriqlar".
+   - Designed a stunning glassmorphic Quests Board Modal card (`.quests-board-card`) with linear-gradient border lights, a glowing header, hover-scale items, and animated green claiming buttons.
+   - Updated the top-right HUD tracker texts to match the quest naming.
+
+2. **Upgraded 3D Voxel Animals:**
+   - **File modified:** [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - Redesigned all game animal models inside `buildAnimalMesh` to add detailed 3D blocks:
+     - Sheep: Fluffy white woolly coats, beige heads, black eyes, ears, and head wool caps.
+     - Cow: Brown bodies with custom black spot plates, white horns, pink snouts, and udders.
+     - Fox: White chest plates, orange/white pointy ears, long snout with black nose tips, and long bushy tails with white tips.
+     - Wolf: Gray bodies with dark gray spine plates, wild orange-red eyes, and bushy tails.
+     - Eagle: White heads, big yellow curved beaks, yellow talons, and side wings.
+     - Others: Custom eyes, snouts, ears, tails, and hooves added.
+
+3. **Perpetual Fleeing AI:**
+   - **File modified:** [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - When any animal is attacked, it sets `animal.isFleeing = true` and continues running away at a fast speed (6.0 units) indefinitely, with legs swinging rapidly. Bounces off map edges to stay in the world.
+
+4. **Mobile Responsive Styling:**
+   - **File modified:** [style.css](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/style.css)
+   - Added media queries for phone screens: scaled down padding, margins, borders, and text sizes for the new Quests Modal.
+   - Made the HUD mission tracker widget compact (width: 160px) and shifted it to avoid overlapping touch zones.
+
 
 
 
