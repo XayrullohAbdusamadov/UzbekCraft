@@ -619,7 +619,7 @@
   let orbitYaw = 0, orbitPitch = 0;
   let activeSlotIndex = 0;
   let currentInventoryTab = 'weapons';
-  let hotbarBlocks = [25, 26, 1, 2, 3, 6, 17, 13, 15];
+  let hotbarBlocks = [25, 36, 26, 1, 2, 6, 3, 12, 13];
   let worldData = {}, modifiedBlocks = {};
   let currentMapRadius = 250;
   let currentWorldMeta = { name: "Mening Dunyoim", seed: "Uzbekistan2026", map: "minecraft_classic" };
@@ -634,12 +634,38 @@
   let highlightBox = null, raycaster = new THREE.Raycaster();
   let npcs = [], animals = [], spawnedFurniture = [];
   let meatCollectibles = [];
-  let meatInventory = {
-    "Qo'y": 0, "Sigir": 0, "Tulki": 0, "Bo'ri": 0, "Burgut": 0,
-    "Tuya": 0, "Ot": 0, "Eshak": 0, "Tovuq": 0, "Qoplon": 0,
-    "Jun": 0, "Yog'och": 0, "Tosh": 0, "Qora Tosh": 0, "Ko'mir": 0,
-    "Oltin": 0, "Olmos": 0, "Temir": 0, "Mis": 0
-  };
+
+  function createDefaultInventory(isNewGame = false) {
+    const inv = {
+      "Qo'y": 0, "Sigir": 0, "Tulki": 0, "Bo'ri": 0, "Burgut": 0,
+      "Tuya": 0, "Ot": 0, "Eshak": 0, "Tovuq": 0, "Qoplon": 0,
+      "Jun": 0, "Yog'och": 0, "Tosh": 0, "Qora Tosh": 0, "Ko'mir": 0,
+      "Oltin": 0, "Olmos": 0, "Temir": 0, "Mis": 0,
+      "Taxta": 0, "Chiroq": 0, "Mashala (Olov)": 0, "Divan": 0,
+      "Stol": 0, "Stul": 0, "Qilich": 0, "Kamon": 0, "Temir Bolta": 0,
+      "Bomba": 0, "Avtomat": 0, "Chelak": 0, "Suvli chelak": 0,
+      "O't": 0, "Tuproq": 0, "Qum": 0, "Qor": 0, "Barg": 0, "Kaktus": 0,
+      "Suv": 0, "Moviy Koshin": 0, "G'isht": 0, "Oq Mramor": 0,
+      "Zangori Koshin": 0, "Shisha": 0, "Terrakota": 0, "Gul": 0
+    };
+    if (isNewGame) {
+      inv["O't"] = 20;
+      inv["Tuproq"] = 20;
+      inv["Tosh"] = 20;
+      inv["Yog'och"] = 20;
+      inv["Taxta"] = 20;
+      inv["Oq Mramor"] = 10;
+      inv["Chiroq"] = 5;
+      inv["Moviy Koshin"] = 5;
+      inv["Mashala (Olov)"] = 10;
+      inv["Qilich"] = 1;
+      inv["Temir Bolta"] = 1;
+      inv["Kamon"] = 1;
+    }
+    return inv;
+  }
+
+  let meatInventory = createDefaultInventory(true);
 
   const MEAT_TYPES = {
     "Qo'y":   { name: "Qo'y go'shti", color: '#ff8a80', hexColor: 0xff8a80 },
@@ -3061,11 +3087,29 @@
       modifiedBlocks[miningTargetKey] = BLOCKS.AIR;
       soundEngine.playSFX('break');
 
-      // Drop resource collectible if matching RESOURCE_INFO
+      // Drop resource collectible for broken blocks
+      let dropType = null;
+      let dropName = null;
+      let dropColor = '#ffffff';
+
       if (typeof RESOURCE_INFO !== 'undefined' && RESOURCE_INFO[brokenBlockType]) {
         const info = RESOURCE_INFO[brokenBlockType];
+        dropType = info.type;
+        dropName = info.name;
+        dropColor = info.color;
+      } else if (BLOCK_INFO[brokenBlockType]) {
+        const info = BLOCK_INFO[brokenBlockType];
+        if (!info.isWeapon && brokenBlockType !== BLOCKS.AIR && brokenBlockType !== BLOCKS.BEDROCK) {
+          // Map to standard block name in meatInventory
+          dropType = info.name;
+          dropName = info.name;
+          dropColor = info.color || '#cccccc';
+        }
+      }
+
+      if (dropType) {
         const coords = miningTargetKey.split(',').map(Number);
-        spawnResourceCollectible(coords[0], coords[1] + 0.35, coords[2], info.type, info.name, info.color);
+        spawnResourceCollectible(coords[0], coords[1] + 0.35, coords[2], dropType, dropName, dropColor);
       }
 
       if (supabase && multiplayerChannel) {
@@ -3090,12 +3134,30 @@
 
   function placeBlock() {
     let blockId = hotbarBlocks[activeSlotIndex];
-    if (BLOCK_INFO[blockId] && BLOCK_INFO[blockId].isWeapon && blockId !== BLOCKS.BOMB) {
-      const firstBlock = hotbarBlocks.find(b => b !== undefined && BLOCK_INFO[b] && !BLOCK_INFO[b].isWeapon);
+    let bInfo = BLOCK_INFO[blockId];
+    
+    if (bInfo && bInfo.isWeapon && blockId !== BLOCKS.BOMB) {
+      const firstBlock = hotbarBlocks.find(b => {
+        if (b === undefined || b === BLOCKS.AIR) return false;
+        const info = BLOCK_INFO[b];
+        if (!info || info.isWeapon) return false;
+        const count = meatInventory[info.name] || 0;
+        return count > 0;
+      });
       if (firstBlock !== undefined) {
         blockId = firstBlock;
+        bInfo = BLOCK_INFO[blockId];
       } else {
-        blockId = BLOCKS.GRASS;
+        showToast("Qo'yish uchun bloklar yetarli emas!");
+        return;
+      }
+    }
+
+    if (bInfo && !bInfo.isWeapon) {
+      const count = meatInventory[bInfo.name] || 0;
+      if (count <= 0) {
+        showToast(`"${bInfo.name}" bloki tugagan!`);
+        return;
       }
     }
 
@@ -3128,6 +3190,12 @@
       worldData[key] = blockId;
       modifiedBlocks[key] = blockId;
       soundEngine.playSFX('place');
+
+      // Consume the block count
+      if (bInfo && !bInfo.isWeapon) {
+        meatInventory[bInfo.name] = (meatInventory[bInfo.name] || 0) - 1;
+        renderHotbar();
+      }
 
       if (BLOCK_INFO[blockId]?.isLuminous) {
         addPointLightAt(bx, by, bz);
@@ -3350,19 +3418,13 @@
       const parts = saveData.questState.split('|');
       currentQuestState = parts[0];
       try {
-        meatInventory = JSON.parse(parts[1]);
+        meatInventory = Object.assign(createDefaultInventory(false), JSON.parse(parts[1]));
       } catch(e) {
-        meatInventory = saveData.meatInventory || {
-          "Qo'y": 0, "Sigir": 0, "Tulki": 0, "Bo'ri": 0, "Burgut": 0,
-          "Tuya": 0, "Ot": 0, "Eshak": 0, "Tovuq": 0, "Qoplon": 0
-        };
+        meatInventory = Object.assign(createDefaultInventory(false), saveData.meatInventory || {});
       }
     } else {
       currentQuestState = saveData.questState || 'not_started';
-      meatInventory = saveData.meatInventory || {
-        "Qo'y": 0, "Sigir": 0, "Tulki": 0, "Bo'ri": 0, "Burgut": 0,
-        "Tuya": 0, "Ot": 0, "Eshak": 0, "Tovuq": 0, "Qoplon": 0
-      };
+      meatInventory = Object.assign(createDefaultInventory(false), saveData.meatInventory || {});
     }
 
     generateWorld(saveData.seed || 'Uzbekistan2026', saveData.map || 'registan');
@@ -3592,10 +3654,7 @@
       currentWorldMeta = { id: 'world_' + Date.now(), name, seed, map };
       modifiedBlocks = {};
       currentQuestState = 'not_started';
-      meatInventory = {
-        "Qo'y": 0, "Sigir": 0, "Tulki": 0, "Bo'ri": 0, "Burgut": 0,
-        "Tuya": 0, "Ot": 0, "Eshak": 0, "Tovuq": 0, "Qoplon": 0
-      };
+      meatInventory = createDefaultInventory(true);
       generateWorld(seed, map);
       document.getElementById('hud-biome').textContent = getMapDisplayName(map);
       startPlayingSession();
@@ -4547,23 +4606,145 @@
     }
   }
 
+  // --- UI HOVER TOOLTIPS & ACTION BAR POPUPS ---
+  let hotbarPopupTimeout = null;
+  let lastActiveSlot = -1;
+
+  function showHotbarItemNamePopup(nameStr) {
+    const el = document.getElementById('hotbar-item-popup');
+    const textEl = document.getElementById('hotbar-item-popup-text');
+    if (!el || !textEl || !nameStr) return;
+    
+    textEl.textContent = nameStr;
+    el.classList.remove('hidden');
+    
+    el.style.animation = 'none';
+    void el.offsetWidth;
+    el.style.animation = '';
+    
+    if (hotbarPopupTimeout) clearTimeout(hotbarPopupTimeout);
+    hotbarPopupTimeout = setTimeout(() => {
+      el.classList.add('hidden');
+    }, 1800);
+  }
+
+  function showMinecraftTooltip(e, title, subText) {
+    const tt = document.getElementById('minecraft-tooltip');
+    const titleEl = document.getElementById('mc-tooltip-title');
+    const subEl = document.getElementById('mc-tooltip-sub');
+    if (!tt || !titleEl) return;
+
+    titleEl.textContent = title;
+    if (subEl) subEl.textContent = subText || '';
+    
+    tt.style.left = `${e.clientX}px`;
+    tt.style.top = `${e.clientY}px`;
+    tt.classList.remove('hidden');
+  }
+
+  function moveMinecraftTooltip(e) {
+    const tt = document.getElementById('minecraft-tooltip');
+    if (!tt || tt.classList.contains('hidden')) return;
+    tt.style.left = `${e.clientX}px`;
+    tt.style.top = `${e.clientY}px`;
+  }
+
+  function hideMinecraftTooltip() {
+    const tt = document.getElementById('minecraft-tooltip');
+    if (tt) tt.classList.add('hidden');
+  }
+
   function renderHotbar() {
     const el = document.getElementById('hotbar');
-    if (!el) return;
-    el.innerHTML = '';
-    hotbarBlocks.forEach((bId, idx) => {
-      const slot = document.createElement('div');
-      slot.className = `hotbar-slot ${idx === activeSlotIndex ? 'active' : ''}`;
-      
-      let ammoHtml = '';
-      if (bId === BLOCKS.AVTOMAT) {
-        ammoHtml = `<div class="ammo-indicator" style="position: absolute; bottom: 2px; right: 4px; font-size: 10px; font-family: monospace; font-weight: bold; color: #ffeb3b; background: rgba(0,0,0,0.6); padding: 1px 3px; border-radius: 3px; z-index: 10;">${isReloading ? 'RELOAD' : avtomatAmmo}</div>`;
+    if (el) {
+      el.innerHTML = '';
+      hotbarBlocks.forEach((bId, idx) => {
+        const slot = document.createElement('div');
+        slot.className = `hotbar-slot ${idx === activeSlotIndex ? 'active' : ''}`;
+        
+        let ammoHtml = '';
+        if (bId === BLOCKS.AVTOMAT) {
+          ammoHtml = `<div class="ammo-indicator" style="position: absolute; bottom: 2px; right: 4px; font-size: 10px; font-family: monospace; font-weight: bold; color: #ffeb3b; background: rgba(0,0,0,0.6); padding: 1px 3px; border-radius: 3px; z-index: 10;">${isReloading ? 'RELOAD' : avtomatAmmo}</div>`;
+        }
+        
+        let countHtml = '';
+        const bInfo = BLOCK_INFO[bId];
+        if (bInfo && !bInfo.isWeapon) {
+          const count = meatInventory[bInfo.name] || 0;
+          countHtml = `<div class="block-count-indicator">${count}</div>`;
+        }
+        
+        slot.innerHTML = `<span class="hotbar-slot-num">${idx + 1}</span><div class="hotbar-icon" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:4px;">${getItemIconHTML(bId)}</div>${ammoHtml}${countHtml}`;
+        
+        slot.addEventListener('click', () => { activeSlotIndex = idx; renderHotbar(); });
+        
+        slot.addEventListener('mouseenter', (e) => {
+          if (bInfo) {
+            const typeStr = bInfo.isWeapon ? 'Qurol / Asbob' : (bInfo.isFurniture ? 'Anjom' : 'Blok');
+            const countStr = bInfo.isWeapon ? '' : ` • Soni: ${meatInventory[bInfo.name] || 0}`;
+            showMinecraftTooltip(e, bInfo.name, `${typeStr}${countStr}`);
+          }
+        });
+        slot.addEventListener('mousemove', moveMinecraftTooltip);
+        slot.addEventListener('mouseleave', hideMinecraftTooltip);
+
+        el.appendChild(slot);
+      });
+    }
+
+    const invEl = document.getElementById('inventory-hotbar');
+    if (invEl) {
+      invEl.innerHTML = '';
+      hotbarBlocks.forEach((bId, idx) => {
+        const slot = document.createElement('div');
+        slot.className = `hotbar-slot ${idx === activeSlotIndex ? 'active' : ''}`;
+        slot.style.width = '48px';
+        slot.style.height = '48px';
+        slot.style.cursor = 'pointer';
+        
+        let ammoHtml = '';
+        if (bId === BLOCKS.AVTOMAT) {
+          ammoHtml = `<div class="ammo-indicator" style="position: absolute; bottom: 2px; right: 4px; font-size: 9px; font-family: monospace; font-weight: bold; color: #ffeb3b; background: rgba(0,0,0,0.6); padding: 1px 2px; border-radius: 2px; z-index: 10;">${isReloading ? 'RELOAD' : avtomatAmmo}</div>`;
+        }
+        
+        let countHtml = '';
+        const bInfo = BLOCK_INFO[bId];
+        if (bInfo && !bInfo.isWeapon) {
+          const count = meatInventory[bInfo.name] || 0;
+          countHtml = `<div class="block-count-indicator" style="font-size: 8px;">${count}</div>`;
+        }
+        
+        slot.innerHTML = `<span class="hotbar-slot-num">${idx + 1}</span><div class="hotbar-icon" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:4px;">${getItemIconHTML(bId)}</div>${ammoHtml}${countHtml}`;
+        
+        slot.addEventListener('click', () => { 
+          activeSlotIndex = idx; 
+          renderHotbar(); 
+        });
+
+        slot.addEventListener('mouseenter', (e) => {
+          if (bInfo) {
+            const typeStr = bInfo.isWeapon ? 'Qurol / Asbob' : (bInfo.isFurniture ? 'Anjom' : 'Blok');
+            const countStr = bInfo.isWeapon ? '' : ` • Soni: ${meatInventory[bInfo.name] || 0}`;
+            showMinecraftTooltip(e, bInfo.name, `${typeStr}${countStr}`);
+          }
+        });
+        slot.addEventListener('mousemove', moveMinecraftTooltip);
+        slot.addEventListener('mouseleave', hideMinecraftTooltip);
+
+        invEl.appendChild(slot);
+      });
+    }
+
+    if (lastActiveSlot !== activeSlotIndex) {
+      lastActiveSlot = activeSlotIndex;
+      const activeBlockId = hotbarBlocks[activeSlotIndex];
+      const activeInfo = BLOCK_INFO[activeBlockId];
+      if (activeInfo) {
+        const countStr = !activeInfo.isWeapon ? ` (x${meatInventory[activeInfo.name] || 0})` : '';
+        showHotbarItemNamePopup(`${activeInfo.name}${countStr}`);
       }
-      
-      slot.innerHTML = `<span class="hotbar-slot-num">${idx + 1}</span><div class="hotbar-icon" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:4px;">${getItemIconHTML(bId)}</div>${ammoHtml}`;
-      slot.addEventListener('click', () => { activeSlotIndex = idx; renderHotbar(); });
-      el.appendChild(slot);
-    });
+    }
+
     updateFirstPersonHandMesh();
     if (playerMesh) {
       updateThirdPersonHeldItem(playerMesh, hotbarBlocks[activeSlotIndex]);
@@ -4590,10 +4771,26 @@
     }
 
     items.forEach(bId => {
-      if (BLOCK_INFO[bId] === undefined) return;
+      const bInfo = BLOCK_INFO[bId];
+      if (bInfo === undefined) return;
+      
+      const count = bInfo.isWeapon ? 1 : (meatInventory[bInfo.name] || 0);
+      
       const item = document.createElement('div');
       item.className = 'inv-slot-item';
-      item.innerHTML = `<div class="block-icon-box" style="width:48px; height:48px; display:flex; align-items:center; justify-content:center; padding:4px;">${getItemIconHTML(bId)}</div><span class="block-slot-name">${BLOCK_INFO[bId].name}</span>`;
+      item.style.position = 'relative';
+      
+      if (!bInfo.isWeapon && count === 0) {
+        item.style.opacity = '0.5';
+      }
+      
+      let countHtml = '';
+      if (!bInfo.isWeapon) {
+        countHtml = `<div class="block-count-indicator">${count}</div>`;
+      }
+      
+      item.innerHTML = `<div class="block-icon-box" style="width:48px; height:48px; display:flex; align-items:center; justify-content:center; padding:4px;">${getItemIconHTML(bId)}</div><span class="block-slot-name">${bInfo.name}</span>${countHtml}`;
+      
       item.addEventListener('click', () => {
         const existingIdx = hotbarBlocks.indexOf(bId);
         if (existingIdx !== -1) {
@@ -4603,10 +4800,19 @@
           showToast(`Slot ${activeSlotIndex + 1} va Slot ${existingIdx + 1} o'rni almashdi!`);
         } else {
           hotbarBlocks[activeSlotIndex] = bId;
-          showToast(`Slot ${activeSlotIndex + 1}: "${BLOCK_INFO[bId].name}"`);
+          showToast(`Slot ${activeSlotIndex + 1}: "${bInfo.name}"`);
         }
         renderHotbar();
       });
+
+      item.addEventListener('mouseenter', (e) => {
+        const typeStr = bInfo.isWeapon ? 'Qurol / Asbob' : (bInfo.isFurniture ? 'Anjom' : 'Blok');
+        const countStr = bInfo.isWeapon ? '' : ` • Soni: ${count}`;
+        showMinecraftTooltip(e, bInfo.name, `${typeStr}${countStr}`);
+      });
+      item.addEventListener('mousemove', moveMinecraftTooltip);
+      item.addEventListener('mouseleave', hideMinecraftTooltip);
+
       grid.appendChild(item);
     });
   }
@@ -4669,7 +4875,20 @@
         if (n >= 0 && n < 9) { activeSlotIndex = n; renderHotbar(); }
       }
       if (e.code === 'KeyV') { isThirdPerson = !isThirdPerson; showToast(isThirdPerson ? "3-shaxs" : "1-shaxs"); }
-      if (e.code === 'KeyE') document.getElementById('inventory-modal').classList.toggle('hidden');
+      if (e.code === 'KeyE') {
+        const invModal = document.getElementById('inventory-modal');
+        if (invModal) {
+          invModal.classList.toggle('hidden');
+          if (!invModal.classList.contains('hidden')) {
+            renderInventoryGrid();
+            renderHotbar();
+            if (document.pointerLockElement) document.exitPointerLock();
+          } else {
+            const container = document.getElementById('canvas-container');
+            if (container) setTimeout(() => { container.requestPointerLock(); }, 50);
+          }
+        }
+      }
       if (e.code === 'KeyM') {
         const hud = document.getElementById('hud');
         if (hud && !hud.classList.contains('hidden')) {
@@ -4900,7 +5119,17 @@
     document.getElementById('btn-touch-cam').addEventListener('click', () => {
       isThirdPerson = !isThirdPerson; showToast(isThirdPerson ? "3-shaxs" : "1-shaxs");
     });
-    document.getElementById('btn-touch-inv').addEventListener('click', () => document.getElementById('inventory-modal').classList.toggle('hidden'));
+    document.getElementById('btn-touch-inv').addEventListener('click', () => {
+      const invModal = document.getElementById('inventory-modal');
+      if (invModal) {
+        invModal.classList.toggle('hidden');
+        if (!invModal.classList.contains('hidden')) {
+          renderInventoryGrid();
+          renderHotbar();
+          if (document.pointerLockElement) document.exitPointerLock();
+        }
+      }
+    });
   }
 
   function showToast(text) {
@@ -5031,6 +5260,7 @@
         meatCollectibles.splice(i, 1);
         
         updateMeatMenuUI();
+        renderHotbar();
       }
     }
   }
@@ -5094,59 +5324,169 @@
   // ==========================================================================
 
   const CRAFTING_RECIPES = [
+    // Weapons & Tools
+    {
+      result: BLOCKS.SWORD,
+      name: "Olmos Qilich",
+      ingredients: { "Olmos": 2, "Yog'och": 1 },
+      yield: 1,
+      description: "Hayvonlarni tezroq ovlash uchun o'tkir qurol."
+    },
+    {
+      result: BLOCKS.AXE,
+      name: "Temir Bolta",
+      ingredients: { "Temir": 3, "Yog'och": 2 },
+      yield: 1,
+      description: "Daraxtlarni kesishni 3.5 barobar tezlashtiradigan anjom."
+    },
+    {
+      result: BLOCKS.BOW,
+      name: "Kamon",
+      ingredients: { "Yog'och": 3, "Jun": 1 },
+      yield: 1,
+      description: "Uzoqdagi nishonlarni urish uchun yoy va o'q otish quroli."
+    },
+    {
+      result: BLOCKS.BOMB,
+      name: "Bomba",
+      ingredients: { "Ko'mir": 2, "Temir": 1 },
+      yield: 2,
+      description: "Bloklarni portlatish uchun dinamit."
+    },
+    {
+      result: BLOCKS.AVTOMAT,
+      name: "Avtomat",
+      ingredients: { "Temir": 5, "Ko'mir": 3 },
+      yield: 1,
+      description: "Olovli qurol (M klavishi orqali go'shtlarni ko'rish mumkin)."
+    },
+    {
+      result: BLOCKS.BUCKET,
+      name: "Chelak",
+      ingredients: { "Temir": 3 },
+      yield: 1,
+      description: "Suv yoki boshqa narsalarni tashish uchun temir idish."
+    },
+    {
+      result: BLOCKS.WATER_BUCKET,
+      name: "Suvli chelak",
+      ingredients: { "Chelak": 1, "Suv": 1 },
+      yield: 1,
+      description: "Dunyoda suv oqimini yaratish uchun ishlatiladi."
+    },
+    // Furniture & Decorative
     {
       result: BLOCKS.SOFA,
       name: "Divan (Sofa)",
       ingredients: { "Jun": 2, "Yog'och": 2 },
+      yield: 1,
       description: "Qulay dam olish uchun jun va yog'ochdan yasalgan chiroyli divan."
     },
     {
       result: BLOCKS.CHAIR,
       name: "Stul",
       ingredients: { "Yog'och": 2 },
+      yield: 1,
       description: "O'tirish uchun oddiy va qulay yog'och stul."
     },
     {
       result: BLOCKS.TABLE,
       name: "Stol",
       ingredients: { "Yog'och": 3 },
+      yield: 1,
       description: "Ustiga chiqish yoki jihozlar qo'yish uchun stol."
     },
     {
       result: BLOCKS.TORCH,
       name: "Mashala (Torch)",
       ingredients: { "Yog'och": 1, "Ko'mir": 1 },
+      yield: 4,
       description: "Atrofni yoritib turadigan yorug'lik manbai."
     },
     {
       result: BLOCKS.LANTERN,
       name: "Chiroq (Lantern)",
       ingredients: { "Temir": 2, "Ko'mir": 1 },
+      yield: 1,
       description: "Uylar va yo'llarni bezab turuvchi neonli chiroq."
     },
     {
-      result: BLOCKS.SWORD,
-      name: "Olmos Qilich",
-      ingredients: { "Olmos": 2, "Yog'och": 1 },
-      description: "Hayvonlarni tezroq ovlash uchun o'tkir qurol."
+      result: BLOCKS.FLOWER,
+      name: "Gul",
+      ingredients: { "O't": 2 },
+      yield: 1,
+      description: "Chiroyli bezak guli."
     },
-    {
-      result: BLOCKS.BOW,
-      name: "Kamon",
-      ingredients: { "Yog'och": 3, "Jun": 1 },
-      description: "Uzoqdagi nishonlarni urish uchun yoy va o'q otish quroli."
-    },
-    {
-      result: BLOCKS.AXE,
-      name: "Temir Bolta",
-      ingredients: { "Temir": 3, "Yog'och": 2 },
-      description: "Daraxtlarni kesishni 3.5 barobar tezlashtiradigan anjom."
-    },
+    // Blocks
     {
       result: BLOCKS.PLANKS,
-      name: "Taxta",
+      name: "Taxta (Planks)",
       ingredients: { "Yog'och": 1 },
+      yield: 4,
       description: "Qurilish materiallari uchun ishlov berilgan taxta bloki."
+    },
+    {
+      result: BLOCKS.GLASS,
+      name: "Shisha (Glass)",
+      ingredients: { "Qum": 1 },
+      yield: 2,
+      description: "Shaffof oyna bloki."
+    },
+    {
+      result: BLOCKS.RED_BRICK,
+      name: "G'isht (Brick)",
+      ingredients: { "Tuproq": 2 },
+      yield: 4,
+      description: "Mustahkam qizil g'isht bloki."
+    },
+    {
+      result: BLOCKS.WHITE_MARBLE,
+      name: "Oq Mramor",
+      ingredients: { "Tosh": 2 },
+      yield: 4,
+      description: "Chiroyli oq rangli mramor toshi."
+    },
+    {
+      result: BLOCKS.BLUE_TILE,
+      name: "Moviy Koshin",
+      ingredients: { "Tosh": 2, "Olmos": 1 },
+      yield: 8,
+      description: "Samarqand obidalari uslubidagi moviy koshin."
+    },
+    {
+      result: BLOCKS.GLAZED_BLUE,
+      name: "Zangori Koshin",
+      ingredients: { "Tosh": 2, "Mis": 1 },
+      yield: 8,
+      description: "Tarixiy obidalardagi zangori sirlangan koshin."
+    },
+    {
+      result: BLOCKS.TERRACOTTA,
+      name: "Terrakota",
+      ingredients: { "Tuproq": 2 },
+      yield: 4,
+      description: "Pishirilgan loydan qilingan terrakota bloki."
+    },
+    {
+      result: BLOCKS.GRASS,
+      name: "O't",
+      ingredients: { "Tuproq": 1, "Barg": 1 },
+      yield: 2,
+      description: "Yashil o't bloki."
+    },
+    {
+      result: BLOCKS.SAND,
+      name: "Qum",
+      ingredients: { "Tosh": 1 },
+      yield: 2,
+      description: "Sariq sahro qumi bloki."
+    },
+    {
+      result: BLOCKS.SNOW,
+      name: "Qor",
+      ingredients: { "Suv": 1 },
+      yield: 4,
+      description: "Yumshoq oq qor bloki."
     }
   ];
 
@@ -5264,12 +5604,17 @@
     });
     
     const blockId = selectedRecipe.result;
+    const countYield = selectedRecipe.yield || 1;
+    const itemName = BLOCK_INFO[blockId].name;
+    
+    meatInventory[itemName] = (meatInventory[itemName] || 0) + countYield;
+    
     const existingIdx = hotbarBlocks.indexOf(blockId);
     if (existingIdx === -1) {
       hotbarBlocks[activeSlotIndex] = blockId;
-      showToast(`Muvaffaqiyatli yaratildi: "${BLOCK_INFO[blockId].name}" slotga joylandi!`);
+      showToast(`Muvaffaqiyatli yaratildi: +${countYield} "${itemName}" slotga joylandi!`);
     } else {
-      showToast(`Muvaffaqiyatli yaratildi: "${BLOCK_INFO[blockId].name}"!`);
+      showToast(`Muvaffaqiyatli yaratildi: +${countYield} "${itemName}"!`);
     }
     
     soundEngine.playSFX('place');

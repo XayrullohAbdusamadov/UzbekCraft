@@ -334,10 +334,10 @@
         
         <!-- Inventory Tabs Navigation -->
         <div class="inventory-tabs">
-          <button id="tab-weapons" class="inv-tab-btn active">Qurollar</button>
-          <button id="tab-furniture" class="inv-tab-btn">Anjomlar</button>
-          <button id="tab-blocks" class="inv-tab-btn">Bloklar</button>
-          <button id="tab-crafting" class="inv-tab-btn">Hunarmandchilik</button>
+          <button id="tab-weapons" class="inv-tab-btn active"><span class="tab-icon">⚔️</span> Qurollar</button>
+          <button id="tab-furniture" class="inv-tab-btn"><span class="tab-icon">🛋️</span> Anjomlar</button>
+          <button id="tab-blocks" class="inv-tab-btn"><span class="tab-icon">🧱</span> Bloklar</button>
+          <button id="tab-crafting" class="inv-tab-btn"><span class="tab-icon">🔨</span> Hunarmandchilik</button>
         </div>
 
         <p class="modal-text">Tanlangan slotga joylash uchun blok/qurol ustiga bosing:</p>
@@ -366,6 +366,15 @@
             </div>
           </div>
         </div>
+
+        <!-- Inventory Hotbar Section (Visible in all tabs) -->
+        <div class="inventory-hotbar-section" style="margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%;">
+          <span style="font-size: 0.8rem; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.5px;">Tezkor Slotlar (Hotbar)</span>
+          <div id="inventory-hotbar" class="hotbar-slots" style="justify-content: center; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); padding: 6px; border-radius: 12px; display: inline-flex; gap: 6px; box-shadow: none;">
+            <!-- Dynamically populated by renderHotbar() -->
+          </div>
+        </div>
+
         <div class="modal-actions">
           <button id="btn-close-inventory" class="btn btn-emerald">Tayyor</button>
         </div>
@@ -431,6 +440,11 @@
         </div>
       </div>
 
+      <!-- Hotbar Action Bar Item Name Popup Overlay -->
+      <div id="hotbar-item-popup" class="hotbar-item-popup hidden">
+        <span id="hotbar-item-popup-text"></span>
+      </div>
+
       <!-- Hotbar Toolbar -->
       <div id="hotbar-container">
         <!-- Health Hearts Bar -->
@@ -449,7 +463,11 @@
     <!-- DAMAGE FLASH OVERLAY -->
     <div id="damage-flash"></div>
 
-
+    <!-- MINECRAFT STYLE HOVER TOOLTIP OVERLAY -->
+    <div id="minecraft-tooltip" class="minecraft-tooltip hidden">
+      <div id="mc-tooltip-title" class="mc-tooltip-title"></div>
+      <div id="mc-tooltip-sub" class="mc-tooltip-sub"></div>
+    </div>
 
   </div>
 

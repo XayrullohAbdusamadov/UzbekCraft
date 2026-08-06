@@ -287,5 +287,72 @@ Biz hayvonlarni ovlash tizimini yanada realistik va qiziqarli qilish uchun quyid
 
 5. **Saqlash va Yuklash (Save/Load):**
    - O'yin saqlanganda yig'ilgan barcha go'shtlar mahalliy `localStorage` ga va Supabase bulutli ma'lumotlar bazasidagi `quest_state` ustuniga xavfsiz tarzda sinxronizatsiya qilinadi va yuklanganda avtomatik tiklanadi.
+## Part 13: Premium Inventory Hotbar, Minecraft-Style Block Quantity, Chopping & Crafting Upgrades
 
+We have successfully implemented the requested layout and gameplay upgrades:
+
+1. **Interactive Hotbar in Inventory:**
+   - **File modified:** [index.html](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/index.html)
+   - Added a `#inventory-hotbar` container inside the inventory modal card, positioned directly at the bottom.
+   - It is visible across all tabs (Weapons, Furniture, Blocks, and Crafting), letting players see their equipment and actively switch their selected slot while managing resources.
+
+2. **Minecraft-Style Voxel Quantities:**
+   - **File modified:** [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - Added count badges on the bottom-right corner of hotbar slots (on both the game HUD and the inventory modal).
+   - The badges display the player's current item quantity from `meatInventory` using the pixelated font `'Press Start 2P'`.
+   - **File modified:** [style.css](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/style.css)
+   - Styled `.block-count-indicator` with a thick, high-contrast black outline text shadow for a clean retro look and readability over any block texture.
+
+3. **General Mined Block Drops:**
+   - **File modified:** [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - Generalized block drops in `updateMiningProgress()`. Breaking any voxel block (e.g., Grass, Dirt, Sand, Planks) now spawns a physics-based, color-matched 3D collectible block.
+   - Picking up these blocks plays the retro collection sound effect and updates the slot counts in real-time.
+
+4. **Wood Chopping with Axe to Slot 6 (Yog'och):**
+   - **File modified:** [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - Using the Iron Axe (`BLOCKS.AXE` in Slot 2) provides a 3.5x mining speed multiplier on trees (`WOOD` and `LEAVES`).
+   - Mined wood blocks drop logs that accumulate directly in Slot 6 (`Yog'och`).
+
+5. **Enforced Block Placement & Initial Inventory:**
+   - **File modified:** [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - Placing blocks in `placeBlock()` now consumes 1 count from `meatInventory`. If a block count reaches 0, the player cannot place it anymore. Weapons/tools remain infinite use.
+   - Initialized new players with a set of default blocks (Dirt, Stone, Wood, etc.) and starting tools (Sword, Axe, Bow) so they have building blocks on launch.
+   - Merged loaded save games with the new default keys to prevent any save state errors.
+
+6. **Expanded Crafting Recipes:**
+   - **File modified:** [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - Added recipes for all items in the game (weapons like Bomba and Avtomat, furniture like Gul and Chelak, and building blocks like Glass, Brick, Marble, Tiles, etc.) with custom yields.
+   - Crafting successfully deducts resources and adds the recipe yield count (e.g. +4 Planks) to the player's inventory, updating hotbar numbers in real-time.
+
+7. **Inventory Grid badges & Fade-out:**
+   - **File modified:** [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - Updated `renderInventoryGrid()` to display quantity counts on all items. Unowned blocks (count = 0) are rendered with a faded opacity (0.5) to indicate they need to be gathered or crafted.
+
+8. **Keyboard & Touch Controls Fixes:**
+   - **File modified:** [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - Updated the KeyE keydown handler and the touch controls inventory toggler to correctly release pointer lock when the inventory modal is opened, allowing cursor access, and request pointer lock when closed.
+
+---
+
+## Part 14: Minecraft UI Aesthetics & Modernized HUD Enhancements
+
+Using principles from **Minecraft Resource Pack Design** and **Modern Web UI Design**:
+
+1. **Minecraft-Style Hover Tooltips (`.minecraft-tooltip`):**
+   - **Files modified:** [index.html](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/index.html), [style.css](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/style.css), [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - Added a retro dark purple tooltip (`rgba(16, 12, 28, 0.94)`) with a glowing border (`#4f46e5`).
+   - Hovering over hotbar slots or inventory items displays the item's name, category/type, and total quantity owned.
+
+2. **Hotbar Action Bar Item Name Popup:**
+   - **Files modified:** [index.html](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/index.html), [style.css](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/style.css), [main.js](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/main.js)
+   - When switching hotbar slots (keys 1-9 or mouse wheel), a text box pops up above the hotbar showing the item name (e.g. **Temir Bolta**, **Yog'och (x20)**).
+   - Smoothly fades out after 1.8 seconds using an elastic CSS pop keyframe animation.
+
+3. **3D Block Logo & Main Menu Shading:**
+   - **File modified:** [style.css](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/style.css)
+   - Enhanced `.game-logo` with 3D text-shadow layers (`drop-shadow(3px 3px 0px #78350f)`) for a authentic Minecraft block look.
+
+4. **Inventory Navigation Tabs with Icons:**
+   - **File modified:** [index.html](file:///c:/Users/Web/Desktop/HayrullohAbdusamadov%20ning%20Shaxsiy%20saytlari/UzbekCraft/index.html)
+   - Added icons to all inventory tabs: **Qurollar** ⚔️, **Anjomlar** 🛋️, **Bloklar** 🧱, **Hunarmandchilik** 🔨.
 
