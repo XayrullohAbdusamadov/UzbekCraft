@@ -552,107 +552,198 @@
     canvas.width = 32; canvas.height = 32;
     const ctx = canvas.getContext('2d');
     const colors = {
-      [BLOCKS.GRASS]: side === 'top' ? '#4caf50' : side === 'bottom' ? '#6d4c41' : '#388e3c',
+      [BLOCKS.GRASS]: side === 'top' ? '#4caf50' : side === 'bottom' ? '#6d4c41' : '#5d4037',
       [BLOCKS.DIRT]: '#5d4037', [BLOCKS.STONE]: '#757575', [BLOCKS.SAND]: '#fbc02d',
       [BLOCKS.SNOW]: '#eceff1', [BLOCKS.WOOD]: side === 'top' ? '#8d6e63' : '#4e342e',
-      [BLOCKS.LEAVES]: '#1b5e20', [BLOCKS.CACTUS]: '#1b5e20', [BLOCKS.COAL]: '#546e7a',
-      [BLOCKS.GOLD]: '#ffd600', [BLOCKS.DIAMOND]: '#00acc1', [BLOCKS.PLANKS]: '#8d6e63',
+      [BLOCKS.LEAVES]: '#1b5e20', [BLOCKS.CACTUS]: '#1b5e20', [BLOCKS.COAL]: '#757575',
+      [BLOCKS.GOLD]: '#757575', [BLOCKS.DIAMOND]: '#757575', [BLOCKS.PLANKS]: '#8d6e63',
       [BLOCKS.LANTERN]: '#ff9800', [BLOCKS.WATER]: '#0288d1', [BLOCKS.BLUE_TILE]: '#00acc1',
       [BLOCKS.RED_BRICK]: '#c62828', [BLOCKS.WHITE_MARBLE]: '#eeeeee',
       [BLOCKS.GLAZED_BLUE]: '#01579b', [BLOCKS.BEDROCK]: '#212121',
-      [BLOCKS.IRON]: '#b0bec5', [BLOCKS.DARK_STONE]: '#37474f',
+      [BLOCKS.IRON]: '#757575', [BLOCKS.DARK_STONE]: '#37474f',
       [BLOCKS.GLASS]: '#80deea', [BLOCKS.TERRACOTTA]: '#bf360c', [BLOCKS.COPPER]: '#ff7043',
       [BLOCKS.BOMB]: '#b71c1c', [BLOCKS.SOFA]: '#7b1fa2', [BLOCKS.TABLE]: '#5d4037',
       [BLOCKS.CHAIR]: '#6d4c41', [BLOCKS.FLOWER]: '#e91e63',
       [BLOCKS.AVTOMAT]: '#37474f', [BLOCKS.TORCH]: '#8d6e63',
       [BLOCKS.CRAFTING_TABLE]: '#8d6e63', [BLOCKS.FURNACE]: '#546e7a',
-      [BLOCKS.CHEST]: '#a1887f', [BLOCKS.OBSIDIAN]: '#1a102f',
-      [BLOCKS.GLOWSTONE]: '#ffb300', [BLOCKS.PUMPKIN]: '#ef6c00',
+      [BLOCKS.CHEST]: '#a1887f', [BLOCKS.OBSIDIAN]: '#140d21',
+      [BLOCKS.GLOWSTONE]: '#ffd600', [BLOCKS.PUMPKIN]: '#ef6c00',
       [BLOCKS.HAY_BALE]: side === 'top' ? '#fbc02d' : '#f57f17',
-      [BLOCKS.MOSSY_STONE]: '#558b2f'
+      [BLOCKS.MOSSY_STONE]: '#757575'
     };
     ctx.fillStyle = colors[blockId] || '#ffffff';
     ctx.fillRect(0, 0, 32, 32);
+
+    // Random pixel noise for organic texture feel
     for (let x = 0; x < 32; x++) {
       for (let y = 0; y < 32; y++) {
-        const r = (Math.random() - 0.5) * 30;
+        const r = (Math.random() - 0.5) * 26;
         ctx.fillStyle = r > 0 ? `rgba(255,255,255,${r / 200})` : `rgba(0,0,0,${-r / 200})`;
         ctx.fillRect(x, y, 1, 1);
       }
     }
-    if (blockId === BLOCKS.BOMB) {
-      // Bold warning stripes
-      ctx.fillStyle = '#ffcc00';
-      ctx.fillRect(0, 0, 32, 4);
-      ctx.fillRect(0, 28, 32, 4);
-      ctx.fillStyle = '#111111';
-      ctx.fillRect(0, 0, 8, 4); ctx.fillRect(16, 0, 8, 4);
-      ctx.fillRect(8, 28, 8, 4); ctx.fillRect(24, 28, 8, 4);
-      
-      // Central text box
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(2, 8, 28, 16);
-      ctx.fillStyle = '#000000';
-      ctx.font = 'bold 11px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('TNT', 16, 20);
-      
-      // Fuse base
-      ctx.fillStyle = '#8d6e63';
-      ctx.fillRect(14, 4, 4, 4);
-    }
-    if (blockId === BLOCKS.TORCH) {
-      // Draw torch detail on block face
-      ctx.fillStyle = '#ff7043'; // flame orange
-      ctx.fillRect(12, 2, 8, 12);
-      ctx.fillStyle = '#ffeb3b'; // flame yellow
-      ctx.fillRect(14, 4, 4, 6);
-      ctx.fillStyle = '#5d4037'; // handle brown
-      ctx.fillRect(13, 14, 6, 18);
-    }
-    if (blockId === BLOCKS.AVTOMAT) {
-      // Draw automatic rifle outline
-      ctx.fillStyle = '#212121';
-      ctx.fillRect(4, 14, 24, 6); // barrel/body
-      ctx.fillRect(20, 18, 4, 10); // grip
-      ctx.fillStyle = '#8d6e63'; // wooden stock
-      ctx.fillRect(2, 12, 6, 8);
-    }
-    if (blockId === BLOCKS.LANTERN) {
-      ctx.fillStyle = '#fff9c4';
-      ctx.fillRect(6, 6, 20, 20);
-      ctx.strokeStyle = '#5d4037'; ctx.lineWidth = 3;
-      ctx.strokeRect(4, 4, 24, 24);
-      ctx.strokeRect(10, 10, 12, 12);
-    }
-    if (blockId === BLOCKS.SOFA) {
-      ctx.fillStyle = '#4a148c'; // Darker purple cushions border
-      ctx.fillRect(0, 0, 32, 6);
-      ctx.fillRect(0, 26, 32, 6);
-    }
-    if (blockId === BLOCKS.FLOWER) {
-      ctx.fillStyle = '#4caf50'; // green stem
-      ctx.fillRect(15, 12, 2, 20);
-      ctx.fillStyle = '#ffeb3b'; // yellow center
-      ctx.fillRect(14, 10, 4, 4);
-    }
-    if (blockId === BLOCKS.BLUE_TILE || blockId === BLOCKS.GLAZED_BLUE) {
-      ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 2;
-      ctx.strokeRect(2, 2, 28, 28);
-      ctx.beginPath(); ctx.moveTo(16, 2); ctx.lineTo(16, 30); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(2, 16); ctx.lineTo(30, 16); ctx.stroke();
-    }
-    if (blockId === BLOCKS.RED_BRICK) {
-      ctx.fillStyle = 'rgba(0,0,0,0.25)';
-      for (let r = 0; r < 4; r++) {
-        const off = r % 2 === 0 ? 0 : 8;
-        ctx.fillRect(off, r * 8, 14, 2); ctx.fillRect(off + 16, r * 8, 14, 2);
+
+    // --- GRASS SIDE DRIP ---
+    if (blockId === BLOCKS.GRASS && side === 'side') {
+      ctx.fillStyle = '#4caf50';
+      ctx.fillRect(0, 0, 32, 10);
+      for (let x = 0; x < 32; x += 2) {
+        const dropH = Math.floor(Math.random() * 6) + 2;
+        ctx.fillRect(x, 10, 2, dropH);
       }
     }
-    if (blockId === BLOCKS.WHITE_MARBLE) {
-      ctx.strokeStyle = 'rgba(200,200,200,0.4)'; ctx.lineWidth = 0.5;
-      for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.moveTo(0, i * 8); ctx.lineTo(32, i * 8 + 4); ctx.stroke(); }
+
+    // --- WOOD BARK & RINGS ---
+    if (blockId === BLOCKS.WOOD) {
+      if (side === 'top') {
+        ctx.strokeStyle = '#5d4037'; ctx.lineWidth = 2;
+        ctx.strokeRect(6, 6, 20, 20); ctx.strokeRect(12, 12, 8, 8);
+      } else {
+        ctx.fillStyle = '#3e2723';
+        for (let x = 2; x < 32; x += 6) ctx.fillRect(x, 0, 2, 32);
+      }
     }
+
+    // --- CARVED PUMPKIN ---
+    if (blockId === BLOCKS.PUMPKIN) {
+      if (side === 'top') {
+        ctx.fillStyle = '#2e7d32'; // Stem
+        ctx.fillRect(12, 12, 8, 8);
+        ctx.fillStyle = '#1b5e20';
+        ctx.fillRect(14, 14, 4, 4);
+      } else if (side === 'face') {
+        // Carved Black Face with inner orange glow
+        ctx.fillStyle = '#111111';
+        // Left Eye (Triangle)
+        ctx.beginPath(); ctx.moveTo(6, 8); ctx.lineTo(12, 8); ctx.lineTo(9, 14); ctx.fill();
+        // Right Eye (Triangle)
+        ctx.beginPath(); ctx.moveTo(20, 8); ctx.lineTo(26, 8); ctx.lineTo(23, 14); ctx.fill();
+        // Nose
+        ctx.beginPath(); ctx.moveTo(16, 14); ctx.lineTo(19, 17); ctx.lineTo(13, 17); ctx.fill();
+        // Mouth
+        ctx.fillRect(6, 20, 20, 8);
+        ctx.fillStyle = '#ef6c00'; // Teeth
+        ctx.fillRect(9, 20, 3, 3); ctx.fillRect(19, 20, 3, 3);
+        ctx.fillRect(14, 25, 3, 3);
+      } else {
+        // Pumpkin vertical rib lines
+        ctx.fillStyle = '#e65100';
+        for (let x = 6; x < 32; x += 7) ctx.fillRect(x, 0, 2, 32);
+      }
+    }
+
+    // --- HAY BALE ---
+    if (blockId === BLOCKS.HAY_BALE) {
+      if (side === 'top') {
+        ctx.strokeStyle = '#f57f17'; ctx.lineWidth = 2;
+        ctx.strokeRect(4, 4, 24, 24); ctx.strokeRect(10, 10, 12, 12);
+      } else {
+        // Yellow straw streaks
+        ctx.fillStyle = '#fbc02d';
+        for (let y = 2; y < 32; y += 4) ctx.fillRect(0, y, 32, 2);
+        // Red cords
+        ctx.fillStyle = '#b71c1c';
+        ctx.fillRect(8, 0, 4, 32); ctx.fillRect(20, 0, 4, 32);
+      }
+    }
+
+    // --- CRAFTING TABLE ---
+    if (blockId === BLOCKS.CRAFTING_TABLE) {
+      if (side === 'top') {
+        ctx.fillStyle = '#5d4037'; ctx.fillRect(0, 0, 32, 32);
+        ctx.fillStyle = '#8d6e63'; ctx.fillRect(3, 3, 26, 26);
+        ctx.strokeStyle = '#3e2723'; ctx.lineWidth = 1.5;
+        ctx.strokeRect(3, 3, 26, 26);
+        ctx.beginPath(); ctx.moveTo(16, 3); ctx.lineTo(16, 29); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(3, 16); ctx.lineTo(29, 16); ctx.stroke();
+      } else {
+        ctx.fillStyle = '#5d4037'; ctx.fillRect(0, 0, 32, 4);
+        ctx.fillStyle = '#212121'; // Saw icon detail
+        ctx.fillRect(6, 12, 16, 3); ctx.fillRect(20, 10, 3, 7);
+      }
+    }
+
+    // --- FURNACE ---
+    if (blockId === BLOCKS.FURNACE) {
+      if (side === 'front') {
+        ctx.fillStyle = '#212121'; ctx.fillRect(6, 10, 20, 16); // Opening
+        ctx.fillStyle = '#ff5722'; ctx.fillRect(8, 16, 16, 8); // Fire
+        ctx.fillStyle = '#ffeb3b'; ctx.fillRect(12, 18, 8, 4);  // Core flame
+      }
+    }
+
+    // --- CHEST ---
+    if (blockId === BLOCKS.CHEST) {
+      ctx.fillStyle = '#3e2723'; ctx.fillRect(0, 0, 32, 32);
+      ctx.fillStyle = '#a1887f'; ctx.fillRect(2, 2, 28, 28);
+      ctx.fillStyle = '#212121'; ctx.fillRect(0, 14, 32, 3); // Latch seam
+      if (side === 'front') {
+        ctx.fillStyle = '#ffd600'; ctx.fillRect(14, 12, 4, 7); // Gold latch
+        ctx.fillStyle = '#212121'; ctx.fillRect(15, 14, 2, 3);
+      }
+    }
+
+    // --- GOLD ORE ---
+    if (blockId === BLOCKS.GOLD) {
+      ctx.fillStyle = '#ffd600';
+      ctx.fillRect(6, 6, 6, 6); ctx.fillRect(18, 10, 8, 6);
+      ctx.fillRect(10, 20, 6, 6); ctx.fillRect(22, 22, 5, 5);
+    }
+
+    // --- DIAMOND ORE ---
+    if (blockId === BLOCKS.DIAMOND) {
+      ctx.fillStyle = '#00acc1';
+      ctx.fillRect(6, 6, 6, 6); ctx.fillRect(18, 10, 8, 6);
+      ctx.fillRect(10, 20, 6, 6); ctx.fillRect(22, 22, 5, 5);
+      ctx.fillStyle = '#80deea'; ctx.fillRect(8, 8, 3, 3); ctx.fillRect(20, 12, 3, 3);
+    }
+
+    // --- COAL ORE ---
+    if (blockId === BLOCKS.COAL) {
+      ctx.fillStyle = '#212121';
+      ctx.fillRect(6, 6, 7, 7); ctx.fillRect(18, 8, 8, 6);
+      ctx.fillRect(8, 20, 6, 6); ctx.fillRect(20, 20, 6, 6);
+    }
+
+    // --- IRON ORE ---
+    if (blockId === BLOCKS.IRON) {
+      ctx.fillStyle = '#d7ccc8';
+      ctx.fillRect(6, 6, 6, 6); ctx.fillRect(18, 10, 8, 6);
+      ctx.fillRect(10, 20, 6, 6); ctx.fillRect(22, 22, 5, 5);
+    }
+
+    // --- OBSIDIAN ---
+    if (blockId === BLOCKS.OBSIDIAN) {
+      ctx.fillStyle = '#4a148c';
+      ctx.fillRect(4, 4, 8, 4); ctx.fillRect(16, 12, 6, 8); ctx.fillRect(8, 22, 10, 4);
+    }
+
+    // --- GLOWSTONE ---
+    if (blockId === BLOCKS.GLOWSTONE) {
+      ctx.fillStyle = '#fff59d';
+      ctx.fillRect(4, 4, 8, 8); ctx.fillRect(18, 4, 10, 8);
+      ctx.fillRect(4, 18, 10, 10); ctx.fillRect(18, 18, 8, 8);
+    }
+
+    // --- MOSSY STONE ---
+    if (blockId === BLOCKS.MOSSY_STONE) {
+      ctx.fillStyle = '#388e3c';
+      ctx.fillRect(2, 4, 8, 6); ctx.fillRect(16, 12, 12, 8); ctx.fillRect(6, 22, 10, 6);
+    }
+
+    if (blockId === BLOCKS.BOMB) {
+      ctx.fillStyle = '#ffcc00'; ctx.fillRect(0, 0, 32, 4); ctx.fillRect(0, 28, 32, 4);
+      ctx.fillStyle = '#111111'; ctx.fillRect(0, 0, 8, 4); ctx.fillRect(16, 0, 8, 4);
+      ctx.fillStyle = '#ffffff'; ctx.fillRect(2, 8, 28, 16);
+      ctx.fillStyle = '#000000'; ctx.font = 'bold 11px Arial'; ctx.textAlign = 'center';
+      ctx.fillText('TNT', 16, 20);
+    }
+    if (blockId === BLOCKS.TORCH) {
+      ctx.fillStyle = '#ff7043'; ctx.fillRect(12, 2, 8, 12);
+      ctx.fillStyle = '#ffeb3b'; ctx.fillRect(14, 4, 4, 6);
+      ctx.fillStyle = '#5d4037'; ctx.fillRect(13, 14, 6, 18);
+    }
+
     const tex = new THREE.CanvasTexture(canvas);
     tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter;
     return tex;
@@ -668,8 +759,8 @@
         params.transparent = true; params.opacity = 0.35; params.roughness = 0.05; params.metalness = 0.2;
       } else if (blockId === BLOCKS.WATER) {
         params.transparent = true; params.opacity = 0.55; params.roughness = 0.08; params.metalness = 0.1;
-      } else if (blockId === BLOCKS.LANTERN) {
-        params.emissive = new THREE.Color(0xff9800);
+      } else if (blockId === BLOCKS.LANTERN || blockId === BLOCKS.GLOWSTONE) {
+        params.emissive = new THREE.Color(0xffb300);
         params.emissiveIntensity = 1.2;
         params.roughness = 0.1;
       } else if (blockId === BLOCKS.GOLD || blockId === BLOCKS.DIAMOND) {
@@ -704,6 +795,42 @@
         createMat(createPixelTexture(BLOCKS.GRASS, 'side')), createMat(createPixelTexture(BLOCKS.GRASS, 'side')),
         createMat(createPixelTexture(BLOCKS.GRASS, 'top')), createMat(createPixelTexture(BLOCKS.DIRT)),
         createMat(createPixelTexture(BLOCKS.GRASS, 'side')), createMat(createPixelTexture(BLOCKS.GRASS, 'side'))
+      ];
+    } else if (blockId === BLOCKS.WOOD) {
+      blockMaterials[blockId] = [
+        createMat(createPixelTexture(BLOCKS.WOOD, 'side')), createMat(createPixelTexture(BLOCKS.WOOD, 'side')),
+        createMat(createPixelTexture(BLOCKS.WOOD, 'top')), createMat(createPixelTexture(BLOCKS.WOOD, 'top')),
+        createMat(createPixelTexture(BLOCKS.WOOD, 'side')), createMat(createPixelTexture(BLOCKS.WOOD, 'side'))
+      ];
+    } else if (blockId === BLOCKS.HAY_BALE) {
+      blockMaterials[blockId] = [
+        createMat(createPixelTexture(BLOCKS.HAY_BALE, 'side')), createMat(createPixelTexture(BLOCKS.HAY_BALE, 'side')),
+        createMat(createPixelTexture(BLOCKS.HAY_BALE, 'top')), createMat(createPixelTexture(BLOCKS.HAY_BALE, 'top')),
+        createMat(createPixelTexture(BLOCKS.HAY_BALE, 'side')), createMat(createPixelTexture(BLOCKS.HAY_BALE, 'side'))
+      ];
+    } else if (blockId === BLOCKS.PUMPKIN) {
+      blockMaterials[blockId] = [
+        createMat(createPixelTexture(BLOCKS.PUMPKIN, 'face')), createMat(createPixelTexture(BLOCKS.PUMPKIN, 'side')),
+        createMat(createPixelTexture(BLOCKS.PUMPKIN, 'top')), createMat(createPixelTexture(BLOCKS.PUMPKIN, 'side')),
+        createMat(createPixelTexture(BLOCKS.PUMPKIN, 'side')), createMat(createPixelTexture(BLOCKS.PUMPKIN, 'side'))
+      ];
+    } else if (blockId === BLOCKS.CRAFTING_TABLE) {
+      blockMaterials[blockId] = [
+        createMat(createPixelTexture(BLOCKS.CRAFTING_TABLE, 'side')), createMat(createPixelTexture(BLOCKS.CRAFTING_TABLE, 'side')),
+        createMat(createPixelTexture(BLOCKS.CRAFTING_TABLE, 'top')), createMat(createPixelTexture(BLOCKS.PLANKS)),
+        createMat(createPixelTexture(BLOCKS.CRAFTING_TABLE, 'side')), createMat(createPixelTexture(BLOCKS.CRAFTING_TABLE, 'side'))
+      ];
+    } else if (blockId === BLOCKS.FURNACE) {
+      blockMaterials[blockId] = [
+        createMat(createPixelTexture(BLOCKS.FURNACE, 'front')), createMat(createPixelTexture(BLOCKS.FURNACE, 'side')),
+        createMat(createPixelTexture(BLOCKS.FURNACE, 'side')), createMat(createPixelTexture(BLOCKS.FURNACE, 'side')),
+        createMat(createPixelTexture(BLOCKS.FURNACE, 'side')), createMat(createPixelTexture(BLOCKS.FURNACE, 'side'))
+      ];
+    } else if (blockId === BLOCKS.CHEST) {
+      blockMaterials[blockId] = [
+        createMat(createPixelTexture(BLOCKS.CHEST, 'front')), createMat(createPixelTexture(BLOCKS.CHEST, 'side')),
+        createMat(createPixelTexture(BLOCKS.CHEST, 'top')), createMat(createPixelTexture(BLOCKS.CHEST, 'side')),
+        createMat(createPixelTexture(BLOCKS.CHEST, 'side')), createMat(createPixelTexture(BLOCKS.CHEST, 'side'))
       ];
     } else {
       blockMaterials[blockId] = createMat(createPixelTexture(blockId));
