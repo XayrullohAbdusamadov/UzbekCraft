@@ -1572,3 +1572,54 @@ html, body {
     height: 5px !important;
   }
 }
+
+/* SINGLE TOAST NOTIFICATION BOX (Fixes stacking notifications down half screen) */
+.toast-single-box {
+  position: fixed;
+  top: 75px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  background: rgba(15, 23, 42, 0.92);
+  color: #f8fafc;
+  padding: 10px 22px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  font-weight: 700;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), 0 0 15px rgba(16, 185, 129, 0.3);
+  backdrop-filter: blur(10px);
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  max-width: 90vw;
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+.toast-single-box.hidden {
+  opacity: 0;
+  transform: translate(-50%, -15px) scale(0.95);
+  pointer-events: none;
+}
+
+/* CS STYLE KILL FEED NOTIFICATIONS */
+.kill-feed-item {
+  background: rgba(15, 23, 42, 0.88);
+  color: #fff;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-family: var(--font-main);
+  font-size: 0.85rem;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  animation: killFeedSlide 0.3s ease-out;
+}
+
+@keyframes killFeedSlide {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+

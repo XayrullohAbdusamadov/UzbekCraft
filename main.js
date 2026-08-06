@@ -21,7 +21,8 @@
     AVTOMAT: 32, TORCH: 33, BUCKET: 34, WATER_BUCKET: 35,
     AXE: 36, APPLE: 37, BREAD: 38, COOKED_MEAT: 39, MEAT_MUTTON: 40,
     PICKAXE: 41, SHOVEL: 42, HOE: 43, CRAFTING_TABLE: 44, FURNACE: 45,
-    CHEST: 46, OBSIDIAN: 47, GLOWSTONE: 48, PUMPKIN: 49, HAY_BALE: 50, MOSSY_STONE: 51
+    CHEST: 46, OBSIDIAN: 47, GLOWSTONE: 48, PUMPKIN: 49, HAY_BALE: 50, MOSSY_STONE: 51,
+    WINDOW: 52, DOOR: 53, MEAT_EAGLE: 54
   };
 
   const BLOCK_INFO = {
@@ -52,7 +53,7 @@
     [BLOCKS.SWORD]:          { name: "Qilich",               color: '#00bcd4', isWeapon: true },
     [BLOCKS.BOW]:            { name: "Kamon",                color: '#8d6e63', isWeapon: true },
     [BLOCKS.BOMB]:           { name: "Bomba",                color: '#ef5350', isWeapon: true },
-    [BLOCKS.SOFA]:           { name: "Divan",                color: '#ab47bc', isFurniture: true },
+    [BLOCKS.SOFA]:           { name: "Divan (Yotadigan)",   color: '#ab47bc', isFurniture: true },
     [BLOCKS.TABLE]:          { name: "Stol",                 color: '#8d6e63', isFurniture: true },
     [BLOCKS.CHAIR]:          { name: "Stul",                 color: '#a1887f', isFurniture: true },
     [BLOCKS.FLOWER]:         { name: "Gul",                  color: '#ec407a', isFurniture: true },
@@ -65,6 +66,9 @@
     [BLOCKS.BREAD]:          { name: "Non",                  color: '#ffa726', isWeapon: true, isFood: true, hungerRestore: 30 },
     [BLOCKS.COOKED_MEAT]:    { name: "Qovurilgan go'sht",    color: '#8d6e63', isWeapon: true, isFood: true, hungerRestore: 40 },
     [BLOCKS.MEAT_MUTTON]:    { name: "Qo'y go'shti",         color: '#e57373', isWeapon: true, isFood: true, hungerRestore: 30 },
+    [BLOCKS.MEAT_EAGLE]:     { name: "Burgut go'shti",       color: '#d81b60', isWeapon: true, isFood: true, hungerRestore: 45 },
+    [BLOCKS.WINDOW]:         { name: "Deraza (Oyna)",       color: '#80deea', isFurniture: true },
+    [BLOCKS.DOOR]:           { name: "Yog'och Eshik",       color: '#a1887f', isFurniture: true },
     [BLOCKS.PICKAXE]:        { name: "Temir Kirka",          color: '#78909c', isWeapon: true, isPickaxe: true },
     [BLOCKS.SHOVEL]:         { name: "Temir Kurak",          color: '#78909c', isWeapon: true, isShovel: true },
     [BLOCKS.HOE]:            { name: "Temir Ketmon",         color: '#78909c', isWeapon: true, isHoe: true },
@@ -183,6 +187,38 @@
         <!-- Legs -->
         <rect x="5" y="26" width="3" height="3" fill="#5d4037"/>
         <rect x="24" y="26" width="3" height="3" fill="#5d4037"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.WINDOW) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <!-- Outer Frame -->
+        <rect x="4" y="4" width="24" height="24" rx="2" fill="#80deea" stroke="#00acc1" stroke-width="2"/>
+        <!-- Window Panes -->
+        <line x1="16" y1="4" x2="16" y2="28" stroke="#00838f" stroke-width="2"/>
+        <line x1="4" y1="16" x2="28" y2="16" stroke="#00838f" stroke-width="2"/>
+        <!-- Glass shine -->
+        <path d="M6 6 L12 6 L6 12 Z M18 18 L24 18 L18 24 Z" fill="#e0f7fa" opacity="0.6"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.DOOR) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <!-- Door Frame & Body -->
+        <rect x="6" y="2" width="20" height="28" rx="2" fill="#8d6e63" stroke="#4e342e" stroke-width="2"/>
+        <!-- Door Panels -->
+        <rect x="9" y="5" width="14" height="9" fill="#a1887f" stroke="#5d4037" stroke-width="1"/>
+        <rect x="9" y="17" width="14" height="11" fill="#a1887f" stroke="#5d4037" stroke-width="1"/>
+        <!-- Handle -->
+        <circle cx="20" cy="16" r="2" fill="#ffd600"/>
+      </svg>`;
+    }
+    if (bId === BLOCKS.MEAT_EAGLE) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <!-- Eagle Meat leg -->
+        <path d="M8 20 C6 12, 14 6, 22 8 C26 12, 24 22, 16 22 Z" fill="#d81b60" stroke="#880e4f" stroke-width="1.5"/>
+        <path d="M12 14 C14 10, 18 10, 20 12 Z" fill="#ff4081" opacity="0.6"/>
+        <!-- Bone -->
+        <line x1="8" y1="20" x2="4" y2="26" stroke="#f5f5f5" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="4" cy="26" r="2" fill="#e0e0e0"/>
       </svg>`;
     }
     if (bId === BLOCKS.TABLE) {
@@ -941,6 +977,10 @@
   };
   let isSitting = false, sittingOnCoords = null, targetedFurniture = null;
   let isMiningHeld = false, miningStartTime = 0, miningTargetKey = null, isMiningProgress = 0;
+  let miningOverlayMesh = null;
+  let isRidingHorse = false, mountedHorse = null, targetedHorse = null;
+  let singleToastTimer = null;
+  let localPlayerName = localStorage.getItem('uzbekcraft_nickname') || "O'yinchi";
   const MINING_DURATION = 1.5;
   let touchJoystick = { active: false, startX: 0, startY: 0, moveX: 0, moveY: 0 };
   let touchLook = { active: false, lastX: 0, lastY: 0 };
@@ -1223,7 +1263,9 @@
     return true;
   }
 
-  function damageLocalPlayer(amount) {
+  let lastKillerName = "Dushman";
+  function damageLocalPlayer(amount, attackerName = null) {
+    if (attackerName) lastKillerName = attackerName;
     health = Math.max(0, health - amount);
     updateHealthUI();
     soundEngine.playSFX('hit');
@@ -1236,7 +1278,16 @@
     }
 
     if (health <= 0) {
-      respawnPlayer();
+      if (multiplayerChannel || (currentWorldMeta && (currentWorldMeta.map === 'online_shooter' || currentWorldMeta.map === 'coop_building'))) {
+        const deathModal = document.getElementById('online-death-modal');
+        const killerText = document.getElementById('killer-name-text');
+        if (killerText) killerText.textContent = `${lastKillerName} sizni o'ldirdi!`;
+        if (deathModal) deathModal.classList.remove('hidden');
+        if (document.pointerLockElement) document.exitPointerLock();
+        showKillFeed(lastKillerName, localPlayerName);
+      } else {
+        respawnPlayer();
+      }
     }
   }
 
@@ -1658,6 +1709,12 @@
     highlightBox = new THREE.LineSegments(new THREE.EdgesGeometry(boxGeo), new THREE.LineBasicMaterial({ color: 0x000000, linewidth: 2 }));
     highlightBox.visible = false;
     scene.add(highlightBox);
+
+    const crackGeo = new THREE.BoxGeometry(1.03, 1.03, 1.03);
+    const crackMat = new THREE.MeshBasicMaterial({ color: 0x111111, wireframe: true, transparent: true, opacity: 0.85 });
+    miningOverlayMesh = new THREE.Mesh(crackGeo, crackMat);
+    miningOverlayMesh.visible = false;
+    scene.add(miningOverlayMesh);
     createPlayerMesh();
   }
 
@@ -1708,8 +1765,8 @@
     } else {
       const isSandy = ['pyramids', 'ichan_qala', 'desert', 'colosseum'].includes(mapType);
       const isSnowy = ['chimgon', 'everest', 'snow'].includes(mapType);
-      const isClassic = mapType === 'minecraft_classic';
-      const isNature = mapType === 'nature_valley';
+      const isClassic = mapType === 'minecraft_classic' || mapType === 'quest_island' || mapType === 'coop_building';
+      const isNature = mapType === 'nature_valley' || mapType === 'online_shooter';
 
       for (let x = -R; x <= R; x++) {
         for (let z = -R; z <= R; z++) {
@@ -1728,11 +1785,17 @@
           const lakeNoise = (isClassic || isNature) ? (Math.sin(x * 0.04) * Math.cos(z * 0.04)) : 0;
           const riverNoise = isNature ? (Math.sin(x * 0.03 + z * 0.03) + Math.cos(x * 0.02 - z * 0.05)) : 0;
           
-          const isLake = (isClassic && lakeNoise < -0.42) || (isNature && (lakeNoise < -0.3 || Math.abs(riverNoise) < 0.25));
+          // Disable lakes on shooter map to maximize tactical arena ground
+          const isLake = mapType !== 'online_shooter' && ((isClassic && lakeNoise < -0.42) || (isNature && (lakeNoise < -0.3 || Math.abs(riverNoise) < 0.25)));
 
           if (isLake) {
             const lakeDepth = Math.floor(BASE - 5);
             const waterLevel = Math.floor(BASE - 1);
+            
+            // Fill solid ground from bedrock up to lake depth (prevents hollow gaps)
+            for (let y = 1; y < lakeDepth - 2; y++) {
+              worldData[`${x},${y},${z}`] = BLOCKS.STONE;
+            }
             for (let y = lakeDepth - 2; y <= waterLevel; y++) {
               if (y === waterLevel) {
                 worldData[`${x},${y},${z}`] = BLOCKS.WATER;
@@ -1744,6 +1807,11 @@
             }
           } else {
             const hasSandyBorder = (isClassic || isNature) && (lakeNoise < -0.36 || Math.abs(riverNoise) < 0.35);
+            
+            // Fill solid ground from bedrock up to topY - 5 (prevents hollow cliff overhangs)
+            for (let y = 1; y < topY - 5; y++) {
+              worldData[`${x},${y},${z}`] = (y < BASE - 15) ? BLOCKS.STONE : BLOCKS.DIRT;
+            }
             for (let y = topY - 5; y <= topY; y++) {
               if (y === topY) {
                 const bType = hasSandyBorder ? (isNature ? BLOCKS.DIRT : BLOCKS.SAND) : (isSandy ? BLOCKS.SAND : (isSnowy ? BLOCKS.SNOW : BLOCKS.GRASS));
@@ -1775,14 +1843,19 @@
     else if (mapType === 'burj_khalifa') buildBurjKhalifa(0, gY, 0);
     else if (mapType === 'great_wall')  buildGreatWall(gY);
     else if (mapType === 'taj_mahal')   buildTajMahal(0, gY, 0);
+    else if (mapType === 'quest_island') buildQuestIsland(0, gY, 0);
+    else if (mapType === 'online_shooter') buildOnlineShooter(0, gY, 0);
+    else if (mapType === 'coop_building') buildCoopBuilding(0, gY, 0);
 
     // Trees in green maps
     if (!['pyramids', 'colosseum', 'eiffel', 'big_ben', 'ichan_qala'].includes(mapType)) {
       spawnTrees(R, gY, mapType);
     }
 
-    // spawnFamousFigures(gY + 1); // Famous figures removed as requested
-    spawnAnimals(R, gY + 1);
+    // Skip animals on shooter map as requested
+    if (mapType !== 'online_shooter') {
+      spawnAnimals(R, gY + 1);
+    }
     spawnDecorationsAndOres(R, gY, mapType);
 
     Object.keys(modifiedBlocks).forEach(k => { worldData[k] = modifiedBlocks[k]; });
@@ -2376,6 +2449,90 @@
     }
   }
 
+  function buildQuestIsland(vx, vy, vz) {
+    // Ancient Golden Quest Shrine & Beacon Tower
+    fillBox(vx - 12, vy + 1, vz - 12, vx + 12, vy + 2, vz + 12, BLOCKS.WHITE_MARBLE);
+    fillBox(vx - 8, vy + 3, vz - 8, vx + 8, vy + 4, vz + 8, BLOCKS.BLUE_TILE);
+    
+    // Central Quest Tower
+    hollowBox(vx - 4, vy + 4, vz - 4, vx + 4, vy + 24, vz + 4, BLOCKS.GOLD, BLOCKS.AIR);
+    dome(vx, vy + 24, vz, 5, 6, 5, BLOCKS.GLOWSTONE);
+    
+    // 4 Floating Energy Pillars
+    for (const [px, pz] of [[-16, -16], [16, -16], [-16, 16], [16, 16]]) {
+      fillBox(vx + px - 1, vy + 1, vz + pz - 1, vx + px + 1, vy + 12, vz + pz + 1, BLOCKS.DARK_STONE);
+      setB(vx + px, vy + 13, vz + pz, BLOCKS.GLOWSTONE);
+      setB(vx + px, vy + 14, vz + pz, BLOCKS.BLUE_TILE);
+    }
+    
+    // Quest chests & lanterns
+    setB(vx - 2, vy + 5, vz, BLOCKS.CHEST);
+    setB(vx + 2, vy + 5, vz, BLOCKS.CRAFTING_TABLE);
+    setB(vx, vy + 5, vz - 2, BLOCKS.LANTERN);
+    setB(vx, vy + 5, vz + 2, BLOCKS.LANTERN);
+  }
+
+  function buildOnlineShooter(vx, vy, vz) {
+    // Tactical Shooter Arena with walls, barricades, and sniper towers
+    // 1. Perimeter Arena Floor & Borders
+    fillBox(vx - 35, vy + 1, vz - 35, vx + 35, vy + 1, vz + 35, BLOCKS.DARK_STONE);
+    
+    // 2. High Cover Walls (Bullets cannot pass through!)
+    // Center cross barricades
+    fillBox(vx - 10, vy + 2, vz, vx + 10, vy + 6, vz, BLOCKS.RED_BRICK);
+    fillBox(vx, vy + 2, vz - 10, vx, vy + 6, vz + 10, BLOCKS.RED_BRICK);
+    
+    // Corner Bunkers & Sandbag barriers
+    for (const [bx, bz] of [[-18, -18], [18, -18], [-18, 18], [18, 18]]) {
+      hollowBox(vx + bx - 4, vy + 2, vz + bz - 4, vx + bx + 4, vy + 8, vz + bz + 4, BLOCKS.STONE, BLOCKS.AIR);
+      // Windows / Firing Slits
+      setB(vx + bx, vy + 4, vz + bz - 4, BLOCKS.AIR);
+      setB(vx + bx, vy + 4, vz + bz + 4, BLOCKS.AIR);
+      setB(vx + bx - 4, vy + 4, vz + bz, BLOCKS.AIR);
+      setB(vx + bx + 4, vy + 4, vz + bz, BLOCKS.AIR);
+    }
+    
+    // Sandbag barricades spread across map
+    for (const [sx, sz] of [[-8, 12], [12, -8], [-12, -8], [8, 12], [0, -22], [0, 22], [-22, 0], [22, 0]]) {
+      fillBox(vx + sx - 2, vy + 2, vz + sz, vx + sx + 2, vy + 3, vz + sz, BLOCKS.SAND);
+      fillBox(vx + sx, vy + 2, vz + sz - 2, vx + sx, vy + 3, vz + sz + 2, BLOCKS.SAND);
+    }
+    
+    // Wooden Tree Cover Walls (Bulletproof trees)
+    for (const [tx, tz] of [[-14, 5], [14, -5], [-5, -14], [5, 14], [-24, 15], [24, -15]]) {
+      fillBox(vx + tx - 1, vy + 2, vz + tz - 1, vx + tx + 1, vy + 8, vz + tz + 1, BLOCKS.WOOD);
+      fillBox(vx + tx - 2, vy + 9, vz + tz - 2, vx + tx + 2, vy + 12, vz + tz + 2, BLOCKS.LEAVES);
+    }
+  }
+
+  function buildCoopBuilding(vx, vy, vz) {
+    // Co-op House Building Foundation Plot
+    // Shared Building Plot Floor
+    fillBox(vx - 20, vy + 1, vz - 20, vx + 20, vy + 1, vz + 20, BLOCKS.PLANKS);
+    
+    // House frame guide pillars
+    for (const [hx, hz] of [[-12, -12], [12, -12], [-12, 12], [12, 12]]) {
+      fillBox(vx + hx, vy + 2, vz + hz, vx + hx, vy + 7, vz + hz, BLOCKS.WOOD);
+    }
+    fillBox(vx - 12, vy + 7, vz - 12, vx + 12, vy + 7, vz - 12, BLOCKS.WOOD);
+    fillBox(vx - 12, vy + 7, vz + 12, vx + 12, vy + 7, vz + 12, BLOCKS.WOOD);
+    fillBox(vx - 12, vy + 7, vz - 12, vx - 12, vy + 7, vz + 12, BLOCKS.WOOD);
+    fillBox(vx + 12, vy + 7, vz - 12, vx + 12, vy + 7, vz + 12, BLOCKS.WOOD);
+    
+    // Shared Crafting & Building Supplies
+    setB(vx - 5, vy + 2, vz - 5, BLOCKS.CRAFTING_TABLE);
+    setB(vx - 3, vy + 2, vz - 5, BLOCKS.FURNACE);
+    setB(vx - 1, vy + 2, vz - 5, BLOCKS.CHEST);
+    setB(vx + 1, vy + 2, vz - 5, BLOCKS.SOFA);
+    setB(vx + 4, vy + 2, vz - 5, BLOCKS.WINDOW);
+    setB(vx + 6, vy + 2, vz - 5, BLOCKS.DOOR);
+    
+    // Lanterns on corners
+    for (const [lx, lz] of [[-12, -12], [12, -12], [-12, 12], [12, 12]]) {
+      setB(vx + lx, vy + 8, vz + lz, BLOCKS.LANTERN);
+    }
+  }
+
   // ==========================================================================
   // NATURE - Trees & Animals
   // ==========================================================================
@@ -2909,9 +3066,22 @@
     group.isAnimal = true;
     group.animalName = aType.name;
     group.quote = aType.quote;
+    group.health = aType.name === "Sigir" || aType.name === "Tuya" || aType.name === "Ot" ? 20 : 10;
     group.wanderTimer = Math.random() * 5;
     group.wanderDir = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize();
-    group.position.set(x, y, z);
+    
+    if (aType.name === "Burgut") {
+      const flyY = y + 25 + Math.random() * 15;
+      group.isEagle = true;
+      group.baseFlyY = flyY;
+      group.flyAngle = Math.random() * Math.PI * 2;
+      group.flyRadius = 18 + Math.random() * 15;
+      group.flyCenter = new THREE.Vector3(x, flyY, z);
+      group.position.set(x, flyY, z);
+    } else {
+      group.position.set(x, y, z);
+    }
+    
     scene.add(group);
     npcs.push(group);
     animals.push(group);
@@ -3406,6 +3576,45 @@
       return;
     }
 
+    if (isRidingHorse && mountedHorse) {
+      const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+      const right = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+      
+      const moveDir = new THREE.Vector3();
+      if (keys['KeyW']) moveDir.z -= 1;
+      if (keys['KeyS']) moveDir.z += 1;
+      if (keys['KeyA']) moveDir.x -= 1;
+      if (keys['KeyD']) moveDir.x += 1;
+      if (touchJoystick.active) { moveDir.x += touchJoystick.moveX; moveDir.z += touchJoystick.moveY; }
+      moveDir.normalize();
+
+      const horseSpeed = 15.0;
+      const moveVecX = (forward.x * (-moveDir.z) + right.x * moveDir.x) * horseSpeed;
+      const moveVecZ = (forward.z * (-moveDir.z) + right.z * moveDir.x) * horseSpeed;
+      
+      mountedHorse.position.x += moveVecX * delta;
+      mountedHorse.position.z += moveVecZ * delta;
+      if (moveDir.lengthSq() > 0) {
+        mountedHorse.rotation.y = Math.atan2(moveVecX, moveVecZ) - Math.PI / 2;
+      }
+      
+      const groundY = getGroundHeight(Math.round(mountedHorse.position.x), Math.round(mountedHorse.position.z), mountedHorse.position.y);
+      mountedHorse.position.y += (groundY - mountedHorse.position.y) * 0.2;
+      
+      playerPos.set(mountedHorse.position.x, mountedHorse.position.y + 1.25, mountedHorse.position.z);
+      playerVel.set(0, 0, 0);
+      isGrounded = true;
+
+      // Dismount with Shift key
+      if (keys['ShiftLeft'] || keys['ShiftRight'] || keys['KeyShift']) {
+        isRidingHorse = false;
+        mountedHorse = null;
+        playerPos.y += 0.8;
+        showToast("Otdan tushdingiz");
+      }
+      return;
+    }
+
     const speed = 8.0;
     const moveDir = new THREE.Vector3();
     if (keys['KeyW']) moveDir.z -= 1;
@@ -3728,6 +3937,25 @@
       if (npc.isAnimal) {
         let isLooking = false;
         
+        if (npc.isEagle) {
+          // Eagle flies high in the sky in smooth circles!
+          npc.flyAngle += delta * 0.5;
+          const fx = npc.flyCenter.x + Math.cos(npc.flyAngle) * npc.flyRadius;
+          const fz = npc.flyCenter.z + Math.sin(npc.flyAngle) * npc.flyRadius;
+          const fy = npc.baseFlyY + Math.sin(npc.flyAngle * 2) * 2;
+          
+          npc.position.set(fx, fy, fz);
+          npc.rotation.y = Math.atan2(-Math.sin(npc.flyAngle), Math.cos(npc.flyAngle));
+          
+          // Wing flap animation
+          if (npc.children && npc.children.length >= 7) {
+            const flap = Math.sin(performance.now() * 0.01) * 0.45;
+            npc.children[5].rotation.z = flap; // Left wing
+            npc.children[6].rotation.z = -flap; // Right wing
+          }
+          return; // Eagle flying update complete
+        }
+
         if (npc.isFleeing || npc.fleeingTimer > 0) {
           if (npc.fleeingTimer > 0) {
             npc.fleeingTimer -= delta;
@@ -3736,27 +3964,64 @@
           npc.position.z += npc.fleeingDir.z * delta * 6.0;
           npc.rotation.y = Math.atan2(npc.fleeingDir.x, npc.fleeingDir.z) - Math.PI / 2;
         } else {
-          // Slow look at player if nearby
-          const dx = playerPos.x - npc.position.x;
-          const dz = playerPos.z - npc.position.z;
-          const dist = Math.hypot(dx, dz);
+          // Predator AI (Wolf / Bo'ri, Leopard / Qoplon attack herbivores)
+          const isPredator = npc.animalName === "Bo'ri" || npc.animalName === "Qoplon" || npc.animalName === "Ilbirs";
+          let isHunting = false;
 
-          if (dist < 10) {
-            isLooking = true;
-            const targetYaw = Math.atan2(dx, dz) - Math.PI / 2;
-            npc.rotation.y += (targetYaw - npc.rotation.y) * 0.08;
+          if (isPredator) {
+            let targetHerbivore = null;
+            let minDist = 18.0;
+            for (let h = 0; h < animals.length; h++) {
+              const other = animals[h];
+              if (other !== npc && !other.isEagle && (other.animalName === "Qo'y" || other.animalName === "Sigir" || other.animalName === "Tuya" || other.animalName === "Ot" || other.animalName === "Tovuq")) {
+                const d = npc.position.distanceTo(other.position);
+                if (d < minDist) {
+                  minDist = d;
+                  targetHerbivore = other;
+                }
+              }
+            }
+            if (targetHerbivore) {
+              isHunting = true;
+              const dirX = targetHerbivore.position.x - npc.position.x;
+              const dirZ = targetHerbivore.position.z - npc.position.z;
+              const len = Math.hypot(dirX, dirZ);
+              if (len > 0.1) {
+                npc.position.x += (dirX / len) * delta * 4.0;
+                npc.position.z += (dirZ / len) * delta * 4.0;
+                npc.rotation.y = Math.atan2(dirX, dirZ) - Math.PI / 2;
+              }
+              if (len < 1.6) {
+                // Predator attacks herbivore!
+                damageAnimal(targetHerbivore, 10);
+                showToast(`${npc.animalName} ${targetHerbivore.animalName}ga hujum qildi!`);
+              }
+            }
           }
 
-          if (!isLooking) {
-            // Animal wandering
-            npc.wanderTimer -= delta;
-            if (npc.wanderTimer <= 0) {
-              npc.wanderDir = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize();
-              npc.wanderTimer = 3 + Math.random() * 4;
+          if (!isHunting) {
+            // Slow look at player if nearby
+            const dx = playerPos.x - npc.position.x;
+            const dz = playerPos.z - npc.position.z;
+            const dist = Math.hypot(dx, dz);
+
+            if (dist < 10) {
+              isLooking = true;
+              const targetYaw = Math.atan2(dx, dz) - Math.PI / 2;
+              npc.rotation.y += (targetYaw - npc.rotation.y) * 0.08;
             }
-            npc.position.x += npc.wanderDir.x * delta * 1.5;
-            npc.position.z += npc.wanderDir.z * delta * 1.5;
-            npc.rotation.y = Math.atan2(npc.wanderDir.x, npc.wanderDir.z) - Math.PI / 2;
+
+            if (!isLooking) {
+              // Animal wandering
+              npc.wanderTimer -= delta;
+              if (npc.wanderTimer <= 0) {
+                npc.wanderDir = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize();
+                npc.wanderTimer = 3 + Math.random() * 4;
+              }
+              npc.position.x += npc.wanderDir.x * delta * 1.5;
+              npc.position.z += npc.wanderDir.z * delta * 1.5;
+              npc.rotation.y = Math.atan2(npc.wanderDir.x, npc.wanderDir.z) - Math.PI / 2;
+            }
           }
         }
 
@@ -3902,9 +4167,38 @@
 
   function updateTargetRaycast() {
     raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-    const hits = raycaster.intersectObjects(scene.children.filter(c => c.isVoxelMesh || c.isFurnitureMesh), true);
-    if (hits.length > 0 && hits[0].distance < 7.0) {
-      const hit = hits[0];
+    const hits = raycaster.intersectObjects(scene.children.filter(c => c.isVoxelMesh || c.isFurnitureMesh || c.isAnimal), true);
+    
+    // Check animal hits (Horse riding)
+    let hitHorse = null;
+    if (hits.length > 0 && hits[0].distance < 5.0) {
+      let obj = hits[0].object;
+      while (obj && obj !== scene) {
+        if (obj.isAnimal && obj.animalName === "Ot") {
+          hitHorse = obj;
+          break;
+        }
+        obj = obj.parent;
+      }
+    }
+
+    const promptEl = document.getElementById('hud-interaction-container');
+    const actionBtn = document.getElementById('btn-hud-action');
+
+    if (hitHorse && promptEl && actionBtn) {
+      targetedHorse = hitHorse;
+      actionBtn.textContent = "Otga minish [R]";
+      actionBtn.style.background = "#8d6e63";
+      promptEl.classList.remove('hidden');
+      highlightBox.visible = false;
+      return;
+    } else {
+      targetedHorse = null;
+    }
+
+    const voxelHits = raycaster.intersectObjects(scene.children.filter(c => c.isVoxelMesh || c.isFurnitureMesh), true);
+    if (voxelHits.length > 0 && voxelHits[0].distance < 7.0) {
+      const hit = voxelHits[0];
       let bx, by, bz;
       
       let obj = hit.object;
@@ -3928,7 +4222,7 @@
         const p = hit.point.clone().sub(hit.face.normal.clone().multiplyScalar(0.01));
         bx = Math.round(p.x); by = Math.round(p.y); bz = Math.round(p.z);
         bType = worldData[`${bx},${by},${bz}`];
-        if (bType === BLOCKS.SOFA || bType === BLOCKS.CHAIR || bType === BLOCKS.TABLE) {
+        if (bType === BLOCKS.SOFA || bType === BLOCKS.CHAIR || bType === BLOCKS.TABLE || bType === BLOCKS.DOOR || bType === BLOCKS.WINDOW) {
           isFurniture = true;
         }
       }
@@ -3936,20 +4230,20 @@
       highlightBox.position.set(bx, by, bz);
       highlightBox.visible = true;
 
-      const promptEl = document.getElementById('hud-interaction-container');
-      const actionBtn = document.getElementById('btn-hud-action');
-      
-      if (isFurniture && hits[0].distance < 4.0 && promptEl && actionBtn) {
+      if (isFurniture && voxelHits[0].distance < 4.0 && promptEl && actionBtn) {
         targetedFurniture = { type: bType, x: bx, y: by, z: bz };
         if (bType === BLOCKS.SOFA) {
           actionBtn.textContent = "Uxlash [R]";
           actionBtn.style.background = "#10b981";
-        } else if (bType === BLOCKS.CHAIR) {
+        } else if (bType === BLOCKS.CHAIR || bType === BLOCKS.TABLE) {
           actionBtn.textContent = "O'tirish [R]";
           actionBtn.style.background = "#3b82f6";
-        } else if (bType === BLOCKS.TABLE) {
-          actionBtn.textContent = "O'tirish [R]";
-          actionBtn.style.background = "#3b82f6";
+        } else if (bType === BLOCKS.DOOR) {
+          actionBtn.textContent = "Eshikni ochish/yopish [R]";
+          actionBtn.style.background = "#f59e0b";
+        } else if (bType === BLOCKS.WINDOW) {
+          actionBtn.textContent = "Derazadan qarash [R]";
+          actionBtn.style.background = "#06b6d4";
         }
         promptEl.classList.remove('hidden');
       } else {
@@ -3959,7 +4253,6 @@
     } else {
       highlightBox.visible = false;
       cancelMining();
-      const promptEl = document.getElementById('hud-interaction-container');
       if (promptEl) promptEl.classList.add('hidden');
       targetedFurniture = null;
     }
@@ -4003,6 +4296,17 @@
 
   function updateMiningProgress(delta) {
     if (!isMiningHeld || !miningTargetKey) return;
+    
+    // Progressive surface crack visual overlay effect
+    if (miningOverlayMesh && miningTargetKey) {
+      const coords = miningTargetKey.split(',').map(Number);
+      miningOverlayMesh.position.set(coords[0], coords[1], coords[2]);
+      miningOverlayMesh.visible = true;
+      const progressRatio = Math.min(1.0, isMiningProgress / MINING_DURATION);
+      const scl = 1.01 + progressRatio * 0.05;
+      miningOverlayMesh.scale.set(scl, scl, scl);
+      miningOverlayMesh.material.opacity = 0.4 + progressRatio * 0.6;
+    }
     
     const activeBlockId = hotbarBlocks[activeSlotIndex];
     const targetedBlockType = worldData[miningTargetKey];
@@ -4086,6 +4390,7 @@
 
   function cancelMining() {
     isMiningHeld = false; miningTargetKey = null; isMiningProgress = 0;
+    if (miningOverlayMesh) miningOverlayMesh.visible = false;
     const bar = document.getElementById('mining-progress-container');
     if (bar) bar.classList.add('hidden');
   }
@@ -4550,6 +4855,25 @@
       document.getElementById('multiplayer-modal').classList.add('hidden');
     });
     document.getElementById('btn-multiplayer-join').addEventListener('click', () => {
+      const storedName = localStorage.getItem('uzbekcraft_nickname');
+      if (!storedName) {
+        document.getElementById('player-name-modal').classList.remove('hidden');
+        return;
+      }
+      startJoinMultiplayer();
+    });
+
+    document.getElementById('btn-save-nickname').addEventListener('click', () => {
+      const input = document.getElementById('player-nickname-input').value.trim();
+      if (input) {
+        localPlayerName = input;
+        localStorage.setItem('uzbekcraft_nickname', input);
+      }
+      document.getElementById('player-name-modal').classList.add('hidden');
+      startJoinMultiplayer();
+    });
+
+    function startJoinMultiplayer() {
       const roomName = document.getElementById('multiplayer-room-input').value.trim() || "dostlar";
       const map = document.getElementById('multiplayer-map-select').value || "minecraft_classic";
       currentWorldMeta = { id: 'world_' + Date.now(), name: roomName, seed: "Uzbekistan2026", map: map };
@@ -4560,7 +4884,29 @@
       if (hudBiome) hudBiome.textContent = getMapDisplayName(map) + " (Onlayn)";
       startPlayingSession();
       document.getElementById('multiplayer-modal').classList.add('hidden');
-      showToast(`"${roomName}" xonasiga ulanildi!`);
+      showToast(`"${roomName}" xonasiga ulanildi! (${localPlayerName})`);
+    }
+
+    document.getElementById('btn-online-respawn').addEventListener('click', () => {
+      health = MAX_HEALTH;
+      playerHunger = MAX_HUNGER;
+      updateHealthUI();
+      updateHungerUI();
+      playerPos.set(0, 95, 0);
+      document.getElementById('online-death-modal').classList.add('hidden');
+      const container = document.getElementById('canvas-container');
+      if (container) container.requestPointerLock();
+      showToast("Qaytadan jangdasiz!");
+    });
+
+    document.getElementById('btn-online-exit').addEventListener('click', () => {
+      if (multiplayerChannel) {
+        multiplayerChannel.unsubscribe();
+        multiplayerChannel = null;
+      }
+      document.getElementById('online-death-modal').classList.add('hidden');
+      document.getElementById('hud').classList.add('hidden');
+      document.getElementById('main-menu').classList.add('active');
     });
 
     // --- SUPABASE UI LISTENERS ---
@@ -4814,7 +5160,10 @@
       eiffel: 'Parij - Eyfel Minorasi', colosseum: 'Rim - Kolizey',
       big_ben: 'London - Big Ben', burj_khalifa: 'Dubay - Burj Xalifa',
       great_wall: 'Xitoy Buyuk Devori', taj_mahal: 'Hindiston - Taj Mahal',
-      earth_globe: 'Yer Globusi'
+      earth_globe: 'Yer Globusi',
+      quest_island: '✨ Topshiriqlar Kartasi',
+      online_shooter: '🎯 Otishma Kartasi (CS Shooter)',
+      coop_building: '🏡 Do\'stlar Bilan Uy Qurish'
     };
     return names[map] || map;
   }
@@ -5893,6 +6242,8 @@
   function performFurnitureInteraction(f) {
     if (!f) return;
     if (f.type === BLOCKS.SOFA) {
+      health = MAX_HEALTH;
+      updateHealthUI();
       const isNight = dayTime > 0.55 || dayTime < 0.20;
       if (isNight) {
         showToast("Uxlashga yotdingiz...");
@@ -5913,15 +6264,32 @@
           dayTime = 0.23; // morning time
           playerPos.set(f.x, f.y + 0.6, f.z);
           soundEngine.playSFX('famous');
-          showToast("Xayrli tong!");
+          showToast("Xayrli tong! Salomatligingiz to'liq tiklandi!");
           setTimeout(() => {
             fade.style.opacity = '0';
             setTimeout(() => { document.body.removeChild(fade); }, 300);
           }, 300);
         }, 500);
       } else {
-        showToast("Faqat tunda uxlash mumkin!");
+        showToast("Divanda dam oldingiz va salomatligingiz tiklandi!");
       }
+    } else if (f.type === BLOCKS.DOOR) {
+      const key = `${f.x},${f.y},${f.z}`;
+      const currentBlock = worldData[key];
+      if (currentBlock === BLOCKS.DOOR) {
+        worldData[key] = BLOCKS.AIR;
+        modifiedBlocks[key] = BLOCKS.AIR;
+        soundEngine.playSFX('place');
+        showToast("Eshik ochildi!");
+      } else {
+        worldData[key] = BLOCKS.DOOR;
+        modifiedBlocks[key] = BLOCKS.DOOR;
+        soundEngine.playSFX('place');
+        showToast("Eshik yopildi!");
+      }
+      rebuildWorldMesh();
+    } else if (f.type === BLOCKS.WINDOW) {
+      showToast("Derazadan manzaraga qaradingiz!");
     } else if (f.type === BLOCKS.CHAIR || f.type === BLOCKS.TABLE) {
       isSitting = true;
       let seatOffset = 0.38;
@@ -5981,7 +6349,11 @@
       if (e.code === 'Escape') document.getElementById('pause-modal').classList.toggle('hidden');
       if (e.code === 'KeyF') { dayTime = (dayTime + 0.25) % 1; showToast("Vaqt o'tkazildi"); }
       if (e.code === 'KeyR') {
-        if (targetedFurniture) {
+        if (targetedHorse) {
+          isRidingHorse = true;
+          mountedHorse = targetedHorse;
+          showToast("Otga mindingiz! (Tushish uchun Shift tugmasini bosing)");
+        } else if (targetedFurniture) {
           performFurnitureInteraction(targetedFurniture);
         }
       }
@@ -6206,12 +6578,24 @@
   }
 
   function showToast(text) {
-    const c = document.getElementById('toast-container');
-    if (!c) return;
-    const t = document.createElement('div');
-    t.className = 'toast'; t.textContent = text;
-    c.appendChild(t);
-    setTimeout(() => t.remove(), 3500);
+    const el = document.getElementById('toast-single-box');
+    if (!el) return;
+    el.textContent = text;
+    el.classList.remove('hidden');
+    if (singleToastTimer) clearTimeout(singleToastTimer);
+    singleToastTimer = setTimeout(() => {
+      el.classList.add('hidden');
+    }, 2600);
+  }
+
+  function showKillFeed(killer, victim) {
+    const container = document.getElementById('kill-feed-container');
+    if (!container) return;
+    const item = document.createElement('div');
+    item.className = 'kill-feed-item';
+    item.innerHTML = `<span style="color:#ef4444; font-weight:bold;">${killer}</span> 🎯 <span style="color:#38bdf8; font-weight:bold;">${victim}</span>`;
+    container.appendChild(item);
+    setTimeout(() => item.remove(), 4000);
   }
 
   // ==========================================================================
@@ -6449,6 +6833,20 @@
       description: "Dunyoda suv oqimini yaratish uchun ishlatiladi."
     },
     // Furniture & Decorative
+    {
+      result: BLOCKS.WINDOW,
+      name: "Deraza (Oyna)",
+      ingredients: { "Shisha": 2, "Yog'och": 1 },
+      yield: 2,
+      description: "Uylarga o'rnatiladigan chiroyli deraza oynasi."
+    },
+    {
+      result: BLOCKS.DOOR,
+      name: "Yog'och Eshik",
+      ingredients: { "Taxta": 4 },
+      yield: 1,
+      description: "Uylarga kirib-chiqish uchun ochilib-yopiladigan yog'och eshik."
+    },
     {
       result: BLOCKS.SOFA,
       name: "Divan (Sofa)",

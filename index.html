@@ -103,6 +103,11 @@
           <label for="world-map-select">Xaritani tanlang:</label>
           <select id="world-map-select">
             <option value="minecraft_classic" selected>Minecraft Klassik Dunyo (Tog'lar, daryolar va daraxtlar)</option>
+            <optgroup label="Maxsus Sarguzasht & Online Kartalar">
+              <option value="quest_island">✨ Topshiriqlar Kartasi (Sarguzashtlar & Qal'alar)</option>
+              <option value="online_shooter">🎯 Otishma Kartasi (CS Shooter — Devorlar & Daraxtlar)</option>
+              <option value="coop_building">🏡 Do'stlar Bilan Uy Qurish (Co-op Builder)</option>
+            </optgroup>
             <optgroup label="Google Earth Satellit Dunyo">
               <option value="earth_globe">Reallashgan Yer Shari Globe (Okeanlar, qit'alar va atmosfera)</option>
             </optgroup>
@@ -243,6 +248,11 @@
           <label for="multiplayer-map-select" style="font-weight: 600; font-size: 0.9rem; color: var(--text-light);">Xaritani tanlang:</label>
           <select id="multiplayer-map-select" style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glow); color: #fff; font-size: 0.9rem;">
             <option value="minecraft_classic" selected>Minecraft Klassik Dunyo</option>
+            <optgroup label="Maxsus Sarguzasht & Online Kartalar">
+              <option value="quest_island">✨ Topshiriqlar Kartasi (Sarguzashtlar & Qal'alar)</option>
+              <option value="online_shooter">🎯 Otishma Kartasi (CS Shooter — Devorlar & Daraxtlar)</option>
+              <option value="coop_building">🏡 Do'stlar Bilan Uy Qurish (Co-op Builder)</option>
+            </optgroup>
             <optgroup label="Google Earth Satellit Dunyo">
               <option value="earth_globe">Reallashgan Yer Shari Globe</option>
             </optgroup>
@@ -269,6 +279,33 @@
         <div class="modal-actions" style="margin-top: 20px; display: flex; gap: 10px; width: 100%;">
           <button id="btn-multiplayer-join" class="btn btn-purple" style="flex: 1;">Xonaga Ulanish</button>
           <button id="btn-multiplayer-close" class="btn btn-dark" style="flex: 1;">Yopish</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ONLINE PLAYER NICKNAME MODAL -->
+    <div id="player-name-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <h2 class="modal-title">Onlayn O'yinga Kirish</h2>
+        <p class="modal-text">Boshqa o'yinchilar sizni ko'rishi uchun ismingizni kiriting:</p>
+        <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
+          <label for="player-nickname-input" style="font-weight: 600; font-size: 0.9rem; color: var(--text-light);">Sizning Ismingiz:</label>
+          <input type="text" id="player-nickname-input" placeholder="Masalan: Botir_Uzbek" style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glow); color: #fff; font-size: 0.9rem;">
+        </div>
+        <div class="modal-actions" style="margin-top: 16px;">
+          <button id="btn-save-nickname" class="btn btn-emerald" style="width: 100%;">Saqlash va Ulanish</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ONLINE DEATH MODAL -->
+    <div id="online-death-modal" class="modal-overlay hidden">
+      <div class="modal-card" style="text-align: center;">
+        <h2 class="modal-title" style="color: #ef4444;">💀 SIZ HALOK BO'LDINGIZ!</h2>
+        <p id="killer-name-text" class="modal-text" style="font-size: 1.1rem; font-weight: bold; color: #fbbf24; margin-bottom: 20px;">Dushman sizni o'ldirdi!</p>
+        <div class="modal-actions" style="display: flex; gap: 12px; justify-content: center;">
+          <button id="btn-online-respawn" class="btn btn-emerald" style="flex: 1;">Qolish (Yangi paydo bo'lish)</button>
+          <button id="btn-online-exit" class="btn btn-red" style="flex: 1;">Chiqish (Bosh sahifa)</button>
         </div>
       </div>
     </div>
@@ -492,10 +529,12 @@
           <!-- 9 hotbar slots populated dynamically -->
         </div>
       </div>
+      <!-- CS Style Kill Feed Overlay -->
+      <div id="kill-feed-container" style="position: absolute; top: 70px; right: 20px; z-index: 100; display: flex; flex-direction: column; gap: 6px; pointer-events: none;"></div>
     </div>
 
-    <!-- TOAST NOTIFICATIONS -->
-    <div id="toast-container"></div>
+    <!-- SINGLE TOAST NOTIFICATION BOX -->
+    <div id="toast-single-box" class="toast-single-box hidden"></div>
 
     <!-- DAMAGE FLASH OVERLAY -->
     <div id="damage-flash"></div>
