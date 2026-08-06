@@ -3964,40 +3964,9 @@
           npc.position.z += npc.fleeingDir.z * delta * 6.0;
           npc.rotation.y = Math.atan2(npc.fleeingDir.x, npc.fleeingDir.z) - Math.PI / 2;
         } else {
-          // Predator AI (Wolf / Bo'ri, Leopard / Qoplon attack herbivores)
-          const isPredator = npc.animalName === "Bo'ri" || npc.animalName === "Qoplon" || npc.animalName === "Ilbirs";
+          // Predator AI (Wolf / Bo'ri, Leopard / Qoplon attack herbivores) - DISABLED so animals do not eat each other
+          const isPredator = false;
           let isHunting = false;
-
-          if (isPredator) {
-            let targetHerbivore = null;
-            let minDist = 18.0;
-            for (let h = 0; h < animals.length; h++) {
-              const other = animals[h];
-              if (other !== npc && !other.isEagle && (other.animalName === "Qo'y" || other.animalName === "Sigir" || other.animalName === "Tuya" || other.animalName === "Ot" || other.animalName === "Tovuq")) {
-                const d = npc.position.distanceTo(other.position);
-                if (d < minDist) {
-                  minDist = d;
-                  targetHerbivore = other;
-                }
-              }
-            }
-            if (targetHerbivore) {
-              isHunting = true;
-              const dirX = targetHerbivore.position.x - npc.position.x;
-              const dirZ = targetHerbivore.position.z - npc.position.z;
-              const len = Math.hypot(dirX, dirZ);
-              if (len > 0.1) {
-                npc.position.x += (dirX / len) * delta * 4.0;
-                npc.position.z += (dirZ / len) * delta * 4.0;
-                npc.rotation.y = Math.atan2(dirX, dirZ) - Math.PI / 2;
-              }
-              if (len < 1.6) {
-                // Predator attacks herbivore!
-                damageAnimal(targetHerbivore, 10);
-                showToast(`${npc.animalName} ${targetHerbivore.animalName}ga hujum qildi!`);
-              }
-            }
-          }
 
           if (!isHunting) {
             // Slow look at player if nearby
@@ -4167,7 +4136,21 @@
 
   function updateTargetRaycast() {
     raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-    const hits = raycaster.intersectObjects(scene.children.filter(c => c.isVoxelMesh || c.isFurnitureMesh || c.isAnimal), true);
+    
+    // Fast, zero-allocation target resolution
+    const allTargets = [];
+    const voxelTargets = [];
+    for (let i = 0; i < scene.children.length; i++) {
+      const child = scene.children[i];
+      if (child.isVoxelMesh || child.isFurnitureMesh) {
+        voxelTargets.push(child);
+        allTargets.push(child);
+      } else if (child.isAnimal) {
+        allTargets.push(child);
+      }
+    }
+
+    const hits = raycaster.intersectObjects(allTargets, true);
     
     // Check animal hits (Horse riding)
     let hitHorse = null;
@@ -4196,7 +4179,7 @@
       targetedHorse = null;
     }
 
-    const voxelHits = raycaster.intersectObjects(scene.children.filter(c => c.isVoxelMesh || c.isFurnitureMesh), true);
+    const voxelHits = raycaster.intersectObjects(voxelTargets, true);
     if (voxelHits.length > 0 && voxelHits[0].distance < 7.0) {
       const hit = voxelHits[0];
       let bx, by, bz;
@@ -4772,9 +4755,12 @@
 
     if (btnMissionsHUD) {
       btnMissionsHUD.addEventListener('click', () => {
-        if (document.pointerLockElement) document.exitPointerLock();
-        renderMissionsModal();
-        document.getElementById('modal-missions').classList.remove('hidden');
+        currentWorldMeta = { id: 'world_' + Date.now(), name: 'Topshiriqlar', seed: "Uzbekistan2026", map: 'quest_island' };
+        modifiedBlocks = {};
+        generateWorld("Uzbekistan2026", 'quest_island');
+        const hudBiome = document.getElementById('hud-biome');
+        if (hudBiome) hudBiome.textContent = getMapDisplayName('quest_island');
+        showToast("Topshiriqlar kartasi yuklandi!");
       });
     }
 
@@ -6333,17 +6319,12 @@
       if (e.code === 'KeyM') {
         const hud = document.getElementById('hud');
         if (hud && !hud.classList.contains('hidden')) {
-          const missionModal = document.getElementById('modal-missions');
-          if (missionModal) {
-            missionModal.classList.toggle('hidden');
-            if (!missionModal.classList.contains('hidden')) {
-              renderMissionsModal();
-              if (document.pointerLockElement) document.exitPointerLock();
-            } else {
-              const container = document.getElementById('canvas-container');
-              if (container) container.requestPointerLock();
-            }
-          }
+          currentWorldMeta = { id: 'world_' + Date.now(), name: 'Topshiriqlar', seed: "Uzbekistan2026", map: 'quest_island' };
+          modifiedBlocks = {};
+          generateWorld("Uzbekistan2026", 'quest_island');
+          const hudBiome = document.getElementById('hud-biome');
+          if (hudBiome) hudBiome.textContent = getMapDisplayName('quest_island');
+          showToast("Topshiriqlar kartasi yuklandi!");
         }
       }
       if (e.code === 'Escape') document.getElementById('pause-modal').classList.toggle('hidden');
