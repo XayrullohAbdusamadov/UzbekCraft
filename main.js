@@ -3067,7 +3067,7 @@
     group.isAnimal = true;
     group.animalName = aType.name;
     group.quote = aType.quote;
-    group.health = aType.name === "Sigir" || aType.name === "Tuya" || aType.name === "Ot" ? 20 : 10;
+    group.health = 3;
     group.wanderTimer = Math.random() * 5;
     group.wanderDir = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize();
     
@@ -3597,21 +3597,37 @@
       mountedHorse.position.z += moveVecZ * delta;
       if (moveDir.lengthSq() > 0) {
         mountedHorse.rotation.y = Math.atan2(moveVecX, moveVecZ) - Math.PI / 2;
+        
+        // Walk leg swing animation
+        const t = performance.now() * 0.015;
+        if (mountedHorse.legs && mountedHorse.legs.length >= 4) {
+          mountedHorse.legs[0].rotation.x = Math.sin(t) * 0.6;
+          mountedHorse.legs[1].rotation.x = -Math.sin(t) * 0.6;
+          mountedHorse.legs[2].rotation.x = -Math.sin(t) * 0.6;
+          mountedHorse.legs[3].rotation.x = Math.sin(t) * 0.6;
+        }
+      } else {
+        // Reset legs to neutral position
+        if (mountedHorse.legs) {
+          mountedHorse.legs.forEach(leg => leg.rotation.x = 0);
+        }
       }
       
       const groundY = getGroundHeight(Math.round(mountedHorse.position.x), Math.round(mountedHorse.position.z), mountedHorse.position.y);
       mountedHorse.position.y += (groundY - mountedHorse.position.y) * 0.2;
       
-      playerPos.set(mountedHorse.position.x, mountedHorse.position.y + 1.25, mountedHorse.position.z);
+      // Sit lower directly on the animal's back
+      playerPos.set(mountedHorse.position.x, mountedHorse.position.y + 0.8, mountedHorse.position.z);
       playerVel.set(0, 0, 0);
       isGrounded = true;
 
       // Dismount with Shift key
       if (keys['ShiftLeft'] || keys['ShiftRight'] || keys['KeyShift']) {
+        const animalName = mountedHorse.animalName;
         isRidingHorse = false;
         mountedHorse = null;
-        playerPos.y += 0.8;
-        showToast("Otdan tushdingiz");
+        playerPos.y += 1.0;
+        showToast(animalName === 'Ot' ? "Otdan tushdingiz" : "Tuyadan tushdingiz");
       }
       return;
     }
@@ -4153,12 +4169,12 @@
 
     const hits = raycaster.intersectObjects(allTargets, true);
     
-    // Check animal hits (Horse riding)
+    // Check animal hits (Horse or Camel riding)
     let hitHorse = null;
     if (hits.length > 0 && hits[0].distance < 5.0) {
       let obj = hits[0].object;
       while (obj && obj !== scene) {
-        if (obj.isAnimal && obj.animalName === "Ot") {
+        if (obj.isAnimal && (obj.animalName === "Ot" || obj.animalName === "Tuya")) {
           hitHorse = obj;
           break;
         }
@@ -4171,7 +4187,7 @@
 
     if (hitHorse && promptEl && actionBtn) {
       targetedHorse = hitHorse;
-      actionBtn.textContent = "Otga minish [R]";
+      actionBtn.textContent = hitHorse.animalName === "Ot" ? "Otga minish [R]" : "Tuyaga minish [R]";
       actionBtn.style.background = "#8d6e63";
       promptEl.classList.remove('hidden');
       highlightBox.visible = false;
@@ -5683,7 +5699,7 @@
 
   function damageAnimal(animal, amount) {
     if (!animal.health) animal.health = 3.0;
-    animal.health -= amount;
+    animal.health -= 1.0;
     soundEngine.playSFX('hit');
 
     // Make animal flee away from player
@@ -6334,7 +6350,7 @@
         if (targetedHorse) {
           isRidingHorse = true;
           mountedHorse = targetedHorse;
-          showToast("Otga mindingiz! (Tushish uchun Shift tugmasini bosing)");
+          showToast(`${mountedHorse.animalName === 'Ot' ? 'Ot' : 'Tuya'}ga mindingiz! (Tushish uchun Shift tugmasini bosing)`);
         } else if (targetedFurniture) {
           performFurnitureInteraction(targetedFurniture);
         }
