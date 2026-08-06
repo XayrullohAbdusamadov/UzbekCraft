@@ -1817,7 +1817,8 @@
                 const bType = hasSandyBorder ? (isNature ? BLOCKS.DIRT : BLOCKS.SAND) : (isSandy ? BLOCKS.SAND : (isSnowy ? BLOCKS.SNOW : BLOCKS.GRASS));
                 worldData[`${x},${y},${z}`] = bType;
                 
-                if ((isClassic || isNature) && bType === BLOCKS.GRASS && Math.random() < (isNature ? 0.04 : 0.015)) {
+                const flowerProb = (mapType === 'online_shooter') ? 0.0015 : (isNature ? 0.04 : 0.015);
+                if ((isClassic || isNature) && bType === BLOCKS.GRASS && Math.random() < flowerProb) {
                   worldData[`${x},${y+1},${z}`] = BLOCKS.FLOWER;
                 }
               } else {
