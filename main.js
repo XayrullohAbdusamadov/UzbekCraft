@@ -3623,6 +3623,34 @@
       playerVel.set(0, 0, 0);
       isGrounded = true;
 
+      // Sync camera and playerMesh position while riding
+      const isCtrlHeld = keys['ControlLeft'] || keys['ControlRight'] || keys['Control'];
+      let activeThirdPerson = isThirdPerson;
+      if (isCtrlHeld) {
+        activeThirdPerson = true;
+      } else {
+        orbitYaw = yaw;
+        orbitPitch = pitch;
+      }
+
+      if (activeThirdPerson && playerMesh) {
+        playerMesh.visible = true;
+        playerMesh.position.copy(playerPos);
+        playerMesh.rotation.y = yaw + Math.PI;
+
+        const targetX = playerPos.x - Math.sin(orbitYaw) * Math.cos(orbitPitch) * thirdPersonDistance;
+        const targetY = playerPos.y + 1.35 - Math.sin(orbitPitch) * thirdPersonDistance;
+        const targetZ = playerPos.z - Math.cos(orbitYaw) * Math.cos(orbitPitch) * thirdPersonDistance;
+        
+        camera.position.set(targetX, targetY, targetZ);
+        camera.lookAt(playerPos.x, playerPos.y + 1.15, playerPos.z);
+      } else {
+        if (playerMesh) playerMesh.visible = false;
+        camera.position.copy(playerPos);
+        camera.position.y += 1.65;
+        camera.rotation.set(pitch, yaw, 0, 'YXZ');
+      }
+
       // Dismount with Shift key
       if (keys['ShiftLeft'] || keys['ShiftRight'] || keys['KeyShift']) {
         const animalName = mountedHorse.animalName;
