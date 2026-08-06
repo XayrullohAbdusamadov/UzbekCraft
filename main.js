@@ -1015,7 +1015,7 @@
       desc: "Dunyo bo'ylab 15 ta har qanday blok joylashtiring",
       type: "place_blocks",
       target: 15,
-      rewardText: "+10 Olma 🍎, +5 Non 🥖",
+      rewardText: "+10 Olma, +5 Non",
       rewardItems: [
         { name: "Olma", count: 10 },
         { name: "Non", count: 5 }
@@ -1027,7 +1027,7 @@
       desc: "Bolta yoki qo'l bilan 10 ta Yog'och blokini kesing",
       type: "chop_wood",
       target: 10,
-      rewardText: "+1 Temir Bolta 🪓, +5 Qovurilgan go'sht 🍖",
+      rewardText: "+1 Temir Bolta, +5 Qovurilgan go'sht",
       rewardItems: [
         { name: "Temir Bolta", count: 1 },
         { name: "Qovurilgan go'sht", count: 5 }
@@ -1039,7 +1039,7 @@
       desc: "Kirka bilan 5 ta Ko'mir yoki Temir ma'danini qazing",
       type: "mine_ores",
       target: 5,
-      rewardText: "+1 Olmos 💎, +3 Oltin 🪙",
+      rewardText: "+1 Olmos, +3 Oltin",
       rewardItems: [
         { name: "Olmos", count: 1 },
         { name: "Oltin", count: 3 }
@@ -1051,7 +1051,7 @@
       desc: "2 ta hayvonni ovlang yoki taom yeb ochlikni tiklang",
       type: "hunt_or_eat",
       target: 2,
-      rewardText: "+1 Kamon 🏹, +10 O'q",
+      rewardText: "+1 Kamon, +10 O'q",
       rewardItems: [
         { name: "Kamon", count: 1 }
       ]
@@ -1062,7 +1062,7 @@
       desc: "Boshlang'ich nuqtadan 150 metr uzoqlikka sayohat qiling",
       type: "explore_dist",
       target: 150,
-      rewardText: "+1 Sandiq 📦, +2 Glowstone ✨",
+      rewardText: "+1 Sandiq, +2 Nurlanuvchi Tosh",
       rewardItems: [
         { name: "Sandiq (Chest)", count: 1 },
         { name: "Nurlanuvchi Tosh", count: 2 }
@@ -1094,8 +1094,8 @@
     const btnClaim = document.getElementById('btn-hud-claim-mission');
 
     if (!curMission) {
-      if (elTitle) elTitle.textContent = "Hamma Topshiriqlar Bajarildi! 🏆";
-      if (elStep) elStep.textContent = "Barcha topshiriqlarni muvaffaqiyatli yakunladingiz! 🌟";
+      if (elTitle) elTitle.textContent = "Hamma Topshiriqlar Bajarildi!";
+      if (elStep) elStep.textContent = "Barcha topshiriqlarni muvaffaqiyatli yakunladingiz!";
       if (elFill) elFill.style.width = "100%";
       if (btnClaim) btnClaim.classList.add('hidden');
       return;
@@ -1130,7 +1130,7 @@
     });
 
     soundEngine.playSFX('powerup');
-    showToast(`🎉 TOPSHIRIQ BAJARILDI! Mukofot olindi: ${mission.rewardText}`);
+    showToast(`TOPSHIRIQ BAJARILDI! Mukofot olindi: ${mission.rewardText}`);
 
     // Advance to next uncompleted mission
     if (currentMissionIndex < ROBLOX_MISSIONS.length - 1) {
@@ -1161,7 +1161,7 @@
       if (isClaimed) {
         btnHtml = `<span style="color:#10b981; font-weight:bold; font-size:13px; text-shadow: 0 0 8px rgba(16,185,129,0.3);">Olingan ✓</span>`;
       } else if (isDone) {
-        btnHtml = `<button class="btn-claim-mission" onclick="window.claimMission('${m.id}')" style="box-shadow: 0 0 10px rgba(16,185,129,0.4);">Mukofotni Olish! 🎉</button>`;
+        btnHtml = `<button class="btn-claim-mission" onclick="window.claimMission('${m.id}')" style="box-shadow: 0 0 10px rgba(16,185,129,0.4);">Mukofotni Olish!</button>`;
       } else {
         btnHtml = `<span style="color:#cbd5e1; background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); font-size:12px; font-weight:bold;">${val}/${m.target}</span>`;
       }
@@ -1169,12 +1169,12 @@
       card.innerHTML = `
         <div class="mission-info" style="flex: 1;">
           <div class="mission-title" style="display: flex; align-items: center; gap: 8px; font-size: 14px; letter-spacing: 0.3px; color: #fff;">
-            <span class="quest-status-icon">${isClaimed ? '✅' : (isDone ? '✨' : '⏳')}</span>
+            <span class="quest-status-icon">${isClaimed ? '[Bajarildi]' : (isDone ? '[Tayyor]' : '[Kutilmoqda]')}</span>
             ${m.title}
           </div>
           <div style="font-size:12px; color:#94a3b8; margin: 4px 0 6px 22px; font-weight: 500;">${m.desc}</div>
           <div class="mission-reward" style="margin-left: 22px; font-weight: 600; display: flex; align-items: center; gap: 4px; color: #fbbf24;">
-            <span>🎁 Mukofot:</span> <span style="color: #fff; background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.25); padding: 1px 6px; border-radius: 6px; font-size: 11px;">${m.rewardText}</span>
+            <span>Mukofot:</span> <span style="color: #fff; background: rgba(251,191,36,0.15); border: 1px solid rgba(251,191,36,0.25); padding: 1px 6px; border-radius: 6px; font-size: 11px;">${m.rewardText}</span>
           </div>
           <div style="margin-left: 22px; margin-top: 8px; display: flex; align-items: center; gap: 8px;">
             <div class="mission-progress-track" style="width: 140px; height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px;">
@@ -1228,7 +1228,7 @@
         stateClass = 'full';
       }
       const warningClass = (isWarning && val > 0) ? ' warning' : '';
-      el.innerHTML += `<span class="hunger-icon ${stateClass}${warningClass}">🍗</span>`;
+      el.innerHTML += `<span class="hunger-icon ${stateClass}${warningClass}"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="display:inline-block; vertical-align:middle; color:#ffb74d;"><path d="M12 2c-3 0-5 3-5 5c0 1 .4 2.3.8 3.2L3.2 14.8c-.8.8-.8 2 0 2.8c.8.8 2 .8 2.8 0L10.6 13c.9.4 2.2.8 3.2.8c2 0 5-2 5-5C18.8 5 15 2 12 2z"/></svg></span>`;
     }
   }
 
@@ -5161,9 +5161,9 @@
       big_ben: 'London - Big Ben', burj_khalifa: 'Dubay - Burj Xalifa',
       great_wall: 'Xitoy Buyuk Devori', taj_mahal: 'Hindiston - Taj Mahal',
       earth_globe: 'Yer Globusi',
-      quest_island: '✨ Topshiriqlar Kartasi',
-      online_shooter: '🎯 Otishma Kartasi (CS Shooter)',
-      coop_building: '🏡 Do\'stlar Bilan Uy Qurish'
+      quest_island: 'Topshiriqlar Kartasi',
+      online_shooter: 'Otishma Kartasi (CS Shooter)',
+      coop_building: 'Do\'stlar Bilan Uy Qurish'
     };
     return names[map] || map;
   }
@@ -6593,7 +6593,7 @@
     if (!container) return;
     const item = document.createElement('div');
     item.className = 'kill-feed-item';
-    item.innerHTML = `<span style="color:#ef4444; font-weight:bold;">${killer}</span> 🎯 <span style="color:#38bdf8; font-weight:bold;">${victim}</span>`;
+    item.innerHTML = `<span style="color:#ef4444; font-weight:bold;">${killer}</span> <svg viewBox="0 0 24 24" width="12" height="12" stroke="#ef4444" stroke-width="2.5" fill="none" style="display:inline-block; vertical-align:middle; margin:0 4px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line></svg> <span style="color:#38bdf8; font-weight:bold;">${victim}</span>`;
     container.appendChild(item);
     setTimeout(() => item.remove(), 4000);
   }
@@ -6997,9 +6997,9 @@
         }
       });
       
-      const statusIndicator = canCraft ? '🟢' : '🔴';
+      const statusIndicator = canCraft ? '<span style="color:#10b981;">●</span>' : '<span style="color:#ef4444;">●</span>';
       
-      li.innerHTML = `<span style="font-weight: 700; color: #fff;">${recipe.name}</span> <span style="font-size: 0.8rem;">${statusIndicator}</span>`;
+      li.innerHTML = `<span style="font-weight: 700; color: #fff;">${recipe.name}</span> <span style="font-size: 0.8rem; vertical-align:middle; margin-left:4px;">${statusIndicator}</span>`;
       
       li.addEventListener('click', () => {
         selectedRecipe = recipe;
