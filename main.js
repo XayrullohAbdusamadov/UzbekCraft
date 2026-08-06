@@ -3597,7 +3597,7 @@
       mountedHorse.position.z += moveVecZ * delta;
       
       // Directly align animal heading with player's look direction (Minecraft style)
-      mountedHorse.rotation.y = yaw - Math.PI / 2;
+      mountedHorse.rotation.y = yaw + Math.PI / 2;
 
       if (moveDir.lengthSq() > 0) {
         // Walk leg swing animation
