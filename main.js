@@ -3589,7 +3589,7 @@
       if (touchJoystick.active) { moveDir.x += touchJoystick.moveX; moveDir.z += touchJoystick.moveY; }
       moveDir.normalize();
 
-      const horseSpeed = 15.0;
+      const horseSpeed = 11.5;
       const moveVecX = (forward.x * (-moveDir.z) + right.x * moveDir.x) * horseSpeed;
       const moveVecZ = (forward.z * (-moveDir.z) + right.z * moveDir.x) * horseSpeed;
       
@@ -3982,6 +3982,9 @@
     frameCount++;
     npcs.forEach(npc => {
       if (npc.isAnimal) {
+        if (isRidingHorse && npc === mountedHorse) {
+          return; // Skip automated update for currently ridden animal
+        }
         let isLooking = false;
         
         if (npc.isEagle) {
