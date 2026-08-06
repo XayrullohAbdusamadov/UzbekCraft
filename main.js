@@ -2903,12 +2903,12 @@
         return; // skip instanced cube grouping
       }
 
-      const top = worldData[`${x},${y+1},${z}`];
-      const bot = worldData[`${x},${y-1},${z}`];
-      const px = worldData[`${x+1},${y},${z}`];
-      const nx = worldData[`${x-1},${y},${z}`];
-      const pz = worldData[`${x},${y},${z+1}`];
-      const nz = worldData[`${x},${y},${z-1}`];
+      const top = worldData[x + ',' + (y+1) + ',' + z];
+      const bot = worldData[x + ',' + (y-1) + ',' + z];
+      const px = worldData[(x+1) + ',' + y + ',' + z];
+      const nx = worldData[(x-1) + ',' + y + ',' + z];
+      const pz = worldData[x + ',' + y + ',' + (z+1)];
+      const nz = worldData[x + ',' + y + ',' + (z-1)];
       const fullyOccluded = top && bot && px && nx && pz && nz &&
         top !== BLOCKS.AIR && bot !== BLOCKS.AIR && px !== BLOCKS.AIR &&
         nx !== BLOCKS.AIR && pz !== BLOCKS.AIR && nz !== BLOCKS.AIR &&
@@ -3857,22 +3857,28 @@
     }
   }
 
+  let rebuildRequested = false;
   function rebuildWorldMesh() {
-    renderInstancedWorld();
-    
-    // Clean old lights
-    Object.keys(placedLights).forEach(k => {
-      scene.remove(placedLights[k]);
-      delete placedLights[k];
-    });
+    if (rebuildRequested) return;
+    rebuildRequested = true;
+    requestAnimationFrame(() => {
+      renderInstancedWorld();
+      
+      // Clean old lights
+      Object.keys(placedLights).forEach(k => {
+        scene.remove(placedLights[k]);
+        delete placedLights[k];
+      });
 
-    // Spawn point lights for all lanterns in worldData
-    Object.keys(worldData).forEach(key => {
-      if (worldData[key] && BLOCK_INFO[worldData[key]]?.isLuminous) {
-        const coords = key.split(',');
-        const bx = parseInt(coords[0]), by = parseInt(coords[1]), bz = parseInt(coords[2]);
-        addPointLightAt(bx, by, bz);
-      }
+      // Spawn point lights for all lanterns in worldData
+      Object.keys(worldData).forEach(key => {
+        if (worldData[key] && BLOCK_INFO[worldData[key]]?.isLuminous) {
+          const coords = key.split(',');
+          const bx = parseInt(coords[0]), by = parseInt(coords[1]), bz = parseInt(coords[2]);
+          addPointLightAt(bx, by, bz);
+        }
+      });
+      rebuildRequested = false;
     });
   }
 
@@ -4050,7 +4056,7 @@
       meatInventory = Object.assign(createDefaultInventory(false), saveData.meatInventory || {});
     }
 
-    generateWorld(saveData.seed || 'Uzbekistan2026', saveData.map || 'registan');
+    generateWorld(saveData.seed || 'Uzbekistan2026', saveData.map || 'minecraft_classic');
     playerPos.set(saveData.playerPos.x, saveData.playerPos.y, saveData.playerPos.z);
     yaw = saveData.yaw || 0; pitch = saveData.pitch || 0;
     startPlayingSession();
@@ -4202,7 +4208,7 @@
     });
     document.getElementById('btn-multiplayer-join').addEventListener('click', () => {
       const roomName = document.getElementById('multiplayer-room-input').value.trim() || "dostlar";
-      const map = document.getElementById('multiplayer-map-select').value || "registan";
+      const map = document.getElementById('multiplayer-map-select').value || "minecraft_classic";
       currentWorldMeta = { id: 'world_' + Date.now(), name: roomName, seed: "Uzbekistan2026", map: map };
       modifiedBlocks = {};
       currentQuestState = 'not_started';
@@ -4305,7 +4311,7 @@
     document.getElementById('btn-start-game').addEventListener('click', () => {
       const name = document.getElementById('world-name-input').value || "Mening Dunyoim";
       const seed = document.getElementById('world-seed-input').value || "Uzbekistan2026";
-      const map = document.getElementById('world-map-select').value || "registan";
+      const map = document.getElementById('world-map-select').value || "minecraft_classic";
       currentWorldMeta = { id: 'world_' + Date.now(), name, seed, map };
       modifiedBlocks = {};
       currentQuestState = 'not_started';
@@ -4475,6 +4481,7 @@
   let activeBullets = [];
   let activeTorches = [];
   let activeParticles = [];
+  const sharedParticleGeo = new THREE.BoxGeometry(0.2, 0.2, 0.2);
   let isMouseDown = false;
   let avtomatFireTimer = 0.12;
 
@@ -4597,30 +4604,36 @@
     }
 
     // Spawn realistic fire/smoke explosion particles
-    const particleCount = 45;
-    for (let i = 0; i < particleCount; i++) {
-      const pGeo = new THREE.BoxGeometry(0.15 + Math.random() * 0.2, 0.15 + Math.random() * 0.2, 0.15 + Math.random() * 0.2);
-      // Mix of fire orange/yellow and smoke grey
-      const fireColor = Math.random() < 0.45 ? 0xff7043 : (Math.random() < 0.3 ? 0xffeb3b : 0x757575);
-      const pMat = new THREE.MeshBasicMaterial({ color: fireColor, transparent: true, opacity: 0.95 });
-      const pMesh = new THREE.Mesh(pGeo, pMat);
-      
-      pMesh.position.set(
-        bx + (Math.random() - 0.5) * 0.8,
-        by + (Math.random() - 0.5) * 0.8,
-        bz + (Math.random() - 0.5) * 0.8
-      );
-      
-      scene.add(pMesh);
-      activeParticles.push({
-        mesh: pMesh,
-        velocity: new THREE.Vector3(
-          (Math.random() - 0.5) * 7.5,
-          Math.random() * 5.0 + 2.0,
-          (Math.random() - 0.5) * 7.5
-        ),
-        life: 1.2 + Math.random() * 0.6
-      });
+    const maxParticles = 120;
+    if (activeParticles.length < maxParticles) {
+      const spawnCount = Math.min(45, maxParticles - activeParticles.length);
+      for (let i = 0; i < spawnCount; i++) {
+        // Mix of fire orange/yellow and smoke grey
+        const fireColor = Math.random() < 0.45 ? 0xff7043 : (Math.random() < 0.3 ? 0xffeb3b : 0x757575);
+        const pMat = new THREE.MeshBasicMaterial({ color: fireColor, transparent: true, opacity: 0.95 });
+        const pMesh = new THREE.Mesh(sharedParticleGeo, pMat);
+        
+        // Random scale instead of random geometry creation
+        const scl = 0.75 + Math.random() * 1.0;
+        pMesh.scale.set(scl, scl, scl);
+
+        pMesh.position.set(
+          bx + (Math.random() - 0.5) * 0.8,
+          by + (Math.random() - 0.5) * 0.8,
+          bz + (Math.random() - 0.5) * 0.8
+        );
+        
+        scene.add(pMesh);
+        activeParticles.push({
+          mesh: pMesh,
+          velocity: new THREE.Vector3(
+            (Math.random() - 0.5) * 7.5,
+            Math.random() * 5.0 + 2.0,
+            (Math.random() - 0.5) * 7.5
+          ),
+          life: 1.2 + Math.random() * 0.6
+        });
+      }
     }
   }
 
@@ -5035,8 +5048,8 @@
           // Spawn meat collectible!
           spawnMeatCollectible(animal.position.x, animal.position.y + 0.3, animal.position.z, animal.animalName);
 
-          // Sheep and horse ALSO drop wool!
-          if (animal.animalName === "Qo'y" || animal.animalName === "Ot") {
+          // Sheep ALSO drops wool!
+          if (animal.animalName === "Qo'y") {
             spawnWoolCollectible(animal.position.x + (Math.random() - 0.5) * 0.4, animal.position.y + 0.3, animal.position.z + (Math.random() - 0.5) * 0.4);
           }
 
@@ -5906,6 +5919,7 @@
       p.mesh.material.opacity = Math.max(0, p.life / 1.5);
       if (p.life <= 0) {
         scene.remove(p.mesh);
+        p.mesh.material.dispose();
         activeParticles.splice(i, 1);
       }
     }
