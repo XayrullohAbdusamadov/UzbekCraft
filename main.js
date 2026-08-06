@@ -3773,7 +3773,6 @@
 
     updateTargetRaycast();
     updateMiningProgress(delta);
-    animateNPCs(delta);
 
     const deg = Math.round(((yaw * 180 / Math.PI) % 360 + 360) % 360);
     const dirs = ['K', 'KSh', 'Sh', 'JnSh', 'J', 'JG', 'G', 'KG'];
@@ -6687,6 +6686,7 @@
         pause && pause.classList.contains('hidden') && 
         dialogue && dialogue.classList.contains('hidden')) {
       updatePlayer(delta);
+      animateNPCs(delta);
       updateDayNightCycle(delta);
       animateFirstPersonHand(delta);
       updateMeatCollectibles(delta);
