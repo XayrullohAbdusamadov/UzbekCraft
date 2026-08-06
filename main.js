@@ -4215,12 +4215,12 @@
 
     const hits = raycaster.intersectObjects(allTargets, true);
     
-    // Check animal hits (Horse or Camel riding)
+    // Check animal hits (Horse, Camel or Donkey riding)
     let hitHorse = null;
     if (hits.length > 0 && hits[0].distance < 5.0) {
       let obj = hits[0].object;
       while (obj && obj !== scene) {
-        if (obj.isAnimal && (obj.animalName === "Ot" || obj.animalName === "Tuya")) {
+        if (obj.isAnimal && (obj.animalName === "Ot" || obj.animalName === "Tuya" || obj.animalName === "Eshak")) {
           hitHorse = obj;
           break;
         }
@@ -4230,7 +4230,10 @@
 
     if (hitHorse && promptEl && actionBtn) {
       targetedHorse = hitHorse;
-      actionBtn.textContent = (hitHorse.animalName === "Ot" ? "Otga minish" : "Tuyaga minish") + (isTouch ? "" : " [R]");
+      let label = "Otga minish";
+      if (hitHorse.animalName === "Tuya") label = "Tuyaga minish";
+      else if (hitHorse.animalName === "Eshak") label = "Eshakka minish";
+      actionBtn.textContent = label + (isTouch ? "" : " [R]");
       actionBtn.style.background = "#8d6e63";
       promptEl.classList.remove('hidden');
       highlightBox.visible = false;
@@ -6538,11 +6541,12 @@
           isRidingHorse = false;
           mountedHorse = null;
           playerPos.y += 1.0;
-          showToast(animalName === 'Ot' ? "Otdan tushdingiz" : "Tuyadan tushdingiz");
+          showToast(animalName === 'Ot' ? "Otdan tushdingiz" : (animalName === 'Tuya' ? "Tuyadan tushdingiz" : "Eshakdan tushdingiz"));
         } else if (targetedHorse) {
           isRidingHorse = true;
           mountedHorse = targetedHorse;
-          showToast(`${mountedHorse.animalName === 'Ot' ? 'Ot' : 'Tuya'}ga mindingiz!`);
+          let aLabel = mountedHorse.animalName === 'Ot' ? 'Ot' : (mountedHorse.animalName === 'Tuya' ? 'Tuya' : 'Eshak');
+          showToast(`${aLabel}ga mindingiz!`);
         } else if (targetedFurniture) {
           performFurnitureInteraction(targetedFurniture);
         }
