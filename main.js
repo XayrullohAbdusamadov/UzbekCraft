@@ -3595,9 +3595,11 @@
       
       mountedHorse.position.x += moveVecX * delta;
       mountedHorse.position.z += moveVecZ * delta;
+      
+      // Directly align animal heading with player's look direction (Minecraft style)
+      mountedHorse.rotation.y = yaw - Math.PI / 2;
+
       if (moveDir.lengthSq() > 0) {
-        mountedHorse.rotation.y = Math.atan2(moveVecX, moveVecZ) - Math.PI / 2;
-        
         // Walk leg swing animation
         const t = performance.now() * 0.015;
         if (mountedHorse.legs && mountedHorse.legs.length >= 4) {
@@ -4152,6 +4154,19 @@
   // ==========================================================================
 
   function updateTargetRaycast() {
+    const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    const promptEl = document.getElementById('hud-interaction-container');
+    const actionBtn = document.getElementById('btn-hud-action');
+
+    // Show dismount button when riding an animal
+    if (isRidingHorse && mountedHorse && promptEl && actionBtn) {
+      actionBtn.textContent = "Tushish" + (isTouch ? "" : " [Shift]");
+      actionBtn.style.background = "#ef4444";
+      promptEl.classList.remove('hidden');
+      highlightBox.visible = false;
+      return;
+    }
+
     raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
     
     // Fast, zero-allocation target resolution
@@ -4182,12 +4197,9 @@
       }
     }
 
-    const promptEl = document.getElementById('hud-interaction-container');
-    const actionBtn = document.getElementById('btn-hud-action');
-
     if (hitHorse && promptEl && actionBtn) {
       targetedHorse = hitHorse;
-      actionBtn.textContent = hitHorse.animalName === "Ot" ? "Otga minish [R]" : "Tuyaga minish [R]";
+      actionBtn.textContent = (hitHorse.animalName === "Ot" ? "Otga minish" : "Tuyaga minish") + (isTouch ? "" : " [R]");
       actionBtn.style.background = "#8d6e63";
       promptEl.classList.remove('hidden');
       highlightBox.visible = false;
@@ -4233,16 +4245,16 @@
       if (isFurniture && voxelHits[0].distance < 4.0 && promptEl && actionBtn) {
         targetedFurniture = { type: bType, x: bx, y: by, z: bz };
         if (bType === BLOCKS.SOFA) {
-          actionBtn.textContent = "Uxlash [R]";
+          actionBtn.textContent = "Uxlash" + (isTouch ? "" : " [R]");
           actionBtn.style.background = "#10b981";
         } else if (bType === BLOCKS.CHAIR || bType === BLOCKS.TABLE) {
-          actionBtn.textContent = "O'tirish [R]";
+          actionBtn.textContent = "O'tirish" + (isTouch ? "" : " [R]");
           actionBtn.style.background = "#3b82f6";
         } else if (bType === BLOCKS.DOOR) {
-          actionBtn.textContent = "Eshikni ochish/yopish [R]";
+          actionBtn.textContent = "Eshikni ochish/yopish" + (isTouch ? "" : " [R]");
           actionBtn.style.background = "#f59e0b";
         } else if (bType === BLOCKS.WINDOW) {
-          actionBtn.textContent = "Derazadan qarash [R]";
+          actionBtn.textContent = "Derazadan qarash" + (isTouch ? "" : " [R]");
           actionBtn.style.background = "#06b6d4";
         }
         promptEl.classList.remove('hidden');
@@ -6490,7 +6502,17 @@
     const actionBtn = document.getElementById('btn-hud-action');
     if (actionBtn) {
       const triggerAction = () => {
-        if (targetedFurniture) {
+        if (isRidingHorse && mountedHorse) {
+          const animalName = mountedHorse.animalName;
+          isRidingHorse = false;
+          mountedHorse = null;
+          playerPos.y += 1.0;
+          showToast(animalName === 'Ot' ? "Otdan tushdingiz" : "Tuyadan tushdingiz");
+        } else if (targetedHorse) {
+          isRidingHorse = true;
+          mountedHorse = targetedHorse;
+          showToast(`${mountedHorse.animalName === 'Ot' ? 'Ot' : 'Tuya'}ga mindingiz!`);
+        } else if (targetedFurniture) {
           performFurnitureInteraction(targetedFurniture);
         }
       };
