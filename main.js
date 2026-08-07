@@ -1882,8 +1882,9 @@
             const lakeDepth = Math.floor(BASE - 5);
             const waterLevel = Math.floor(BASE - 1);
             
-            // Fill solid ground from bedrock up to lake depth (prevents hollow gaps)
-            for (let y = 1; y < lakeDepth - 2; y++) {
+            // Fill solid ground up to lake depth (optimized to prevent heavy loops)
+            const minLakeY = Math.max(1, lakeDepth - 12);
+            for (let y = minLakeY; y < lakeDepth - 2; y++) {
               worldData[`${x},${y},${z}`] = BLOCKS.STONE;
             }
             for (let y = lakeDepth - 2; y <= waterLevel; y++) {
@@ -1898,8 +1899,9 @@
           } else {
             const hasSandyBorder = (isClassic || isNature) && (lakeNoise < -0.36 || Math.abs(riverNoise) < 0.35);
             
-            // Fill solid ground from bedrock up to topY - 5 (prevents hollow cliff overhangs)
-            for (let y = 1; y < topY - 5; y++) {
+            // Fill solid ground up to topY - 5 (optimized to prevent heavy loops)
+            const minSolidY = Math.max(1, topY - 12);
+            for (let y = minSolidY; y < topY - 5; y++) {
               worldData[`${x},${y},${z}`] = (y < BASE - 15) ? BLOCKS.STONE : BLOCKS.DIRT;
             }
             for (let y = topY - 5; y <= topY; y++) {
@@ -4965,9 +4967,9 @@
           
           setTimeout(() => {
             overlay.classList.add('hidden');
-          }, 350);
-        }, 80);
-      }, 50);
+          }, 80);
+        }, 5);
+      }, 5);
     } else {
       if (currentWorldMeta && currentWorldMeta.map !== 'quest_island') {
         previousWorldMeta = JSON.parse(JSON.stringify(currentWorldMeta));
