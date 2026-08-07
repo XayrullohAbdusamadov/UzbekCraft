@@ -876,7 +876,7 @@
 
   // --- GAME STATE ---
   let scene, camera, renderer, clock, supabase = null;
-  let sunMesh, moonMesh, sunLight, ambientLight, starsParticles;
+  let sunMesh, moonMesh, sunLight, ambientLight, starsParticles, cloudsGroup;
   let playerMesh, playerSkin = 'steve', fpHandGroup = null;
   let isThirdPerson = false, thirdPersonDistance = 6.0;
   let orbitYaw = 0, orbitPitch = 0;
@@ -1778,12 +1778,32 @@
     fpHandGroup = new THREE.Group();
     camera.add(fpHandGroup);
 
-    // Sun mesh
-    sunMesh = new THREE.Mesh(new THREE.SphereGeometry(6, 12, 12), new THREE.MeshBasicMaterial({ color: 0xffee58 }));
+    // Sun mesh (Stylized blocky voxel sun)
+    sunMesh = new THREE.Mesh(new THREE.BoxGeometry(18, 18, 2), new THREE.MeshBasicMaterial({ color: 0xffeb3b, transparent: true, opacity: 0.95 }));
     scene.add(sunMesh);
-    // Moon mesh
-    moonMesh = new THREE.Mesh(new THREE.SphereGeometry(4, 12, 12), new THREE.MeshBasicMaterial({ color: 0xeceff1 }));
+    // Moon mesh (Stylized blocky voxel moon)
+    moonMesh = new THREE.Mesh(new THREE.BoxGeometry(12, 12, 2), new THREE.MeshBasicMaterial({ color: 0xeceff1, transparent: true, opacity: 0.9 }));
     scene.add(moonMesh);
+
+    // Dynamic Floating Voxel Clouds
+    cloudsGroup = new THREE.Group();
+    const cloudMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.65 });
+    const cloudGeoms = [
+      new THREE.BoxGeometry(18, 3, 26),
+      new THREE.BoxGeometry(26, 3, 34),
+      new THREE.BoxGeometry(14, 3, 20)
+    ];
+    for (let i = 0; i < 22; i++) {
+      const geom = cloudGeoms[Math.floor(Math.random() * cloudGeoms.length)];
+      const cloud = new THREE.Mesh(geom, cloudMat);
+      cloud.position.set(
+        (Math.random() - 0.5) * 600,
+        142 + Math.random() * 15,
+        (Math.random() - 0.5) * 600
+      );
+      cloudsGroup.add(cloud);
+    }
+    scene.add(cloudsGroup);
 
     // Stars
     const starGeo = new THREE.BufferGeometry();
@@ -3567,18 +3587,21 @@
     sunLight.position.set(Math.cos(angle) * R + playerPos.x, Math.sin(angle) * R + playerPos.y, playerPos.z);
     sunLight.target.position.copy(playerPos);
     sunMesh.position.copy(sunLight.position);
+    sunMesh.lookAt(playerPos);
     moonMesh.position.set(-Math.cos(angle) * R + playerPos.x, -Math.sin(angle) * R + playerPos.y, playerPos.z);
+    moonMesh.lookAt(playerPos);
 
     const isDay = sunLight.position.y > 0;
     let skyR, skyG, skyB;
     const t = dayTime;
     if (t < 0.22) {
-      // Dawn
+      // Dawn (Warm golden transition)
       const f = t / 0.22;
       skyR = 0x87 + f * (0xff - 0x87); skyG = 0x70 + f * (0xce - 0x70); skyB = 0x50 + f * (0xeb - 0x50);
     } else if (t < 0.5) {
       skyR = 0x87; skyG = 0xce; skyB = 0xeb;
     } else if (t < 0.6) {
+      // Sunset (Rich reddish sunset glow)
       const f = (t - 0.5) / 0.1;
       skyR = 0x87 + f * (0xf0 - 0x87); skyG = 0xce - f * 0x50; skyB = 0xeb - f * 0x80;
     } else {
@@ -3590,8 +3613,22 @@
     const skyColor = new THREE.Color(`rgb(${Math.round(skyR)},${Math.round(skyG)},${Math.round(skyB)})`);
     scene.background = skyColor;
     scene.fog.color = skyColor;
-    sunLight.intensity = isDay ? Math.max(0.1, Math.sin(angle)) * 2.0 : 0.05;
-    ambientLight.intensity = isDay ? 0.8 : 0.2;
+    
+    // Dynamic morning/sunset mist and starry nights
+    if (scene.fog) {
+      let fogDensity = 0.007; // Default midday
+      if (t < 0.22) { // Dawn mist
+        fogDensity = 0.016 - (t / 0.22) * 0.009;
+      } else if (t > 0.5 && t < 0.65) { // Sunset mist
+        fogDensity = 0.007 + ((t - 0.5) / 0.15) * 0.009;
+      } else if (t >= 0.65) { // Night thin fog for stars
+        fogDensity = 0.004;
+      }
+      scene.fog.density = fogDensity;
+    }
+
+    sunLight.intensity = isDay ? Math.max(0.1, Math.sin(angle)) * 2.2 : 0.05;
+    ambientLight.intensity = isDay ? 0.85 : 0.2;
     if (starsParticles) {
       starsParticles.material.opacity = isDay ? 0 : Math.min(1, (t - 0.65) * 6);
     }
@@ -3693,6 +3730,9 @@
       const moveVecX = (forward.x * (-moveDir.z) + right.x * moveDir.x) * horseSpeed;
       const moveVecZ = (forward.z * (-moveDir.z) + right.z * moveDir.x) * horseSpeed;
       
+      const prevX = mountedHorse.position.x;
+      const prevZ = mountedHorse.position.z;
+
       mountedHorse.position.x += moveVecX * delta;
       mountedHorse.position.z += moveVecZ * delta;
 
@@ -3721,7 +3761,14 @@
       }
       
       const groundY = getGroundHeight(Math.round(mountedHorse.position.x), Math.round(mountedHorse.position.z), mountedHorse.position.y);
-      mountedHorse.position.y += (groundY - mountedHorse.position.y) * 0.2;
+      if (groundY - mountedHorse.position.y > 1.25) {
+        // Collide and block movement if step is too high
+        mountedHorse.position.x = prevX;
+        mountedHorse.position.z = prevZ;
+      } else {
+        // Move smoothly
+        mountedHorse.position.y += (groundY - mountedHorse.position.y) * 0.25;
+      }
       
       // Sit lower directly on the animal's back
       playerPos.set(mountedHorse.position.x, mountedHorse.position.y + 0.8, mountedHorse.position.z);
@@ -6922,6 +6969,24 @@
       updateDayNightCycle(delta);
       animateFirstPersonHand(delta);
       updateMeatCollectibles(delta);
+    }
+
+    // Animate clouds
+    if (cloudsGroup) {
+      cloudsGroup.children.forEach(c => {
+        c.position.x += delta * 1.8;
+        if (c.position.x > 320) {
+          c.position.x = -320;
+          c.position.z = (Math.random() - 0.5) * 600;
+        }
+      });
+    }
+
+    // Animate water flow
+    const waterMat = getBlockMaterials(BLOCKS.WATER);
+    if (waterMat && waterMat.map) {
+      waterMat.map.offset.y += delta * 0.05;
+      waterMat.map.offset.x += delta * 0.02;
     }
 
     // Update active particles
