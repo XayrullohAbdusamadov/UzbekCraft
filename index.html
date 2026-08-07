@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="uz">
+
 <head>
   <script>
-    window.addEventListener('error', function(e) {
+    window.addEventListener('error', function (e) {
       const div = document.createElement('div');
       div.style.position = 'fixed';
       div.style.top = '0';
@@ -23,11 +24,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>UzbekCraft - 3D O'zbek Voxel O'yini</title>
-  <meta name="description" content="UzbekCraft - Google Earth uslubidagi HD Yer shari, O'zbekiston mashhur obidalari va 3D voxel dunyosi.">
+  <meta name="description"
+    content="UzbekCraft - Google Earth uslubidagi HD Yer shari, O'zbekiston mashhur obidalari va 3D voxel dunyosi.">
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=Press+Start+2P&display=swap"
+    rel="stylesheet">
   <!-- CSS -->
   <link rel="stylesheet" href="style.css?v=2.2">
   <!-- Three.js CDN -->
@@ -35,6 +38,7 @@
   <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
+
 <body>
 
   <!-- Game WebGL Canvas Container -->
@@ -53,6 +57,16 @@
         </div>
 
         <div class="menu-buttons">
+          <!-- Nickname request input -->
+          <div class="nickname-container"
+            style="margin-bottom: 12px; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+            <span id="name-warning-msg"
+              style="color: #ef4444; font-family: var(--font-pixel); font-size: 0.65rem; visibility: hidden; text-shadow: 1px 1px 0px #000; height: 14px;">Iltimos
+              Kirish uchun Ism kiriting</span>
+            <input type="text" id="main-menu-nickname-input" placeholder="Ismingizni kiriting..."
+              style="width: 100%; max-width: 280px; padding: 10px; background: rgba(0,0,0,0.6); border: 2px solid #ffb74d; border-radius: 4px; color: #fff; text-align: center; font-family: var(--font-pixel); font-size: 0.75rem; outline: none;">
+          </div>
+
           <button id="btn-new-world" class="btn btn-emerald">
             Yangi Dunyo Yaratish
           </button>
@@ -78,8 +92,11 @@
 
         <div class="menu-footer">
           UzbekCraft v2.5 Ultra HD • Google Earth Motori Integratsiyasi <br>
-          <span class="creator-credit">Yaratuvchi: <strong>Hayrulloh Abdusamadov</strong></span> &bull; 
-          <span class="telegram-channel">Telegram kanal: <a href="https://t.me/HayrullohAdusamadov" target="_blank" style="color: #29b6f6; text-decoration: none; font-weight: bold; transition: color 0.2s;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='#29b6f6'">@HayrullohAdusamadov</a></span>
+          <span class="creator-credit">Yaratuvchi: <strong>Hayrulloh Abdusamadov</strong></span> &bull;
+          <span class="telegram-channel">Telegram kanal: <a href="https://t.me/HayrullohAdusamadov" target="_blank"
+              style="color: #29b6f6; text-decoration: none; font-weight: bold; transition: color 0.2s;"
+              onmouseover="this.style.color='#00e5ff'"
+              onmouseout="this.style.color='#29b6f6'">@HayrullohAdusamadov</a></span>
         </div>
       </div>
     </div>
@@ -88,7 +105,7 @@
     <div id="create-world-modal" class="modal-overlay hidden">
       <div class="modal-card modal-large">
         <h2 class="modal-title">Yangi Dunyo Yaratish (HD Xaritalar)</h2>
-        
+
         <div class="form-group">
           <label for="world-name-input">Dunyo Nomi:</label>
           <input type="text" id="world-name-input" placeholder="Mening Dunyoim" value="Mening Dunyoim">
@@ -174,7 +191,7 @@
     <div id="settings-modal" class="modal-overlay hidden">
       <div class="modal-card">
         <h2 class="modal-title">Sozlamalar</h2>
-        
+
         <div class="form-group">
           <label>Ovoz Balandligi: <span id="sfx-vol-val">80%</span></label>
           <input type="range" id="slider-sfx" min="0" max="100" value="80">
@@ -205,19 +222,25 @@
     <div id="supabase-modal" class="modal-overlay hidden">
       <div class="modal-card">
         <h2 class="modal-title">Supabase Bulutli Saqlash</h2>
-        <p class="modal-text">Dunyolarni bulutga saqlash va sinxronizatsiya qilish uchun Supabase loyihangiz ma'lumotlarini kiriting.</p>
-        
+        <p class="modal-text">Dunyolarni bulutga saqlash va sinxronizatsiya qilish uchun Supabase loyihangiz
+          ma'lumotlarini kiriting.</p>
+
         <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
-          <label for="supabase-url" style="font-weight: 600; font-size: 0.9rem; color: var(--text-light);">Supabase URL:</label>
-          <input type="text" id="supabase-url" placeholder="https://xxxx.supabase.co" class="input-text" style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glow); color: #fff; font-size: 0.9rem;">
-        </div>
-        
-        <div class="form-group" style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
-          <label for="supabase-key" style="font-weight: 600; font-size: 0.9rem; color: var(--text-light);">Supabase Anon Key:</label>
-          <input type="password" id="supabase-key" placeholder="eyJhbGciOi..." class="input-text" style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glow); color: #fff; font-size: 0.9rem;">
+          <label for="supabase-url" style="font-weight: 600; font-size: 0.9rem; color: var(--text-light);">Supabase
+            URL:</label>
+          <input type="text" id="supabase-url" placeholder="https://xxxx.supabase.co" class="input-text"
+            style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glow); color: #fff; font-size: 0.9rem;">
         </div>
 
-        <div id="supabase-status" class="status-msg" style="font-size: 0.85rem; padding: 8px; border-radius: 8px; text-align: center; display: none;"></div>
+        <div class="form-group" style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
+          <label for="supabase-key" style="font-weight: 600; font-size: 0.9rem; color: var(--text-light);">Supabase Anon
+            Key:</label>
+          <input type="password" id="supabase-key" placeholder="eyJhbGciOi..." class="input-text"
+            style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glow); color: #fff; font-size: 0.9rem;">
+        </div>
+
+        <div id="supabase-status" class="status-msg"
+          style="font-size: 0.85rem; padding: 8px; border-radius: 8px; text-align: center; display: none;"></div>
 
         <div class="modal-actions" style="flex-direction: column; gap: 10px; margin-top: 15px;">
           <div style="display: flex; gap: 10px; width: 100%;">
@@ -236,16 +259,21 @@
     <div id="multiplayer-modal" class="modal-overlay hidden">
       <div class="modal-card">
         <h2 class="modal-title">Ko'p O'yinchi (Onlayn)</h2>
-        <p class="modal-text">Yoningizdagi yoki uzoqdagi do'stlaringiz bilan birga o'ynash uchun bir xil xona (dunyo) nomini yozib ulaning.</p>
-        
+        <p class="modal-text">Yoningizdagi yoki uzoqdagi do'stlaringiz bilan birga o'ynash uchun bir xil xona (dunyo)
+          nomini yozib ulaning.</p>
+
         <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
-          <label for="multiplayer-room-input" style="font-weight: 600; font-size: 0.9rem; color: var(--text-light);">Xona (Dunyo) Nomi:</label>
-          <input type="text" id="multiplayer-room-input" placeholder="Masalan: dostlar, registon" value="dostlar" style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glow); color: #fff; font-size: 0.9rem;">
+          <label for="multiplayer-room-input"
+            style="font-weight: 600; font-size: 0.9rem; color: var(--text-light);">Xona (Dunyo) Nomi:</label>
+          <input type="text" id="multiplayer-room-input" placeholder="Masalan: dostlar, registon" value="dostlar"
+            style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glow); color: #fff; font-size: 0.9rem;">
         </div>
 
         <div class="form-group" style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
-          <label for="multiplayer-map-select" style="font-weight: 600; font-size: 0.9rem; color: var(--text-light);">Xaritani tanlang:</label>
-          <select id="multiplayer-map-select" style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glow); color: #fff; font-size: 0.9rem;">
+          <label for="multiplayer-map-select"
+            style="font-weight: 600; font-size: 0.9rem; color: var(--text-light);">Xaritani tanlang:</label>
+          <select id="multiplayer-map-select"
+            style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glow); color: #fff; font-size: 0.9rem;">
             <option value="minecraft_classic" selected>Minecraft Klassik Dunyo</option>
             <optgroup label="Maxsus Sarguzasht & Online Kartalar">
               <option value="online_shooter">Otishma Kartasi (CS Shooter — Devorlar & Daraxtlar)</option>
@@ -287,8 +315,10 @@
         <h2 class="modal-title">Onlayn O'yinga Kirish</h2>
         <p class="modal-text">Boshqa o'yinchilar sizni ko'rishi uchun ismingizni kiriting:</p>
         <div class="form-group" style="display: flex; flex-direction: column; gap: 8px;">
-          <label for="player-nickname-input" style="font-weight: 600; font-size: 0.9rem; color: var(--text-light);">Sizning Ismingiz:</label>
-          <input type="text" id="player-nickname-input" placeholder="Masalan: Botir_Uzbek" style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glow); color: #fff; font-size: 0.9rem;">
+          <label for="player-nickname-input"
+            style="font-weight: 600; font-size: 0.9rem; color: var(--text-light);">Sizning Ismingiz:</label>
+          <input type="text" id="player-nickname-input" placeholder="Masalan: Botir_Uzbek"
+            style="width: 100%; padding: 10px 14px; border-radius: 10px; background: rgba(0,0,0,0.25); border: 1px solid var(--border-glow); color: #fff; font-size: 0.9rem;">
         </div>
         <div class="modal-actions" style="margin-top: 16px;">
           <button id="btn-save-nickname" class="btn btn-emerald" style="width: 100%;">Saqlash va Ulanish</button>
@@ -300,7 +330,8 @@
     <div id="online-death-modal" class="modal-overlay hidden">
       <div class="modal-card" style="text-align: center;">
         <h2 class="modal-title" style="color: #ef4444;">SIZ HALOK BO'LDINGIZ!</h2>
-        <p id="killer-name-text" class="modal-text" style="font-size: 1.1rem; font-weight: bold; color: #fbbf24; margin-bottom: 20px;">Dushman sizni o'ldirdi!</p>
+        <p id="killer-name-text" class="modal-text"
+          style="font-size: 1.1rem; font-weight: bold; color: #fbbf24; margin-bottom: 20px;">Dushman sizni o'ldirdi!</p>
         <div class="modal-actions" style="display: flex; gap: 12px; justify-content: center;">
           <button id="btn-online-respawn" class="btn btn-emerald" style="flex: 1;">Qolish (Yangi paydo bo'lish)</button>
           <button id="btn-online-exit" class="btn btn-red" style="flex: 1;">Chiqish (Bosh sahifa)</button>
@@ -339,26 +370,59 @@
     <div id="exit-survey-modal" class="modal-overlay hidden">
       <div class="modal-card" style="max-width: 480px;">
         <h2 class="modal-title" style="font-size: 1.05rem;">Fikr-mulohaza So'rovnomasi</h2>
-        <p class="modal-text" style="font-size: 0.75rem; margin-bottom: 8px;">O'yinimiz sizga yoqdimi? Fikringiz biz uchun muhim!</p>
-        
+        <p class="modal-text" style="font-size: 0.75rem; margin-bottom: 8px;">O'yinimiz sizga yoqdimi? Fikringiz biz
+          uchun muhim!</p>
+
         <div class="survey-options" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
-          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--font-pixel); font-size: 0.65rem; color: #fff;">
-            <input type="radio" name="game-rating" value="excellent" checked style="accent-color: #4caf50; width: 16px; height: 16px;">
+          <label
+            style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--font-pixel); font-size: 0.65rem; color: #fff;">
+            <input type="radio" name="game-rating" value="excellent" checked
+              style="accent-color: #4caf50; width: 16px; height: 16px;">
             <span>Ha, juda ajoyib! 🌟</span>
           </label>
-          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--font-pixel); font-size: 0.65rem; color: #fff;">
-            <input type="radio" name="game-rating" value="good" style="accent-color: #ffd600; width: 16px; height: 16px;">
+          <label
+            style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--font-pixel); font-size: 0.65rem; color: #fff;">
+            <input type="radio" name="game-rating" value="good"
+              style="accent-color: #ffd600; width: 16px; height: 16px;">
             <span>Yomon emas, yoqdi 👍</span>
           </label>
-          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--font-pixel); font-size: 0.65rem; color: #fff;">
-            <input type="radio" name="game-rating" value="poor" style="accent-color: #f44336; width: 16px; height: 16px;">
+          <label
+            style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--font-pixel); font-size: 0.65rem; color: #fff;">
+            <input type="radio" name="game-rating" value="poor"
+              style="accent-color: #f44336; width: 16px; height: 16px;">
             <span>Yo'q, kamchiliklar ko'p 👎</span>
           </label>
         </div>
-
         <div style="margin-bottom: 12px;">
-          <label style="display: block; font-family: var(--font-pixel); font-size: 0.62rem; color: #ffb74d; margin-bottom: 6px;">Qanday takliflaringiz bor?</label>
-          <textarea id="exit-survey-feedback" placeholder="Takliflaringizni shu yerga yozing..." style="width: 100%; height: 75px; background: rgba(0,0,0,0.6); border: 2px solid #555; color: #fff; font-family: monospace; font-size: 0.85rem; padding: 6px; outline: none; resize: none;"></textarea>
+          <label
+            style="display: block; font-family: var(--font-pixel); font-size: 0.62rem; color: #ffb74d; margin-bottom: 6px;">Asosiy
+            taklifingiz nima?</label>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <label
+              style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--font-pixel); font-size: 0.65rem; color: #fff;">
+              <input type="radio" name="exit-feedback-suggest" value="Ko'proq xaritalar qo'shish 🗺️" checked
+                style="accent-color: #4caf50; width: 16px; height: 16px;">
+              <span>Ko'proq xaritalar qo'shish 🗺️</span>
+            </label>
+            <label
+              style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--font-pixel); font-size: 0.65rem; color: #fff;">
+              <input type="radio" name="exit-feedback-suggest" value="Ko'proq qurollar va hayvonlar ⚔️"
+                style="accent-color: #4caf50; width: 16px; height: 16px;">
+              <span>Ko'proq qurollar va hayvonlar ⚔️</span>
+            </label>
+            <label
+              style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--font-pixel); font-size: 0.65rem; color: #fff;">
+              <input type="radio" name="exit-feedback-suggest" value="Grafikani yaxshilash 🎨"
+                style="accent-color: #4caf50; width: 16px; height: 16px;">
+              <span>Grafikani yaxshilash 🎨</span>
+            </label>
+            <label
+              style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--font-pixel); font-size: 0.65rem; color: #fff;">
+              <input type="radio" name="exit-feedback-suggest" value="O'yinni optimallashtirish ⚡"
+                style="accent-color: #4caf50; width: 16px; height: 16px;">
+              <span>O'yinni optimallashtirish ⚡</span>
+            </label>
+          </div>
         </div>
 
         <div class="modal-actions">
@@ -369,10 +433,15 @@
     </div>
 
     <!-- TRANSITION LOADING OVERLAY -->
-    <div id="loading-overlay" class="modal-overlay hidden" style="z-index: 999999; background: #11111b; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--font-pixel); color: #fff;">
-      <div id="loading-overlay-text" style="font-size: 1.15rem; text-shadow: 2px 2px 0px #000; margin-bottom: 20px; color: #ffb74d;">O'tilmoqda...</div>
-      <div style="width: 220px; height: 20px; border: 4px solid #1a120b; background: #2d241c; outline: 4px solid #000; position: relative;">
-        <div id="loading-overlay-bar" style="width: 0%; height: 100%; background: #4caf50; transition: width 0.05s;"></div>
+    <div id="loading-overlay" class="modal-overlay hidden"
+      style="z-index: 999999; background: #11111b; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--font-pixel); color: #fff;">
+      <div id="loading-overlay-text"
+        style="font-size: 1.15rem; text-shadow: 2px 2px 0px #000; margin-bottom: 20px; color: #ffb74d;">O'tilmoqda...
+      </div>
+      <div
+        style="width: 220px; height: 20px; border: 4px solid #1a120b; background: #2d241c; outline: 4px solid #000; position: relative;">
+        <div id="loading-overlay-bar" style="width: 0%; height: 100%; background: #4caf50; transition: width 0.05s;">
+        </div>
       </div>
     </div>
 
@@ -406,14 +475,17 @@
     <div id="modal-missions" class="modal-overlay hidden">
       <div class="modal-card modal-large quests-board-card">
         <h2 class="modal-title quests-board-title">Qiziqarli Topshiriqlar</h2>
-        <p class="modal-text quests-board-subtitle">Ajoyib sarguzashtlarni bajaring va afsonaviy mukofotlarga ega bo'ling!</p>
-        
-        <div id="missions-list-container" class="missions-list-container" style="display: flex; flex-direction: column; gap: 12px; max-height: 340px; overflow-y: auto; padding-right: 4px;">
+        <p class="modal-text quests-board-subtitle">Ajoyib sarguzashtlarni bajaring va afsonaviy mukofotlarga ega
+          bo'ling!</p>
+
+        <div id="missions-list-container" class="missions-list-container"
+          style="display: flex; flex-direction: column; gap: 12px; max-height: 340px; overflow-y: auto; padding-right: 4px;">
           <!-- Filled dynamically via main.js -->
         </div>
 
         <div class="modal-actions" style="margin-top: 16px;">
-          <button id="btn-close-missions" class="btn btn-emerald" style="border-radius: 12px; font-weight: bold; font-family: 'Outfit', sans-serif;">Yopish</button>
+          <button id="btn-close-missions" class="btn btn-emerald"
+            style="border-radius: 12px; font-weight: bold; font-family: 'Outfit', sans-serif;">Yopish</button>
         </div>
       </div>
     </div>
@@ -422,14 +494,42 @@
     <div id="inventory-modal" class="modal-overlay hidden">
       <div class="modal-card modal-large">
         <h2 class="modal-title">Inventar</h2>
-        
+
         <!-- Inventory Tabs Navigation -->
         <div class="inventory-tabs">
-          <button id="tab-weapons" class="inv-tab-btn active"><span class="tab-icon"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" style="display:inline-block; vertical-align:middle; margin-right:4px;"><polygon points="6 3 3 6 3 13 8 18 13 13 13 6 10 3 6 3"></polygon><line x1="14.5" y1="14.5" x2="21" y2="21"></line></svg></span> Qurollar</button>
-          <button id="tab-furniture" class="inv-tab-btn"><span class="tab-icon"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" style="display:inline-block; vertical-align:middle; margin-right:4px;"><rect x="3" y="11" width="18" height="8" rx="2"></rect><path d="M3 11V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5"></path><path d="M6 19v2M18 19v2"></path></svg></span> Anjomlar</button>
-          <button id="tab-blocks" class="inv-tab-btn"><span class="tab-icon"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" style="display:inline-block; vertical-align:middle; margin-right:4px;"><rect x="3" y="3" width="18" height="18" rx="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg></span> Bloklar</button>
-          <button id="tab-food" class="inv-tab-btn"><span class="tab-icon"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;"><circle cx="12" cy="12" r="9"></circle><path d="M12 2v2"></path></svg></span> Oziq-Ovqatlar</button>
-          <button id="tab-crafting" class="inv-tab-btn"><span class="tab-icon"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" style="display:inline-block; vertical-align:middle; margin-right:4px;"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.77 3.77z"></path></svg></span> Yaratish</button>
+          <button id="tab-weapons" class="inv-tab-btn active"><span class="tab-icon"><svg viewBox="0 0 24 24" width="16"
+                height="16" stroke="currentColor" stroke-width="2" fill="none"
+                style="display:inline-block; vertical-align:middle; margin-right:4px;">
+                <polygon points="6 3 3 6 3 13 8 18 13 13 13 6 10 3 6 3"></polygon>
+                <line x1="14.5" y1="14.5" x2="21" y2="21"></line>
+              </svg></span> Qurollar</button>
+          <button id="tab-furniture" class="inv-tab-btn"><span class="tab-icon"><svg viewBox="0 0 24 24" width="16"
+                height="16" stroke="currentColor" stroke-width="2" fill="none"
+                style="display:inline-block; vertical-align:middle; margin-right:4px;">
+                <rect x="3" y="11" width="18" height="8" rx="2"></rect>
+                <path d="M3 11V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5"></path>
+                <path d="M6 19v2M18 19v2"></path>
+              </svg></span> Anjomlar</button>
+          <button id="tab-blocks" class="inv-tab-btn"><span class="tab-icon"><svg viewBox="0 0 24 24" width="16"
+                height="16" stroke="currentColor" stroke-width="2" fill="none"
+                style="display:inline-block; vertical-align:middle; margin-right:4px;">
+                <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                <line x1="3" y1="9" x2="21" y2="9"></line>
+                <line x1="3" y1="15" x2="21" y2="15"></line>
+              </svg></span> Bloklar</button>
+          <button id="tab-food" class="inv-tab-btn"><span class="tab-icon"><svg viewBox="0 0 24 24" width="16"
+                height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"
+                stroke-linejoin="round" style="display:inline-block; vertical-align:middle; margin-right:4px;">
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="M12 2v2"></path>
+              </svg></span> Oziq-Ovqatlar</button>
+          <button id="tab-crafting" class="inv-tab-btn"><span class="tab-icon"><svg viewBox="0 0 24 24" width="16"
+                height="16" stroke="currentColor" stroke-width="2" fill="none"
+                style="display:inline-block; vertical-align:middle; margin-right:4px;">
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.77 3.77z">
+                </path>
+              </svg></span> Yaratish</button>
         </div>
 
         <p class="modal-text">Tanlangan slotga joylash uchun blok/qurol ustiga bosing:</p>
@@ -438,31 +538,54 @@
         </div>
 
         <!-- Crafting UI container -->
-        <div id="crafting-container" class="hidden" style="display: flex; flex-direction: column; gap: 12px; height: 300px; overflow-y: auto;">
+        <div id="crafting-container" class="hidden"
+          style="display: flex; flex-direction: column; gap: 12px; height: 300px; overflow-y: auto;">
           <div style="display: flex; gap: 16px; flex: 1; height: 100%;">
             <!-- Left side: Recipe Book (Yo'riqnoma) -->
-            <div class="crafting-guide" style="flex: 1.2; background: rgba(15, 23, 42, 0.6); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); overflow-y: auto; text-align: left;">
-              <h3 style="margin-top: 0; color: #fbbf24; font-family: 'Outfit', sans-serif; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" style="display:inline-block; vertical-align:middle;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg> Retseptlar Kitobi</h3>
-              <ul id="crafting-guide-list" style="list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 8px; margin: 0;">
+            <div class="crafting-guide"
+              style="flex: 1.2; background: rgba(15, 23, 42, 0.6); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); overflow-y: auto; text-align: left;">
+              <h3
+                style="margin-top: 0; color: #fbbf24; font-family: 'Outfit', sans-serif; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"
+                  style="display:inline-block; vertical-align:middle;">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg> Retseptlar Kitobi</h3>
+              <ul id="crafting-guide-list"
+                style="list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 8px; margin: 0;">
                 <!-- Filled dynamically -->
               </ul>
             </div>
-            
+
             <!-- Right side: Crafting Grid / Action -->
-            <div class="crafting-action" style="flex: 1; background: rgba(15, 23, 42, 0.85); padding: 12px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap: 8px; text-align: center;">
-              <h3 style="margin-top: 0; color: #10b981; font-family: 'Outfit', sans-serif; font-size: 0.95rem;"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" style="display:inline-block; vertical-align:middle; margin-right:4px;"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.77 3.77z"></path></svg> Yaratish</h3>
-              <div id="crafting-recipe-select-info" style="text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 100%;">
-                <p style="color: #94a3b8; font-size: 0.85rem; margin: 0;">Chap tomondan yaratmoqchi bo'lgan narsangizni tanlang.</p>
+            <div class="crafting-action"
+              style="flex: 1; background: rgba(15, 23, 42, 0.85); padding: 12px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; justify-content: space-between; align-items: center; gap: 8px; text-align: center;">
+              <h3 style="margin-top: 0; color: #10b981; font-family: 'Outfit', sans-serif; font-size: 0.95rem;"><svg
+                  viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"
+                  style="display:inline-block; vertical-align:middle; margin-right:4px;">
+                  <path
+                    d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.77 3.77z">
+                  </path>
+                </svg> Yaratish</h3>
+              <div id="crafting-recipe-select-info"
+                style="text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; width: 100%;">
+                <p style="color: #94a3b8; font-size: 0.85rem; margin: 0;">Chap tomondan yaratmoqchi bo'lgan narsangizni
+                  tanlang.</p>
               </div>
-              <button id="btn-craft-action" class="btn btn-emerald disabled" style="width: 100%;" disabled>Yaratish</button>
+              <button id="btn-craft-action" class="btn btn-emerald disabled" style="width: 100%;"
+                disabled>Yaratish</button>
             </div>
           </div>
         </div>
 
         <!-- Inventory Hotbar Section (Visible in all tabs) -->
-        <div class="inventory-hotbar-section" style="margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%;">
-          <span style="font-size: 0.8rem; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.5px;">Tezkor Slotlar (Hotbar)</span>
-          <div id="inventory-hotbar" class="hotbar-slots" style="justify-content: center; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); padding: 6px; border-radius: 12px; display: inline-flex; gap: 6px; box-shadow: none;">
+        <div class="inventory-hotbar-section"
+          style="margin-top: 16px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%;">
+          <span
+            style="font-size: 0.8rem; font-weight: 700; color: #fbbf24; text-transform: uppercase; letter-spacing: 0.5px;">Tezkor
+            Slotlar (Hotbar)</span>
+          <div id="inventory-hotbar" class="hotbar-slots"
+            style="justify-content: center; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); padding: 6px; border-radius: 12px; display: inline-flex; gap: 6px; box-shadow: none;">
             <!-- Dynamically populated by renderHotbar() -->
           </div>
         </div>
@@ -479,8 +602,10 @@
       <div id="crosshair">+</div>
 
       <!-- Interaction Prompt Overlay -->
-      <div id="hud-interaction-container" class="hidden" style="position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); z-index: 100; text-align: center;">
-        <button id="btn-hud-action" style="padding: 10px 20px; font-size: 16px; font-family: 'Outfit', sans-serif; font-weight: bold; background: #10b981; color: #fff; border: 2px solid rgba(255,255,255,0.4); border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); pointer-events: auto; text-shadow: 0 1px 2px rgba(0,0,0,0.5);"></button>
+      <div id="hud-interaction-container" class="hidden"
+        style="position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%); z-index: 100; text-align: center;">
+        <button id="btn-hud-action"
+          style="padding: 10px 20px; font-size: 16px; font-family: 'Outfit', sans-serif; font-weight: bold; background: #10b981; color: #fff; border: 2px solid rgba(255,255,255,0.4); border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); pointer-events: auto; text-shadow: 0 1px 2px rgba(0,0,0,0.5);"></button>
       </div>
 
       <!-- Single Progress Bar Overlay for Digging -->
@@ -514,7 +639,12 @@
       <!-- Floating Quest Tracker Widget -->
       <div id="hud-mission-tracker" class="hud-mission-tracker">
         <div class="mission-widget-header">
-          <span class="mission-badge-icon"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" style="display:inline-block; vertical-align:middle; margin-right:4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></span>
+          <span class="mission-badge-icon"><svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor"
+              stroke-width="2.5" fill="none" style="display:inline-block; vertical-align:middle; margin-right:4px;">
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+              </polygon>
+            </svg></span>
           <span id="hud-mission-title">Topshiriq 1: Bunyodkor</span>
         </div>
         <div class="mission-widget-body">
@@ -569,7 +699,9 @@
         </div>
       </div>
       <!-- CS Style Kill Feed Overlay -->
-      <div id="kill-feed-container" style="position: absolute; top: 70px; right: 20px; z-index: 100; display: flex; flex-direction: column; gap: 6px; pointer-events: none;"></div>
+      <div id="kill-feed-container"
+        style="position: absolute; top: 70px; right: 20px; z-index: 100; display: flex; flex-direction: column; gap: 6px; pointer-events: none;">
+      </div>
     </div>
 
     <!-- SINGLE TOAST NOTIFICATION BOX -->
@@ -588,4 +720,5 @@
 
   <script src="main.js?v=2.2"></script>
 </body>
+
 </html>

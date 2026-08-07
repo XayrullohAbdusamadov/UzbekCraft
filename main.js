@@ -5056,14 +5056,33 @@
     if (tabFood) tabFood.addEventListener('click', () => switchTab('food'));
     if (tabCrafting) tabCrafting.addEventListener('click', () => switchTab('crafting'));
 
+    function validateMainMenuNickname() {
+      const input = document.getElementById('main-menu-nickname-input');
+      const warning = document.getElementById('name-warning-msg');
+      const val = input ? input.value.trim() : '';
+      if (!val) {
+        if (warning) warning.style.visibility = 'visible';
+        if (input) input.style.borderColor = '#ef4444';
+        return false;
+      }
+      if (warning) warning.style.visibility = 'hidden';
+      if (input) input.style.borderColor = '#ffb74d';
+      localPlayerName = val;
+      localStorage.setItem('uzbekcraft_nickname', val);
+      return true;
+    }
+
     document.getElementById('btn-new-world').addEventListener('click', () => {
+      if (!validateMainMenuNickname()) return;
       document.getElementById('create-world-modal').classList.remove('hidden');
     });
     document.getElementById('btn-saved-worlds').addEventListener('click', () => {
+      if (!validateMainMenuNickname()) return;
       loadSavedWorldsList();
       document.getElementById('saved-worlds-modal').classList.remove('hidden');
     });
     document.getElementById('btn-skins').addEventListener('click', () => {
+      if (!validateMainMenuNickname()) return;
       document.getElementById('skins-modal').classList.remove('hidden');
     });
     document.getElementById('btn-settings').addEventListener('click', () => {
@@ -5079,7 +5098,7 @@
 
     document.getElementById('btn-survey-submit').addEventListener('click', () => {
       const selected = document.querySelector('input[name="game-rating"]:checked')?.value || 'excellent';
-      const feedbackText = document.getElementById('exit-survey-feedback').value || '';
+      const feedbackText = document.querySelector('input[name="exit-feedback-suggest"]:checked')?.value || '';
       
       console.log("Exit survey response:", { rating: selected, feedback: feedbackText });
       showToast("Fikr-mulohaza uchun rahmat!");
@@ -5094,17 +5113,14 @@
 
     // --- MULTIPLAYER UI LISTENERS ---
     document.getElementById('btn-multiplayer').addEventListener('click', () => {
+      if (!validateMainMenuNickname()) return;
       document.getElementById('multiplayer-modal').classList.remove('hidden');
     });
     document.getElementById('btn-multiplayer-close').addEventListener('click', () => {
       document.getElementById('multiplayer-modal').classList.add('hidden');
     });
     document.getElementById('btn-multiplayer-join').addEventListener('click', () => {
-      const storedName = localStorage.getItem('uzbekcraft_nickname');
-      if (!storedName) {
-        document.getElementById('player-name-modal').classList.remove('hidden');
-        return;
-      }
+      if (!validateMainMenuNickname()) return;
       startJoinMultiplayer();
     });
 
@@ -5113,6 +5129,8 @@
       if (input) {
         localPlayerName = input;
         localStorage.setItem('uzbekcraft_nickname', input);
+        const mainMenuNickInput = document.getElementById('main-menu-nickname-input');
+        if (mainMenuNickInput) mainMenuNickInput.value = input;
       }
       document.getElementById('player-name-modal').classList.add('hidden');
       startJoinMultiplayer();
@@ -6549,6 +6567,19 @@
   // ==========================================================================
 
   function setupEvents() {
+    // Initialize main menu nickname input from localStorage
+    const mainMenuNickInput = document.getElementById('main-menu-nickname-input');
+    if (mainMenuNickInput) {
+      mainMenuNickInput.value = localStorage.getItem('uzbekcraft_nickname') || '';
+      mainMenuNickInput.addEventListener('input', () => {
+        const warning = document.getElementById('name-warning-msg');
+        if (mainMenuNickInput.value.trim()) {
+          warning.style.visibility = 'hidden';
+          mainMenuNickInput.style.borderColor = '#ffb74d';
+        }
+      });
+    }
+
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
