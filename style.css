@@ -35,7 +35,8 @@
   touch-action: manipulation;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -80,7 +81,8 @@ html, body {
   display: flex !important;
 }
 
-.modal-overlay, .hud-layer {
+.modal-overlay,
+.hud-layer {
   pointer-events: auto;
 }
 
@@ -120,36 +122,52 @@ html, body {
   background: linear-gradient(135deg, #10b981 0%, #047857 100%);
   border-color: rgba(52, 211, 153, 0.4);
 }
-.btn-emerald:hover { background: linear-gradient(135deg, #34d399 0%, #059669 100%); }
+
+.btn-emerald:hover {
+  background: linear-gradient(135deg, #34d399 0%, #059669 100%);
+}
 
 .btn-gold {
   background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
   border-color: rgba(251, 191, 36, 0.4);
 }
-.btn-gold:hover { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); }
+
+.btn-gold:hover {
+  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+}
 
 .btn-blue {
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   border-color: rgba(96, 165, 250, 0.4);
 }
-.btn-blue:hover { background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%); }
+
+.btn-blue:hover {
+  background: linear-gradient(135deg, #60a5fa 0%, #2563eb 100%);
+}
 
 .btn-dark {
   background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
   border-color: rgba(148, 163, 184, 0.3);
 }
-.btn-dark:hover { background: linear-gradient(135deg, #475569 0%, #334155 100%); }
+
+.btn-dark:hover {
+  background: linear-gradient(135deg, #475569 0%, #334155 100%);
+}
 
 .btn-red {
   background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
   border-color: rgba(248, 113, 113, 0.4);
 }
-.btn-red:hover { background: linear-gradient(135deg, #f87171 0%, #dc2626 100%); }
+
+.btn-red:hover {
+  background: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+}
 
 .btn-purple {
   background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
   border-color: rgba(168, 85, 247, 0.4);
 }
+
 .btn-purple:hover {
   background: linear-gradient(135deg, #c084fc 0%, #9333ea 100%);
 }
@@ -207,13 +225,27 @@ html, body {
 }
 
 @keyframes pulse-logo {
-  0% { transform: scale(1); filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.8)); }
-  100% { transform: scale(1.03); filter: drop-shadow(0 10px 20px rgba(245, 158, 11, 0.4)); }
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.8));
+  }
+
+  100% {
+    transform: scale(1.03);
+    filter: drop-shadow(0 10px 20px rgba(245, 158, 11, 0.4));
+  }
 }
 
 @keyframes hunger-alert-pulse {
-  0% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.3)); }
-  100% { transform: scale(1.15); filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.9)); }
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.3));
+  }
+
+  100% {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.9));
+  }
 }
 
 /* ROBLOX-STYLE MISSION TRACKER & MODAL STYLES */
@@ -224,6 +256,7 @@ html, body {
   border: 1px solid rgba(255, 255, 255, 0.4) !important;
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4) !important;
 }
+
 .btn-mission-hud:hover {
   transform: translateY(-1px);
   filter: brightness(1.15);
@@ -244,6 +277,7 @@ html, body {
   pointer-events: auto;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .hud-mission-tracker:hover {
   border-color: #f59e0b;
   box-shadow: 0 8px 30px rgba(245, 158, 11, 0.3);
@@ -301,13 +335,21 @@ html, body {
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
   animation: claim-pulse 1s infinite alternate;
 }
+
 .btn-claim-mission:hover {
   filter: brightness(1.2);
 }
 
 @keyframes claim-pulse {
-  from { transform: scale(1); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4); }
-  to { transform: scale(1.03); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.8); }
+  from {
+    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  }
+
+  to {
+    transform: scale(1.03);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.8);
+  }
 }
 
 /* PREMIUM QUESTS BOARD & CARDS STYLES */
@@ -371,6 +413,7 @@ html, body {
   border-color: rgba(16, 185, 129, 0.4);
   background: linear-gradient(135deg, rgba(6, 78, 59, 0.25), rgba(15, 23, 42, 0.95));
 }
+
 .mission-card.completed:hover {
   border-color: rgba(16, 185, 129, 0.7);
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.2);
@@ -406,7 +449,7 @@ html, body {
   color: var(--accent-emerald);
   letter-spacing: 4px;
   margin-top: 10px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .menu-buttons {
@@ -464,8 +507,15 @@ html, body {
 }
 
 @keyframes modal-pop {
-  0% { opacity: 0; transform: scale(0.9) translateY(20px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); }
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .modal-title {
@@ -711,7 +761,7 @@ html, body {
   width: 34px;
   height: 34px;
   border-radius: 6px;
-  box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
 }
 
 .block-slot-name {
@@ -757,7 +807,8 @@ html, body {
   pointer-events: none;
 }
 
-.bar-left, .bar-right {
+.bar-left,
+.bar-right {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1022,13 +1073,27 @@ html, body {
 }
 
 @keyframes toast-in {
-  0% { opacity: 0; transform: translateY(-20px) scale(0.9); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.9);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @keyframes toast-out {
-  0% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-20px); }
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
 }
 
 /* RESPONSIVE DESIGN */
@@ -1037,7 +1102,7 @@ html, body {
     padding: 20px;
     border-radius: 18px;
   }
-  
+
   .game-logo {
     font-size: 2.2rem;
   }
@@ -1046,7 +1111,7 @@ html, body {
     width: 44px;
     height: 44px;
   }
-  
+
   .hotbar-icon {
     width: 22px;
     height: 22px;
@@ -1156,8 +1221,15 @@ html, body {
 }
 
 @keyframes bubble-pop {
-  0% { opacity: 0; transform: scale(0.85) translateY(15px); }
-  100% { opacity: 1; transform: scale(1) translateY(0); }
+  0% {
+    opacity: 0;
+    transform: scale(0.85) translateY(15px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 /* MOBILE PORTRAIT RESPONSIVENESS AND TIGHT LAYOUT */
@@ -1168,35 +1240,42 @@ html, body {
     width: 110px !important;
     height: 110px !important;
   }
+
   #joystick-base {
     border-width: 1px !important;
   }
+
   #joystick-stick {
     width: 40px !important;
     height: 40px !important;
   }
+
   #touch-actions {
     bottom: 10px !important;
     right: 10px !important;
     width: 170px !important;
     height: 170px !important;
   }
+
   .touch-btn {
     font-size: 0.68rem !important;
     border-width: 1px !important;
   }
+
   #btn-touch-jump {
     bottom: 15px !important;
     right: 5px !important;
     width: 55px !important;
     height: 55px !important;
   }
+
   #btn-touch-place {
     top: 10px !important;
     left: 35px !important;
     width: 50px !important;
     height: 50px !important;
   }
+
   #btn-touch-break {
     bottom: 5px !important;
     left: 10px !important;
@@ -1204,6 +1283,7 @@ html, body {
     height: 65px !important;
     font-size: 0.75rem !important;
   }
+
   #btn-touch-cam {
     top: 10px !important;
     right: 20px !important;
@@ -1211,6 +1291,7 @@ html, body {
     height: 42px !important;
     font-size: 0.62rem !important;
   }
+
   #btn-touch-inv {
     top: 60px !important;
     right: 5px !important;
@@ -1218,14 +1299,17 @@ html, body {
     height: 42px !important;
     font-size: 0.62rem !important;
   }
+
   /* scale down modals on small portrait screens */
   .modal-card {
     padding: 16px !important;
     max-width: 92% !important;
   }
+
   .modal-title {
     font-size: 1.15rem !important;
   }
+
   .modal-text {
     font-size: 0.8rem !important;
   }
@@ -1280,9 +1364,17 @@ html, body {
 }
 
 @keyframes heart-pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.06); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.06);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* DAMAGE FLASH OVERLAY */
@@ -1447,8 +1539,15 @@ html, body {
 }
 
 @keyframes actionbar-pop {
-  0% { opacity: 0; transform: translate(-50%, 10px) scale(0.9); }
-  100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 10px) scale(0.9);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
 }
 
 /* HUD STATUS BARS (HEALTH & HUNGER) */
@@ -1487,12 +1586,20 @@ html, body {
 }
 
 @keyframes hunger-alert-pulse {
-  0% { transform: scale(1); filter: drop-shadow(0 0 4px #ef4444); }
-  100% { transform: scale(1.25); filter: drop-shadow(0 0 10px #ef4444); }
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 4px #ef4444);
+  }
+
+  100% {
+    transform: scale(1.25);
+    filter: drop-shadow(0 0 10px #ef4444);
+  }
 }
 
 /* MOBILE RESPONSIVE UPDATES FOR QUESTS BOARD & WIDGET */
 @media (max-width: 768px) {
+
   /* Quests board modal styling */
   .quests-board-card {
     width: 95% !important;
@@ -1500,41 +1607,41 @@ html, body {
     padding: 14px !important;
     border-radius: 16px !important;
   }
-  
+
   .quests-board-title {
     font-size: 19px !important;
     margin-bottom: 2px !important;
   }
-  
+
   .quests-board-subtitle {
     font-size: 11px !important;
     margin-bottom: 12px !important;
   }
-  
+
   .missions-list-container {
     max-height: 240px !important;
     gap: 8px !important;
   }
-  
+
   .mission-card {
     padding: 10px 12px !important;
     gap: 10px !important;
     border-radius: 10px !important;
   }
-  
+
   .mission-title {
     font-size: 12px !important;
   }
-  
+
   .mission-info div {
     font-size: 11px !important;
   }
-  
+
   .mission-reward {
     margin-left: 22px !important;
     font-size: 10px !important;
   }
-  
+
   .mission-reward span {
     font-size: 9px !important;
   }
@@ -1619,14 +1726,26 @@ html, body {
 }
 
 @keyframes killFeedSlide {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* ==========================================================================
    MINECRAFT PIXEL ART GUI STYLE OVERRIDE
    ========================================================================== */
-.btn, .hud-btn, .touch-btn, .btn-claim-mission, .btn-online-respawn, .btn-online-exit {
+.btn,
+.hud-btn,
+.touch-btn,
+.btn-claim-mission,
+.btn-online-respawn,
+.btn-online-exit {
   font-family: var(--font-pixel) !important;
   font-size: 0.8rem !important;
   font-weight: normal !important;
@@ -1642,7 +1761,10 @@ html, body {
   cursor: pointer;
 }
 
-.btn:hover, .hud-btn:hover, .touch-btn:hover, .btn-claim-mission:hover {
+.btn:hover,
+.hud-btn:hover,
+.touch-btn:hover,
+.btn-claim-mission:hover {
   background: #5c8c5c !important;
   border-color: #a0ffa0 #305030 #305030 #a0ffa0 !important;
   color: #fff !important;
@@ -1650,7 +1772,9 @@ html, body {
   box-shadow: none !important;
 }
 
-.btn:active, .hud-btn:active, .touch-btn:active {
+.btn:active,
+.hud-btn:active,
+.touch-btn:active {
   background: #4a4a4a !important;
   border-color: #2b2b2b #808080 #808080 #2b2b2b !important;
 }
@@ -1659,16 +1783,20 @@ html, body {
   background: #2e7d32 !important;
   border-color: #4caf50 #1b5e20 #1b5e20 #4caf50 !important;
 }
+
 .btn-emerald:hover {
   background: #388e3c !important;
   border-color: #66bb6a #2e7d32 #2e7d32 #66bb6a !important;
 }
 
-.btn-red, .btn-online-exit {
+.btn-red,
+.btn-online-exit {
   background: #c62828 !important;
   border-color: #ef5350 #7f0000 #7f0000 #ef5350 !important;
 }
-.btn-red:hover, .btn-online-exit:hover {
+
+.btn-red:hover,
+.btn-online-exit:hover {
   background: #d32f2f !important;
   border-color: #e57373 #c62828 #c62828 #e57373 !important;
 }
@@ -1677,12 +1805,15 @@ html, body {
   background: #e65100 !important;
   border-color: #ffb74d #e65100 #e65100 #ffb74d !important;
 }
+
 .btn-gold:hover {
   background: #f57c00 !important;
   border-color: #ffcc80 #ef6c00 #ef6c00 #ffcc80 !important;
 }
 
-.modal-card, .quests-board-card, #main-menu .menu-card {
+.modal-card,
+.quests-board-card,
+#main-menu .menu-card {
   background-color: #31281f !important;
   background-image: repeating-conic-gradient(#2d241c 0% 25%, #352c22 0% 50%) !important;
   background-size: 16px 16px !important;
@@ -1692,14 +1823,20 @@ html, body {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.9) !important;
 }
 
-.modal-title, .screen-panel h2, .quests-board-title, .quests-board-subtitle {
+.modal-title,
+.screen-panel h2,
+.quests-board-title,
+.quests-board-subtitle {
   font-family: var(--font-pixel) !important;
   text-shadow: 2px 2px 0px #000 !important;
   letter-spacing: 0px !important;
   color: #fff !important;
 }
 
-.stat-badge, #top-bar, .hud-mission-tracker, .toast-single-box {
+.stat-badge,
+#top-bar,
+.hud-mission-tracker,
+.toast-single-box {
   border-radius: 0px !important;
   border: 2px solid #555 !important;
   background: rgba(0, 0, 0, 0.8) !important;
@@ -1749,7 +1886,8 @@ html, body {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
-  width: 414px !important; /* 9 * 46px slots */
+  width: 414px !important;
+  /* 9 * 46px slots */
   margin-bottom: 2px !important;
   gap: 0px !important;
 }
@@ -1861,4 +1999,3 @@ html, body {
   color: #e0e0e0 !important;
   margin-bottom: 4px !important;
 }
-

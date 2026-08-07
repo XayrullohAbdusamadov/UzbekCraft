@@ -1498,25 +1498,47 @@
     return group;
   }
 
-  function animateCharacterWalk(mesh, speed, isMoving, grounded = true, isMining = false) {
+  function animateCharacterWalk(mesh, speed, isMoving, grounded = true, isMining = false, isSitting = false, isRiding = false) {
     if (!mesh) return;
     
     if (mesh.legL && mesh.legR && mesh.armL) {
-      if (isMoving && grounded && speed > 0.05) {
+      if (isSitting || isRiding) {
+        mesh.legL.rotation.x = -Math.PI / 2;
+        mesh.legR.rotation.x = -Math.PI / 2;
+        if (isRiding) {
+          mesh.legL.rotation.z = -0.2;
+          mesh.legR.rotation.z = 0.2;
+        } else {
+          mesh.legL.rotation.z = 0;
+          mesh.legR.rotation.z = 0;
+        }
+        mesh.armL.rotation.x = -Math.PI / 4;
+      } else if (isMoving && grounded && speed > 0.05) {
         const swingSpeed = 12.0;
         const angle = Math.sin(performance.now() * 0.001 * swingSpeed) * 0.6;
         mesh.legL.rotation.x = angle;
         mesh.legR.rotation.x = -angle;
+        mesh.legL.rotation.z = 0;
+        mesh.legR.rotation.z = 0;
         mesh.armL.rotation.x = -angle;
       } else {
         mesh.legL.rotation.x = 0;
         mesh.legR.rotation.x = 0;
+        mesh.legL.rotation.z = 0;
+        mesh.legR.rotation.z = 0;
         mesh.armL.rotation.x = 0;
       }
     }
 
     if (mesh.armR) {
-      if (isMining) {
+      if (isSitting || isRiding) {
+        if (isMining) {
+          const chopSpeed = 25.0;
+          mesh.armR.rotation.x = -0.5 + Math.sin(performance.now() * 0.001 * chopSpeed) * 0.8;
+        } else {
+          mesh.armR.rotation.x = -Math.PI / 4;
+        }
+      } else if (isMining) {
         const chopSpeed = 25.0;
         mesh.armR.rotation.x = -0.5 + Math.sin(performance.now() * 0.001 * chopSpeed) * 0.8;
       } else if (isMoving && grounded && speed > 0.05) {
@@ -1528,7 +1550,9 @@
     }
 
     if (mesh.cape) {
-      if (isMoving && speed > 0.05) {
+      if (isSitting || isRiding) {
+        mesh.cape.rotation.x = 0.5;
+      } else if (isMoving && speed > 0.05) {
         const flutter = Math.sin(performance.now() * 0.015) * 0.08 + 0.25;
         mesh.cape.rotation.x = flutter;
       } else {
@@ -1545,6 +1569,13 @@
     }
     const p = otherPlayers[id];
     p.mesh.position.set(data.x, data.y, data.z);
+    p.isSitting = data.isSitting || false;
+    p.isRidingHorse = data.isRidingHorse || false;
+    if (p.isSitting) {
+      p.mesh.position.y -= 0.65;
+    } else if (p.isRidingHorse) {
+      p.mesh.position.y -= 0.35;
+    }
     p.mesh.rotation.y = data.yaw + Math.PI;
     p.isMining = data.isMining || false;
     p.lastUpdate = Date.now();
@@ -3708,6 +3739,7 @@
       if (activeThirdPerson && playerMesh) {
         playerMesh.visible = true;
         playerMesh.position.copy(playerPos);
+        playerMesh.position.y -= 0.35; // Shift down for horse/camel riding
         playerMesh.rotation.y = yaw + Math.PI;
 
         const targetX = playerPos.x - Math.sin(orbitYaw) * Math.cos(orbitPitch) * thirdPersonDistance;
@@ -3820,6 +3852,9 @@
     if (activeThirdPerson && playerMesh) {
       playerMesh.visible = true;
       playerMesh.position.copy(playerPos);
+      if (isSitting) {
+        playerMesh.position.y -= 0.65; // Shift down for sitting on sofa/chair/table
+      }
       playerMesh.rotation.y = yaw + Math.PI;
 
       // Centered third-person camera directly behind the player's back
@@ -3840,7 +3875,7 @@
     // Animate local player walking
     const isMoving = keys['KeyW'] || keys['KeyS'] || keys['KeyA'] || keys['KeyD'] || touchJoystick.active;
     const currentSpeed = Math.hypot(playerVel.x, playerVel.z);
-    animateCharacterWalk(playerMesh, currentSpeed, isMoving, isGrounded, isMiningHeld);
+    animateCharacterWalk(playerMesh, currentSpeed, isMoving, isGrounded, isMiningHeld, isSitting, isRidingHorse);
 
     updateTargetRaycast();
     updateMiningProgress(delta);
@@ -3873,7 +3908,9 @@
             pitch: pitch,
             skin: playerSkin,
             isMining: isMiningHeld,
-            activeBlockId: hotbarBlocks[activeSlotIndex]
+            activeBlockId: hotbarBlocks[activeSlotIndex],
+            isSitting: isSitting,
+            isRidingHorse: isRidingHorse
           }
         });
       }
@@ -3892,7 +3929,7 @@
         const prevPos = op.prevPos || op.mesh.position.clone();
         const dist = prevPos.distanceTo(op.mesh.position);
         const moving = dist > 0.005;
-        animateCharacterWalk(op.mesh, dist / delta, moving, true, op.isMining);
+        animateCharacterWalk(op.mesh, dist / delta, moving, true, op.isMining, op.isSitting, op.isRidingHorse);
         op.prevPos = op.mesh.position.clone();
       }
     });
