@@ -3675,15 +3675,15 @@
         // Walk leg swing animation
         const t = performance.now() * 0.015;
         if (mountedHorse.legs && mountedHorse.legs.length >= 4) {
-          mountedHorse.legs[0].rotation.x = Math.sin(t) * 0.6;
-          mountedHorse.legs[1].rotation.x = -Math.sin(t) * 0.6;
-          mountedHorse.legs[2].rotation.x = -Math.sin(t) * 0.6;
-          mountedHorse.legs[3].rotation.x = Math.sin(t) * 0.6;
+          mountedHorse.legs[0].rotation.z = Math.sin(t) * 0.6;
+          mountedHorse.legs[1].rotation.z = -Math.sin(t) * 0.6;
+          mountedHorse.legs[2].rotation.z = -Math.sin(t) * 0.6;
+          mountedHorse.legs[3].rotation.z = Math.sin(t) * 0.6;
         }
       } else {
         // Reset legs to neutral position
         if (mountedHorse.legs) {
-          mountedHorse.legs.forEach(leg => leg.rotation.x = 0);
+          mountedHorse.legs.forEach(leg => leg.rotation.z = 0);
         }
       }
       
