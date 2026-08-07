@@ -18,11 +18,10 @@
     DARK_STONE: 21, GLASS: 22, TERRACOTTA: 23, COPPER: 24,
     SWORD: 25, BOW: 26, BOMB: 27, SOFA: 28, TABLE: 29, CHAIR: 30, FLOWER: 31,
     AVTOMAT: 32, TORCH: 33, BUCKET: 34, WATER_BUCKET: 35,
-    AVTOMAT: 32, TORCH: 33, BUCKET: 34, WATER_BUCKET: 35,
     AXE: 36, APPLE: 37, BREAD: 38, COOKED_MEAT: 39, MEAT_MUTTON: 40,
     PICKAXE: 41, SHOVEL: 42, HOE: 43, CRAFTING_TABLE: 44, FURNACE: 45,
     CHEST: 46, OBSIDIAN: 47, GLOWSTONE: 48, PUMPKIN: 49, HAY_BALE: 50, MOSSY_STONE: 51,
-    WINDOW: 52, DOOR: 53, MEAT_EAGLE: 54
+    WINDOW: 52, DOOR: 53, MEAT_EAGLE: 54, STAR: 55
   };
 
   const BLOCK_INFO = {
@@ -79,11 +78,17 @@
     [BLOCKS.GLOWSTONE]:      { name: "Nurlanuvchi Tosh",     color: '#ffb300', isLuminous: true },
     [BLOCKS.PUMPKIN]:        { name: "Qovoq (Pumpkin)",      color: '#ef6c00', isFurniture: true },
     [BLOCKS.HAY_BALE]:       { name: "Somon Taxlami",        color: '#fbc02d' },
-    [BLOCKS.MOSSY_STONE]:    { name: "Moxli Tosh",           color: '#558b2f' }
+    [BLOCKS.MOSSY_STONE]:    { name: "Moxli Tosh",           color: '#558b2f' },
+    [BLOCKS.STAR]:           { name: "Tushgan Yulduz",       color: '#fff59d', isLuminous: true, isFurniture: true }
   };
 
   function getItemIconHTML(bId) {
     if (bId === undefined || bId === BLOCKS.AIR) return '';
+    if (bId === BLOCKS.STAR) {
+      return `<svg viewBox="0 0 32 32" width="100%" height="100%">
+        <polygon points="16,2 20,12 30,12 22,19 25,29 16,22 7,29 10,19 2,12 12,12" fill="#fff59d" stroke="#fbc02d" stroke-width="1.5"/>
+      </svg>`;
+    }
     
     // Weapons/Tools
     if (bId === BLOCKS.SWORD) {
@@ -605,7 +610,8 @@
       [BLOCKS.CHEST]: '#a1887f', [BLOCKS.OBSIDIAN]: '#140d21',
       [BLOCKS.GLOWSTONE]: '#ffd600', [BLOCKS.PUMPKIN]: '#ef6c00',
       [BLOCKS.HAY_BALE]: side === 'top' ? '#fbc02d' : '#f57f17',
-      [BLOCKS.MOSSY_STONE]: '#757575'
+      [BLOCKS.MOSSY_STONE]: '#757575',
+      [BLOCKS.STAR]: '#fff59d'
     };
     ctx.fillStyle = colors[blockId] || '#ffffff';
     ctx.fillRect(0, 0, 32, 32);
@@ -780,6 +786,18 @@
       ctx.fillStyle = '#5d4037'; ctx.fillRect(13, 14, 6, 18);
     }
 
+    // --- TUSHGAN YULDUZ (STAR) ---
+    if (blockId === BLOCKS.STAR) {
+      ctx.fillStyle = '#ffb300';
+      ctx.fillRect(4, 4, 24, 24);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(14, 8, 4, 16);
+      ctx.fillRect(8, 14, 16, 4);
+      ctx.fillRect(11, 11, 10, 10);
+      ctx.fillStyle = '#ffd54f';
+      ctx.fillRect(13, 13, 6, 6);
+    }
+
     if (blockId !== BLOCKS.WATER && blockId !== BLOCKS.AIR) {
       ctx.strokeStyle = 'rgba(0,0,0,0.18)';
       ctx.lineWidth = 1;
@@ -801,7 +819,7 @@
         params.transparent = true; params.opacity = 0.35; params.roughness = 0.05; params.metalness = 0.2;
       } else if (blockId === BLOCKS.WATER) {
         params.transparent = true; params.opacity = 0.55; params.roughness = 0.08; params.metalness = 0.1;
-      } else if (blockId === BLOCKS.LANTERN || blockId === BLOCKS.GLOWSTONE) {
+      } else if (blockId === BLOCKS.LANTERN || blockId === BLOCKS.GLOWSTONE || blockId === BLOCKS.STAR) {
         params.emissive = new THREE.Color(0xffb300);
         params.emissiveIntensity = 1.2;
         params.roughness = 0.1;
@@ -882,7 +900,7 @@
 
   // --- GAME STATE ---
   let scene, camera, renderer, clock, supabase = null;
-  let sunMesh, moonMesh, sunLight, ambientLight, starsParticles, cloudsGroup;
+  let sunMesh, moonMesh, sunLight, ambientLight, starsParticles, cloudsGroup, activeFallingStars = [], starFallTimer = 0;
   let playerMesh, playerSkin = 'steve', fpHandGroup = null;
   let isThirdPerson = false, thirdPersonDistance = 6.0;
   let orbitYaw = 0, orbitPitch = 0;
@@ -3644,6 +3662,49 @@
     const el_icon = document.getElementById('hud-time-icon');
     if (el_time) el_time.textContent = `${isDay ? 'Kun' : 'Tun'} ${hours.toString().padStart(2,'0')}:00`;
     if (el_icon) el_icon.textContent = '';
+
+    // Falling Star Event (Only at Night/Dawn/Dusk: dayTime > 0.58 || dayTime < 0.22)
+    const isNightTime = dayTime > 0.58 || dayTime < 0.22;
+    if (isNightTime) {
+      starFallTimer += delta;
+      if (starFallTimer >= 70.0) {
+        starFallTimer = 0;
+        triggerFallingStar();
+      }
+    } else {
+      starFallTimer = 0;
+    }
+  }
+
+  function triggerFallingStar() {
+    const offsetX = (Math.random() - 0.5) * 160;
+    const offsetZ = (Math.random() - 0.5) * 160;
+    const startX = playerPos.x + offsetX;
+    const startZ = playerPos.z + offsetZ;
+    const startY = 150;
+
+    const targetX = startX + (Math.random() - 0.5) * 40;
+    const targetZ = startZ + (Math.random() - 0.5) * 40;
+    const targetY = getGroundHeight(Math.round(targetX), Math.round(targetZ), 90);
+
+    const starGeo = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+    const starMat = new THREE.MeshBasicMaterial({ color: 0xfff59d });
+    const starMesh = new THREE.Mesh(starGeo, starMat);
+    starMesh.position.set(startX, startY, startZ);
+    scene.add(starMesh);
+
+    soundEngine.playSFX('pickup');
+    showToast("Osmondan yulduz tushmoqda! Qayergadir uriladi...");
+
+    const starEvent = {
+      mesh: starMesh,
+      startX, startY, startZ,
+      targetX, targetY, targetZ,
+      progress: 0,
+      speed: 0.35
+    };
+
+    activeFallingStars.push(starEvent);
   }
 
   // ==========================================================================
@@ -4530,7 +4591,7 @@
         miningSpeedMultiplier = 4.0;
       }
     } else if (activeBlockId === BLOCKS.PICKAXE) {
-      if (targetedBlockType === BLOCKS.STONE || targetedBlockType === BLOCKS.COAL || targetedBlockType === BLOCKS.GOLD || targetedBlockType === BLOCKS.DIAMOND || targetedBlockType === BLOCKS.IRON || targetedBlockType === BLOCKS.COPPER || targetedBlockType === BLOCKS.DARK_STONE || targetedBlockType === BLOCKS.BLUE_TILE || targetedBlockType === BLOCKS.RED_BRICK || targetedBlockType === BLOCKS.WHITE_MARBLE || targetedBlockType === BLOCKS.GLAZED_BLUE || targetedBlockType === BLOCKS.TERRACOTTA || targetedBlockType === BLOCKS.FURNACE || targetedBlockType === BLOCKS.OBSIDIAN || targetedBlockType === BLOCKS.GLOWSTONE || targetedBlockType === BLOCKS.MOSSY_STONE) {
+      if (targetedBlockType === BLOCKS.STONE || targetedBlockType === BLOCKS.COAL || targetedBlockType === BLOCKS.GOLD || targetedBlockType === BLOCKS.DIAMOND || targetedBlockType === BLOCKS.IRON || targetedBlockType === BLOCKS.COPPER || targetedBlockType === BLOCKS.DARK_STONE || targetedBlockType === BLOCKS.BLUE_TILE || targetedBlockType === BLOCKS.RED_BRICK || targetedBlockType === BLOCKS.WHITE_MARBLE || targetedBlockType === BLOCKS.GLAZED_BLUE || targetedBlockType === BLOCKS.TERRACOTTA || targetedBlockType === BLOCKS.FURNACE || targetedBlockType === BLOCKS.OBSIDIAN || targetedBlockType === BLOCKS.GLOWSTONE || targetedBlockType === BLOCKS.MOSSY_STONE || targetedBlockType === BLOCKS.STAR) {
         miningSpeedMultiplier = 4.0;
       }
     } else if (activeBlockId === BLOCKS.SHOVEL) {
@@ -4567,7 +4628,30 @@
       let dropName = null;
       let dropColor = '#ffffff';
 
-      if (typeof RESOURCE_INFO !== 'undefined' && RESOURCE_INFO[brokenBlockType]) {
+      if (brokenBlockType === BLOCKS.STAR) {
+        const coords = miningTargetKey.split(',').map(Number);
+        // Spawn 1-2 Diamonds (Olmos)
+        const dCount = Math.floor(Math.random() * 2) + 1;
+        for (let j = 0; j < dCount; j++) {
+          spawnResourceCollectible(
+            coords[0] + (Math.random() - 0.5) * 0.5,
+            coords[1] + 0.35 + j * 0.2,
+            coords[2] + (Math.random() - 0.5) * 0.5,
+            "Olmos", "Olmos", "#00bcd4"
+          );
+        }
+        // Spawn 2-4 Glowstones (Nurlanuvchi Tosh)
+        const gCount = Math.floor(Math.random() * 3) + 2;
+        for (let j = 0; j < gCount; j++) {
+          spawnResourceCollectible(
+            coords[0] + (Math.random() - 0.5) * 0.5,
+            coords[1] + 0.35 + j * 0.2,
+            coords[2] + (Math.random() - 0.5) * 0.5,
+            "Nurlanuvchi Tosh", "Nurlanuvchi Tosh", "#ffb300"
+          );
+        }
+        showToast("Yulduzni buzdingiz: Olmos va Nurlanuvchi tosh oldingiz!");
+      } else if (typeof RESOURCE_INFO !== 'undefined' && RESOURCE_INFO[brokenBlockType]) {
         const info = RESOURCE_INFO[brokenBlockType];
         dropType = info.type;
         dropName = info.name;
@@ -7019,6 +7103,66 @@
     if (waterMat && waterMat.map) {
       waterMat.map.offset.y += delta * 0.05;
       waterMat.map.offset.x += delta * 0.02;
+    }
+
+    // Update active falling stars
+    for (let i = activeFallingStars.length - 1; i >= 0; i--) {
+      const star = activeFallingStars[i];
+      star.progress += delta * star.speed;
+      
+      const currentX = THREE.MathUtils.lerp(star.startX, star.targetX, star.progress);
+      const currentY = THREE.MathUtils.lerp(star.startY, star.targetY, star.progress);
+      const currentZ = THREE.MathUtils.lerp(star.startZ, star.targetZ, star.progress);
+      
+      star.mesh.position.set(currentX, currentY, currentZ);
+
+      // Spawn trail particles
+      if (Math.random() < 0.35) {
+        const pGeo = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+        const pMat = new THREE.MeshBasicMaterial({ color: 0xfff59d, transparent: true, opacity: 0.9 });
+        const pMesh = new THREE.Mesh(pGeo, pMat);
+        pMesh.position.copy(star.mesh.position);
+        scene.add(pMesh);
+        activeParticles.push({
+          mesh: pMesh,
+          velocity: new THREE.Vector3((Math.random() - 0.5) * 1.5, (Math.random() - 0.5) * 1.5, (Math.random() - 0.5) * 1.5),
+          life: 1.0
+        });
+      }
+
+      if (star.progress >= 1.0) {
+        scene.remove(star.mesh);
+        
+        const gx = Math.round(star.targetX);
+        const gy = Math.round(star.targetY) + 1;
+        const gz = Math.round(star.targetZ);
+        
+        const key = `${gx},${gy},${gz}`;
+        worldData[key] = BLOCKS.STAR;
+        modifiedBlocks[key] = BLOCKS.STAR;
+        
+        addPointLightAt(gx, gy, gz);
+        
+        // Explosion particle burst
+        for (let j = 0; j < 15; j++) {
+          const pGeo = new THREE.BoxGeometry(0.25, 0.25, 0.25);
+          const pMat = new THREE.MeshBasicMaterial({ color: 0xffeb3b, transparent: true, opacity: 0.9 });
+          const pMesh = new THREE.Mesh(pGeo, pMat);
+          pMesh.position.set(star.targetX, gy + 0.5, star.targetZ);
+          scene.add(pMesh);
+          activeParticles.push({
+            mesh: pMesh,
+            velocity: new THREE.Vector3((Math.random() - 0.5) * 4.0, Math.random() * 4.0, (Math.random() - 0.5) * 4.0),
+            life: 1.5
+          });
+        }
+
+        soundEngine.playSFX('place');
+        showToast(`Yulduz yerga urildi! Koordinata: X: ${gx}, Z: ${gz}`);
+        
+        rebuildWorldMesh();
+        activeFallingStars.splice(i, 1);
+      }
     }
 
     // Update active particles
