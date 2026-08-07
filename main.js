@@ -1654,7 +1654,7 @@
 
   // --- MINECRAFT STYLE PIXEL TEXTURE GENERATION FOR MATERIALS ---
   const pixelTextureCache = {};
-  function getPixelNoiseTexture(colorHex, resolution = 8) {
+  function getPixelNoiseTexture(colorHex, resolution = 16) {
     const cacheKey = `${colorHex}_${resolution}`;
     if (pixelTextureCache[cacheKey]) return pixelTextureCache[cacheKey];
 
@@ -1667,10 +1667,10 @@
     ctx.fillStyle = colorStr;
     ctx.fillRect(0, 0, resolution, resolution);
 
-    // Apply pixelated color variance (Minecraft noise)
+    // Apply high-contrast pixelated color variance (Minecraft noise)
     for (let x = 0; x < resolution; x++) {
       for (let y = 0; y < resolution; y++) {
-        const r = (Math.random() - 0.5) * 35;
+        const r = (Math.random() - 0.5) * 80;
         ctx.fillStyle = r > 0 ? `rgba(255,255,255,${r / 255})` : `rgba(0,0,0,${-r / 255})`;
         ctx.fillRect(x, y, 1, 1);
       }
@@ -1697,7 +1697,7 @@
         }
       }
 
-      const tex = getPixelNoiseTexture(colorVal, 8);
+      const tex = getPixelNoiseTexture(colorVal, 16);
       const newParams = {
         map: tex,
         roughness: 0.85,
@@ -2600,7 +2600,7 @@
   function getGroundHeight(x, z, defaultY) {
     for (let y = CHUNK_HEIGHT_MAX; y >= 0; y--) {
       const b = worldData[`${x},${y},${z}`];
-      if (b && b !== BLOCKS.AIR && b !== BLOCKS.WATER && b !== BLOCKS.LEAVES && b !== BLOCKS.WOOD) {
+      if (b && b !== BLOCKS.AIR && b !== BLOCKS.LEAVES && b !== BLOCKS.WOOD) {
         return y + 1;
       }
     }
@@ -2620,7 +2620,15 @@
       const treeH = 4 + Math.floor(Math.random() * 4);
       for (let h = 1; h <= treeH; h++) setB(tx, groundY + h, tz, BLOCKS.WOOD);
       for (let dx = -2; dx <= 2; dx++) for (let dz = -2; dz <= 2; dz++) for (let dy = -1; dy <= 2; dy++) {
-        if (Math.abs(dx) + Math.abs(dz) <= 3) setB(tx + dx, groundY + treeH + dy, tz + dz, BLOCKS.LEAVES);
+        if (Math.abs(dx) + Math.abs(dz) <= 3) {
+          const ly = groundY + treeH + dy;
+          const lx = tx + dx;
+          const lz = tz + dz;
+          const existing = worldData[`${lx},${ly},${lz}`];
+          if (existing !== BLOCKS.WOOD) {
+            setB(lx, ly, lz, BLOCKS.LEAVES);
+          }
+        }
       }
     }
 
@@ -3723,10 +3731,8 @@
         playerPos.y += 1.0;
         showToast(animalName === 'Ot' ? "Otdan tushdingiz" : "Tuyadan tushdingiz");
       }
-      return;
-    }
-
-    const speed = 8.0;
+    } else {
+      const speed = 8.0;
     const moveDir = new THREE.Vector3();
     if (keys['KeyW']) moveDir.z -= 1;
     if (keys['KeyS']) moveDir.z += 1;
@@ -3829,6 +3835,7 @@
       camera.position.y += 1.65;
       camera.rotation.set(pitch, yaw, 0, 'YXZ');
     }
+  }
 
     // Animate local player walking
     const isMoving = keys['KeyW'] || keys['KeyS'] || keys['KeyA'] || keys['KeyD'] || touchJoystick.active;
@@ -4243,9 +4250,9 @@
     });
   }
 
-  // ==========================================================================
-  // MINING / PLACING
-  // ==========================================================================
+  let raycastAllTargets = [];
+  let raycastVoxelTargets = [];
+  let lastRaycastRebuildTime = 0;
 
   function updateTargetRaycast() {
     const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
@@ -4263,20 +4270,24 @@
 
     raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
     
-    // Fast, zero-allocation target resolution
-    const allTargets = [];
-    const voxelTargets = [];
-    for (let i = 0; i < scene.children.length; i++) {
-      const child = scene.children[i];
-      if (child.isVoxelMesh || child.isFurnitureMesh) {
-        voxelTargets.push(child);
-        allTargets.push(child);
-      } else if (child.isAnimal) {
-        allTargets.push(child);
+    // Caching target lists to rebuild only every 120ms (eliminates framerate drops)
+    const now = performance.now();
+    if (now - lastRaycastRebuildTime > 120) {
+      lastRaycastRebuildTime = now;
+      raycastAllTargets.length = 0;
+      raycastVoxelTargets.length = 0;
+      for (let i = 0; i < scene.children.length; i++) {
+        const child = scene.children[i];
+        if (child.isVoxelMesh || child.isFurnitureMesh) {
+          raycastVoxelTargets.push(child);
+          raycastAllTargets.push(child);
+        } else if (child.isAnimal) {
+          raycastAllTargets.push(child);
+        }
       }
     }
 
-    const hits = raycaster.intersectObjects(allTargets, true);
+    const hits = raycaster.intersectObjects(raycastAllTargets, true);
     
     // Check animal hits (Horse, Camel or Donkey riding)
     let hitHorse = null;
@@ -4305,7 +4316,7 @@
       targetedHorse = null;
     }
 
-    const voxelHits = raycaster.intersectObjects(voxelTargets, true);
+    const voxelHits = raycaster.intersectObjects(raycastVoxelTargets, true);
     if (voxelHits.length > 0 && voxelHits[0].distance < 7.0) {
       const hit = voxelHits[0];
       let bx, by, bz;
@@ -4956,7 +4967,26 @@
       document.getElementById('settings-modal').classList.remove('hidden');
     });
     document.getElementById('btn-exit').addEventListener('click', () => {
-      document.getElementById('save-prompt-modal').classList.remove('hidden');
+      document.getElementById('exit-survey-modal').classList.remove('hidden');
+    });
+
+    document.getElementById('btn-survey-cancel').addEventListener('click', () => {
+      document.getElementById('exit-survey-modal').classList.add('hidden');
+    });
+
+    document.getElementById('btn-survey-submit').addEventListener('click', () => {
+      const selected = document.querySelector('input[name="game-rating"]:checked')?.value || 'excellent';
+      const feedbackText = document.getElementById('exit-survey-feedback').value || '';
+      
+      console.log("Exit survey response:", { rating: selected, feedback: feedbackText });
+      showToast("Fikr-mulohaza uchun rahmat!");
+      
+      setTimeout(() => {
+        // Close window/tab
+        window.close();
+        // Fallback for user-typed URLs
+        window.location.href = "about:blank";
+      }, 1000);
     });
 
     // --- MULTIPLAYER UI LISTENERS ---

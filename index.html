@@ -335,6 +335,39 @@
       </div>
     </div>
 
+    <!-- MAIN MENU EXIT SURVEY MODAL -->
+    <div id="exit-survey-modal" class="modal-overlay hidden">
+      <div class="modal-card" style="max-width: 480px;">
+        <h2 class="modal-title" style="font-size: 1.05rem;">Fikr-mulohaza So'rovnomasi</h2>
+        <p class="modal-text" style="font-size: 0.75rem; margin-bottom: 8px;">O'yinimiz sizga yoqdimi? Fikringiz biz uchun muhim!</p>
+        
+        <div class="survey-options" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--font-pixel); font-size: 0.65rem; color: #fff;">
+            <input type="radio" name="game-rating" value="excellent" checked style="accent-color: #4caf50; width: 16px; height: 16px;">
+            <span>Ha, juda ajoyib! 🌟</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--font-pixel); font-size: 0.65rem; color: #fff;">
+            <input type="radio" name="game-rating" value="good" style="accent-color: #ffd600; width: 16px; height: 16px;">
+            <span>Yomon emas, yoqdi 👍</span>
+          </label>
+          <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-family: var(--font-pixel); font-size: 0.65rem; color: #fff;">
+            <input type="radio" name="game-rating" value="poor" style="accent-color: #f44336; width: 16px; height: 16px;">
+            <span>Yo'q, kamchiliklar ko'p 👎</span>
+          </label>
+        </div>
+
+        <div style="margin-bottom: 12px;">
+          <label style="display: block; font-family: var(--font-pixel); font-size: 0.62rem; color: #ffb74d; margin-bottom: 6px;">Qanday takliflaringiz bor?</label>
+          <textarea id="exit-survey-feedback" placeholder="Takliflaringizni shu yerga yozing..." style="width: 100%; height: 75px; background: rgba(0,0,0,0.6); border: 2px solid #555; color: #fff; font-family: monospace; font-size: 0.85rem; padding: 6px; outline: none; resize: none;"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button id="btn-survey-submit" class="btn btn-emerald" style="flex: 1;">Yuborish va Chiqish</button>
+          <button id="btn-survey-cancel" class="btn btn-dark" style="flex: 1;">Orqaga</button>
+        </div>
+      </div>
+    </div>
+
     <!-- DIALOGUE & QUEST MODAL -->
     <div id="dialogue-modal" class="modal-overlay hidden">
       <div class="modal-card">
