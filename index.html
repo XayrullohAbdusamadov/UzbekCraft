@@ -368,6 +368,14 @@
       </div>
     </div>
 
+    <!-- TRANSITION LOADING OVERLAY -->
+    <div id="loading-overlay" class="modal-overlay hidden" style="z-index: 999999; background: #11111b; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--font-pixel); color: #fff;">
+      <div id="loading-overlay-text" style="font-size: 1.15rem; text-shadow: 2px 2px 0px #000; margin-bottom: 20px; color: #ffb74d;">O'tilmoqda...</div>
+      <div style="width: 220px; height: 20px; border: 4px solid #1a120b; background: #2d241c; outline: 4px solid #000; position: relative;">
+        <div id="loading-overlay-bar" style="width: 0%; height: 100%; background: #4caf50; transition: width 0.05s;"></div>
+      </div>
+    </div>
+
     <!-- DIALOGUE & QUEST MODAL -->
     <div id="dialogue-modal" class="modal-overlay hidden">
       <div class="modal-card">

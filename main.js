@@ -4879,6 +4879,70 @@
   // UI SETUP
   // ==========================================================================
 
+  let previousWorldMeta = null;
+  let previousModifiedBlocks = {};
+
+  function updateMissionsButtonState() {
+    const btn = document.getElementById('btn-hud-missions');
+    if (!btn) return;
+    if (currentWorldMeta && currentWorldMeta.map === 'quest_island') {
+      btn.textContent = "Oldingi dunyoga qaytish";
+      btn.style.setProperty('background', '#c62828', 'important');
+      btn.style.setProperty('border-color', '#ef5350 #5f0909 #5f0909 #ef5350', 'important');
+    } else {
+      btn.textContent = "Topshiriqlar";
+      btn.style.removeProperty('background');
+      btn.style.removeProperty('border-color');
+    }
+  }
+
+  function transitionToWorld(targetWorldMeta, targetModBlocks) {
+    const overlay = document.getElementById('loading-overlay');
+    const bar = document.getElementById('loading-overlay-bar');
+    const textEl = document.getElementById('loading-overlay-text');
+    
+    if (overlay && bar) {
+      overlay.classList.remove('hidden');
+      bar.style.width = '0%';
+      textEl.textContent = targetWorldMeta.map === 'quest_island' ? "Topshiriqlar xonasiga o'tilmoqda..." : "Oldingi dunyoga qaytilmoqda...";
+      
+      setTimeout(() => {
+        bar.style.width = '45%';
+        
+        setTimeout(() => {
+          if (currentWorldMeta && currentWorldMeta.map !== 'quest_island') {
+            previousWorldMeta = JSON.parse(JSON.stringify(currentWorldMeta));
+            previousModifiedBlocks = JSON.parse(JSON.stringify(modifiedBlocks));
+          }
+
+          currentWorldMeta = targetWorldMeta;
+          modifiedBlocks = targetModBlocks;
+          
+          generateWorld(targetWorldMeta.seed, targetWorldMeta.map);
+          
+          const hudBiome = document.getElementById('hud-biome');
+          if (hudBiome) hudBiome.textContent = getMapDisplayName(targetWorldMeta.map);
+          updateMissionsButtonState();
+          
+          bar.style.width = '100%';
+          
+          setTimeout(() => {
+            overlay.classList.add('hidden');
+          }, 350);
+        }, 80);
+      }, 50);
+    } else {
+      if (currentWorldMeta && currentWorldMeta.map !== 'quest_island') {
+        previousWorldMeta = JSON.parse(JSON.stringify(currentWorldMeta));
+        previousModifiedBlocks = JSON.parse(JSON.stringify(modifiedBlocks));
+      }
+      currentWorldMeta = targetWorldMeta;
+      modifiedBlocks = targetModBlocks;
+      generateWorld(targetWorldMeta.seed, targetWorldMeta.map);
+      updateMissionsButtonState();
+    }
+  }
+
   function setupUI() {
     renderHotbar();
     renderInventoryGrid();
@@ -4892,12 +4956,14 @@
 
     if (btnMissionsHUD) {
       btnMissionsHUD.addEventListener('click', () => {
-        currentWorldMeta = { id: 'world_' + Date.now(), name: 'Topshiriqlar', seed: "Uzbekistan2026", map: 'quest_island' };
-        modifiedBlocks = {};
-        generateWorld("Uzbekistan2026", 'quest_island');
-        const hudBiome = document.getElementById('hud-biome');
-        if (hudBiome) hudBiome.textContent = getMapDisplayName('quest_island');
-        showToast("Topshiriqlar kartasi yuklandi!");
+        if (currentWorldMeta && currentWorldMeta.map === 'quest_island') {
+          const targetWorld = previousWorldMeta || { id: 'world_' + Date.now(), name: 'Ijodiy Dunyo', seed: "Uzbekistan2026", map: 'classic_flat' };
+          const targetBlocks = previousModifiedBlocks || {};
+          transitionToWorld(targetWorld, targetBlocks);
+        } else {
+          const questWorld = { id: 'world_quests_global', name: 'Topshiriqlar', seed: "Uzbekistan2026", map: 'quest_island' };
+          transitionToWorld(questWorld, {});
+        }
       });
     }
 
@@ -6475,12 +6541,14 @@
       if (e.code === 'KeyM') {
         const hud = document.getElementById('hud');
         if (hud && !hud.classList.contains('hidden')) {
-          currentWorldMeta = { id: 'world_' + Date.now(), name: 'Topshiriqlar', seed: "Uzbekistan2026", map: 'quest_island' };
-          modifiedBlocks = {};
-          generateWorld("Uzbekistan2026", 'quest_island');
-          const hudBiome = document.getElementById('hud-biome');
-          if (hudBiome) hudBiome.textContent = getMapDisplayName('quest_island');
-          showToast("Topshiriqlar kartasi yuklandi!");
+          if (currentWorldMeta && currentWorldMeta.map === 'quest_island') {
+            const targetWorld = previousWorldMeta || { id: 'world_' + Date.now(), name: 'Ijodiy Dunyo', seed: "Uzbekistan2026", map: 'classic_flat' };
+            const targetBlocks = previousModifiedBlocks || {};
+            transitionToWorld(targetWorld, targetBlocks);
+          } else {
+            const questWorld = { id: 'world_quests_global', name: 'Topshiriqlar', seed: "Uzbekistan2026", map: 'quest_island' };
+            transitionToWorld(questWorld, {});
+          }
         }
       }
       if (e.code === 'Escape') document.getElementById('pause-modal').classList.toggle('hidden');

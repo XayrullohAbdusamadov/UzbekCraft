@@ -1766,23 +1766,23 @@ html, body {
   justify-content: flex-end !important;
 }
 
-/* TOUCH SCREEN ACTION BUTTON GRID (Non-overlapping & spacious) */
+/* TOUCH SCREEN ACTION BUTTON GRID (Non-overlapping, colorful & ergonomic) */
 #touch-actions {
   position: absolute !important;
-  bottom: 30px !important;
-  right: 30px !important;
-  width: 170px !important;
+  bottom: 25px !important;
+  right: 25px !important;
+  width: 190px !important;
   height: auto !important;
   display: grid !important;
   grid-template-columns: 1fr 1fr !important;
-  grid-gap: 8px !important;
+  grid-gap: 10px !important;
   pointer-events: none !important;
 }
 
 .touch-btn {
   position: static !important;
   width: auto !important;
-  height: 48px !important;
+  height: 50px !important;
   border-radius: 0px !important;
   font-family: var(--font-pixel) !important;
   font-size: 0.65rem !important;
@@ -1790,15 +1790,48 @@ html, body {
   align-items: center !important;
   justify-content: center !important;
   pointer-events: auto !important;
-  box-shadow: none !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4) !important;
   text-shadow: 2px 2px 0px #000 !important;
+  border: 3px solid !important;
+  color: #ffffff !important;
+  transition: transform 0.05s ease, box-shadow 0.05s ease !important;
 }
 
+.touch-btn:active {
+  transform: translateY(2px) !important;
+  box-shadow: none !important;
+}
+
+/* Green Jump */
 #btn-touch-jump {
   grid-column: span 2 !important;
-  height: 52px !important;
+  height: 54px !important;
   background: #2e7d32 !important;
   border-color: #4caf50 #1b5e20 #1b5e20 #4caf50 !important;
+}
+
+/* Blue Place */
+.touch-btn.btn-place {
+  background: #1976d2 !important;
+  border-color: #2196f3 #0d47a1 #0d47a1 #2196f3 !important;
+}
+
+/* Red Break */
+.touch-btn.btn-break {
+  background: #c62828 !important;
+  border-color: #ef5350 #5f0909 #5f0909 #ef5350 !important;
+}
+
+/* Purple Camera */
+.touch-btn.btn-cam {
+  background: #6a1b9a !important;
+  border-color: #ab47bc #3b0066 #3b0066 #ab47bc !important;
+}
+
+/* Yellow Inventory */
+.touch-btn.btn-inv {
+  background: #ef6c00 !important;
+  border-color: #ffb74d #b33c00 #b33c00 #ffb74d !important;
 }
 
 /* Clean, Readable Mission Widget */
