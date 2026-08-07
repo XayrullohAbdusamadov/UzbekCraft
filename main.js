@@ -780,6 +780,12 @@
       ctx.fillStyle = '#5d4037'; ctx.fillRect(13, 14, 6, 18);
     }
 
+    if (blockId !== BLOCKS.WATER && blockId !== BLOCKS.AIR) {
+      ctx.strokeStyle = 'rgba(0,0,0,0.18)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(0, 0, 32, 32);
+    }
+
     const tex = new THREE.CanvasTexture(canvas);
     tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter;
     return tex;
@@ -1758,19 +1764,19 @@
     renderer.toneMappingExposure = 1.15;
     container.appendChild(renderer.domElement);
     clock = new THREE.Clock();
-    ambientLight = new THREE.HemisphereLight(0xffeedd, 0x444466, 0.85);
+    ambientLight = new THREE.HemisphereLight(0xffeedd, 0x444466, 0.45);
     scene.add(ambientLight);
-    sunLight = new THREE.DirectionalLight(0xfffaed, 2.2);
+    sunLight = new THREE.DirectionalLight(0xfffaed, 1.8);
     sunLight.position.set(60, 150, 60);
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.set(4096, 4096);
     sunLight.shadow.camera.near = 0.5;
     sunLight.shadow.camera.far = 300;
-    sunLight.shadow.camera.left = -50;
-    sunLight.shadow.camera.right = 50;
-    sunLight.shadow.camera.top = 50;
-    sunLight.shadow.camera.bottom = -50;
-    sunLight.shadow.bias = -0.0002;
+    sunLight.shadow.camera.left = -70;
+    sunLight.shadow.camera.right = 70;
+    sunLight.shadow.camera.top = 70;
+    sunLight.shadow.camera.bottom = -70;
+    sunLight.shadow.bias = -0.00015;
     scene.add(sunLight);
     scene.add(sunLight.target);
     scene.add(camera);
@@ -1973,6 +1979,7 @@
 
     Object.keys(modifiedBlocks).forEach(k => { worldData[k] = modifiedBlocks[k]; });
     renderInstancedWorld();
+    initializeWorldLights();
     playerPos.set(5, gY + 20, 30);
   }
 
@@ -3627,8 +3634,8 @@
       scene.fog.density = fogDensity;
     }
 
-    sunLight.intensity = isDay ? Math.max(0.1, Math.sin(angle)) * 2.2 : 0.05;
-    ambientLight.intensity = isDay ? 0.85 : 0.2;
+    sunLight.intensity = isDay ? Math.max(0.1, Math.sin(angle)) * 1.8 : 0.05;
+    ambientLight.intensity = isDay ? 0.45 : 0.15;
     if (starsParticles) {
       starsParticles.material.opacity = isDay ? 0 : Math.min(1, (t - 0.65) * 6);
     }
@@ -4711,27 +4718,31 @@
     }
   }
 
+  function initializeWorldLights() {
+    // Clean old lights
+    Object.keys(placedLights).forEach(k => {
+      if (placedLights[k] && placedLights[k].isLight) {
+        scene.remove(placedLights[k]);
+      }
+      delete placedLights[k];
+    });
+
+    // Spawn point lights for all lanterns in worldData
+    Object.keys(worldData).forEach(key => {
+      if (worldData[key] && BLOCK_INFO[worldData[key]]?.isLuminous) {
+        const coords = key.split(',');
+        const bx = parseInt(coords[0]), by = parseInt(coords[1]), bz = parseInt(coords[2]);
+        addPointLightAt(bx, by, bz);
+      }
+    });
+  }
+
   let rebuildRequested = false;
   function rebuildWorldMesh() {
     if (rebuildRequested) return;
     rebuildRequested = true;
     requestAnimationFrame(() => {
       renderInstancedWorld();
-      
-      // Clean old lights
-      Object.keys(placedLights).forEach(k => {
-        scene.remove(placedLights[k]);
-        delete placedLights[k];
-      });
-
-      // Spawn point lights for all lanterns in worldData
-      Object.keys(worldData).forEach(key => {
-        if (worldData[key] && BLOCK_INFO[worldData[key]]?.isLuminous) {
-          const coords = key.split(',');
-          const bx = parseInt(coords[0]), by = parseInt(coords[1]), bz = parseInt(coords[2]);
-          addPointLightAt(bx, by, bz);
-        }
-      });
       rebuildRequested = false;
     });
   }
@@ -6633,6 +6644,27 @@
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Auto-capture pointer lock when user re-enters or focuses the page
+    window.addEventListener('focus', () => {
+      const hud = document.getElementById('hud');
+      const pause = document.getElementById('pause-modal');
+      const container = document.getElementById('canvas-container');
+      if (hud && !hud.classList.contains('hidden') && pause && pause.classList.contains('hidden') && container) {
+        container.requestPointerLock();
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        const hud = document.getElementById('hud');
+        const pause = document.getElementById('pause-modal');
+        const container = document.getElementById('canvas-container');
+        if (hud && !hud.classList.contains('hidden') && pause && pause.classList.contains('hidden') && container) {
+          container.requestPointerLock();
+        }
+      }
     });
     window.addEventListener('keydown', e => {
       keys[e.code] = true;
