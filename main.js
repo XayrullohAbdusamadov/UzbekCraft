@@ -6854,6 +6854,15 @@
       const c = meatCollectibles[i];
       c.rotation.y += 1.5 * delta;
       c.bobOffset += delta * 2.0;
+
+      // Apply gravity/falling to collectibles until they hit the ground
+      const gx = Math.round(c.position.x);
+      const gz = Math.round(c.position.z);
+      const targetGroundY = getGroundHeight(gx, gz, c.position.y);
+      if (c.baseY > targetGroundY) {
+        c.baseY = Math.max(targetGroundY, c.baseY - delta * 15.0);
+      }
+
       c.position.y = c.baseY + Math.sin(c.bobOffset) * 0.08;
       
       const dist = playerPos.distanceTo(c.position);
