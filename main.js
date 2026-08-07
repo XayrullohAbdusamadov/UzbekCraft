@@ -3657,10 +3657,12 @@
     if (starsParticles) {
       starsParticles.material.opacity = isDay ? 0 : Math.min(1, (t - 0.65) * 6);
     }
-    const hours = Math.floor(dayTime * 24);
+    const totalMinutes = dayTime * 24 * 60;
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = Math.floor(totalMinutes % 60);
     const el_time = document.getElementById('hud-time-text');
     const el_icon = document.getElementById('hud-time-icon');
-    if (el_time) el_time.textContent = `${isDay ? 'Kun' : 'Tun'} ${hours.toString().padStart(2,'0')}:00`;
+    if (el_time) el_time.textContent = `${isDay ? 'Kun' : 'Tun'} ${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}`;
     if (el_icon) el_icon.textContent = '';
 
     // Falling Star Event (Only at Night/Dawn/Dusk: dayTime > 0.58 || dayTime < 0.22)
@@ -4616,6 +4618,9 @@
       modifiedBlocks[miningTargetKey] = BLOCKS.AIR;
       soundEngine.playSFX('break');
 
+      const coords = miningTargetKey.split(',').map(Number);
+      triggerFallingCascade(coords[0], coords[1], coords[2]);
+
       if (brokenBlockType === BLOCKS.WOOD) {
         updateMissionProgress('chop_wood', 1);
       }
@@ -4751,6 +4756,22 @@
       }
       
       if (by > CHUNK_HEIGHT_MAX) { showToast(`Maksimal balandlik ${CHUNK_HEIGHT_MAX} blok!`); return; }
+
+      // FALLING BLOCK PHYSICS:
+      if (blockId === BLOCKS.SAND || blockId === BLOCKS.BOMB || blockId === BLOCKS.WATER) {
+        let targetY = by;
+        while (targetY > 1) {
+          const belowKey = `${bx},${targetY - 1},${bz}`;
+          const blockBelow = worldData[belowKey];
+          if (!blockBelow || blockBelow === BLOCKS.AIR || blockBelow === BLOCKS.WATER) {
+            targetY--;
+          } else {
+            break;
+          }
+        }
+        by = targetY;
+      }
+
       const key = `${bx},${by},${bz}`;
       worldData[key] = blockId;
       modifiedBlocks[key] = blockId;
@@ -4761,6 +4782,10 @@
       if (bInfo && !bInfo.isWeapon) {
         meatInventory[bInfo.name] = (meatInventory[bInfo.name] || 0) - 1;
         renderHotbar();
+        updateFirstPersonHandMesh();
+        if (playerMesh) {
+          updateThirdPersonHeldItem(playerMesh, hotbarBlocks[activeSlotIndex]);
+        }
       }
 
       if (BLOCK_INFO[blockId]?.isLuminous) {
@@ -4819,6 +4844,46 @@
         addPointLightAt(bx, by, bz);
       }
     });
+  }
+
+  function triggerFallingCascade(bx, by, bz) {
+    let y = by + 1;
+    let targetY = by;
+    while (y < CHUNK_HEIGHT_MAX) {
+      const currentKey = `${bx},${y},${bz}`;
+      const block = worldData[currentKey];
+      if (block === BLOCKS.SAND || block === BLOCKS.BOMB || block === BLOCKS.WATER) {
+        const targetKey = `${bx},${targetY},${bz}`;
+        worldData[targetKey] = block;
+        modifiedBlocks[targetKey] = block;
+        
+        worldData[currentKey] = BLOCKS.AIR;
+        modifiedBlocks[currentKey] = BLOCKS.AIR;
+        
+        if (BLOCK_INFO[block]?.isLuminous) {
+          removePointLightAtKey(currentKey);
+          addPointLightAt(bx, targetY, bz);
+        }
+        
+        if (supabase && multiplayerChannel) {
+          multiplayerChannel.send({
+            type: 'broadcast',
+            event: 'block_change',
+            payload: { x: bx, y: y, z: bz, blockId: BLOCKS.AIR }
+          });
+          multiplayerChannel.send({
+            type: 'broadcast',
+            event: 'block_change',
+            payload: { x: bx, y: targetY, z: bz, blockId: block }
+          });
+        }
+        
+        targetY++;
+      } else if (block && block !== BLOCKS.AIR) {
+        break;
+      }
+      y++;
+    }
   }
 
   let rebuildRequested = false;
@@ -5756,6 +5821,13 @@
     handMesh.rotation.y = -0.25;
     fpHandGroup.add(handMesh);
 
+    // If the count of this block is 0 in the inventory, don't show the held model!
+    const bInfo = BLOCK_INFO[blockId];
+    if (bInfo && !bInfo.isWeapon) {
+      const count = meatInventory[bInfo.name] || 0;
+      if (count <= 0) return; // Only show hand, no held block
+    }
+
     // 2. Held Weapon/Block Model
     if (blockId === BLOCKS.SWORD) {
       const swordGroup = new THREE.Group();
@@ -5916,6 +5988,13 @@
     }
 
     if (blockId === undefined || blockId === BLOCKS.AIR) return;
+
+    // If the count of this block is 0 in the inventory, don't show the held model!
+    const bInfo = BLOCK_INFO[blockId];
+    if (bInfo && !bInfo.isWeapon) {
+      const count = meatInventory[bInfo.name] || 0;
+      if (count <= 0) return; // Render nothing
+    }
 
     // Create the 3D model of the held item in third person
     const matSwordHandle = new THREE.MeshLambertMaterial({ color: 0x795548 });
@@ -6437,13 +6516,19 @@
         }
         
         let countHtml = '';
+        let iconHtml = '';
         const bInfo = BLOCK_INFO[bId];
         if (bInfo && !bInfo.isWeapon) {
           const count = meatInventory[bInfo.name] || 0;
           countHtml = `<div class="block-count-indicator">${count}</div>`;
+          if (count > 0) {
+            iconHtml = getItemIconHTML(bId);
+          }
+        } else {
+          iconHtml = getItemIconHTML(bId);
         }
         
-        slot.innerHTML = `<span class="hotbar-slot-num">${idx + 1}</span><div class="hotbar-icon" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:4px;">${getItemIconHTML(bId)}</div>${ammoHtml}${countHtml}`;
+        slot.innerHTML = `<span class="hotbar-slot-num">${idx + 1}</span><div class="hotbar-icon" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; padding:4px;">${iconHtml}</div>${ammoHtml}${countHtml}`;
         
         slot.addEventListener('click', () => { activeSlotIndex = idx; renderHotbar(); });
         
@@ -6587,7 +6672,7 @@
 
     let items = [];
     if (currentInventoryTab === 'weapons') {
-      items = [BLOCKS.SWORD, BLOCKS.BOW, BLOCKS.AXE, BLOCKS.PICKAXE, BLOCKS.SHOVEL, BLOCKS.HOE, BLOCKS.BOMB, BLOCKS.AVTOMAT];
+      items = [BLOCKS.SWORD, BLOCKS.BOW, BLOCKS.AVTOMAT, BLOCKS.AXE, BLOCKS.PICKAXE, BLOCKS.SHOVEL, BLOCKS.HOE, BLOCKS.CRAFTING_TABLE, BLOCKS.FURNACE, BLOCKS.CHEST, BLOCKS.BUCKET, BLOCKS.WATER_BUCKET, BLOCKS.TORCH, BLOCKS.DOOR, BLOCKS.WINDOW, BLOCKS.STAR];
     } else if (currentInventoryTab === 'furniture') {
       items = [BLOCKS.CRAFTING_TABLE, BLOCKS.FURNACE, BLOCKS.CHEST, BLOCKS.PUMPKIN, BLOCKS.LANTERN, BLOCKS.TORCH, BLOCKS.SOFA, BLOCKS.TABLE, BLOCKS.CHAIR, BLOCKS.FLOWER, BLOCKS.BUCKET];
     } else {
