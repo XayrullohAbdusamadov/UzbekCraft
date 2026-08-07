@@ -4004,6 +4004,9 @@
     const el_compass = document.getElementById('compass-badge');
     const el_pos = document.getElementById('hud-pos');
     if (el_compass) el_compass.textContent = `${dirs[Math.floor((deg + 22.5) / 45) % 8]}`;
+    if (el_pos) {
+      el_pos.textContent = `X: ${Math.round(playerPos.x)} Y: ${Math.round(playerPos.y)} Z: ${Math.round(playerPos.z)}`;
+    }
     checkInteractions();
 
     const distFromSpawn = Math.hypot(playerPos.x, playerPos.z);
@@ -6821,7 +6824,7 @@
       const pause = document.getElementById('pause-modal');
       const container = document.getElementById('canvas-container');
       if (hud && !hud.classList.contains('hidden') && pause && pause.classList.contains('hidden') && container) {
-        container.requestPointerLock();
+        setTimeout(() => container.requestPointerLock(), 50);
       }
     });
 
@@ -6831,7 +6834,7 @@
         const pause = document.getElementById('pause-modal');
         const container = document.getElementById('canvas-container');
         if (hud && !hud.classList.contains('hidden') && pause && pause.classList.contains('hidden') && container) {
-          container.requestPointerLock();
+          setTimeout(() => container.requestPointerLock(), 50);
         }
       }
     });
@@ -6977,10 +6980,10 @@
     window.addEventListener('contextmenu', e => e.preventDefault());
 
     const container = document.getElementById('canvas-container');
-    container.addEventListener('click', () => {
+    document.addEventListener('click', () => {
       if (!document.getElementById('hud').classList.contains('hidden') &&
           document.getElementById('pause-modal').classList.contains('hidden')) {
-        container.requestPointerLock();
+        if (container) container.requestPointerLock();
       }
     });
     document.addEventListener('pointerlockchange', () => isPointerLocked = (document.pointerLockElement === container));
