@@ -1652,6 +1652,65 @@
     animate();
   }
 
+  // --- MINECRAFT STYLE PIXEL TEXTURE GENERATION FOR MATERIALS ---
+  const pixelTextureCache = {};
+  function getPixelNoiseTexture(colorHex, resolution = 8) {
+    const cacheKey = `${colorHex}_${resolution}`;
+    if (pixelTextureCache[cacheKey]) return pixelTextureCache[cacheKey];
+
+    const canvas = document.createElement('canvas');
+    canvas.width = resolution;
+    canvas.height = resolution;
+    const ctx = canvas.getContext('2d');
+
+    const colorStr = typeof colorHex === 'string' ? colorHex : ('#' + colorHex.toString(16).padStart(6, '0'));
+    ctx.fillStyle = colorStr;
+    ctx.fillRect(0, 0, resolution, resolution);
+
+    // Apply pixelated color variance (Minecraft noise)
+    for (let x = 0; x < resolution; x++) {
+      for (let y = 0; y < resolution; y++) {
+        const r = (Math.random() - 0.5) * 35;
+        ctx.fillStyle = r > 0 ? `rgba(255,255,255,${r / 255})` : `rgba(0,0,0,${-r / 255})`;
+        ctx.fillRect(x, y, 1, 1);
+      }
+    }
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.magFilter = THREE.NearestFilter;
+    tex.minFilter = THREE.NearestFilter;
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    pixelTextureCache[cacheKey] = tex;
+    return tex;
+  }
+
+  // Override THREE.MeshLambertMaterial to automatically map pixelated textures to all non-block models (animals, tools, birds, etc.)
+  THREE.MeshLambertMaterial = class extends THREE.MeshStandardMaterial {
+    constructor(parameters) {
+      let colorVal = 0xffffff;
+      if (parameters && parameters.color !== undefined) {
+        if (parameters.color instanceof THREE.Color) {
+          colorVal = parameters.color.getHex();
+        } else {
+          colorVal = parameters.color;
+        }
+      }
+
+      const tex = getPixelNoiseTexture(colorVal, 8);
+      const newParams = {
+        map: tex,
+        roughness: 0.85,
+        metalness: 0.1,
+        transparent: (parameters && parameters.transparent) || false,
+        opacity: (parameters && parameters.opacity !== undefined) ? parameters.opacity : 1.0
+      };
+
+      super(newParams);
+      this.color = new THREE.Color(0xffffff);
+    }
+  };
+
   function setupThree() {
     const container = document.getElementById('canvas-container');
     scene = new THREE.Scene();
