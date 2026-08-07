@@ -1623,3 +1623,87 @@ html, body {
   to { opacity: 1; transform: translateX(0); }
 }
 
+/* ==========================================================================
+   MINECRAFT PIXEL ART GUI STYLE OVERRIDE
+   ========================================================================== */
+.btn, .hud-btn, .touch-btn, .btn-claim-mission, .btn-online-respawn, .btn-online-exit {
+  font-family: var(--font-pixel) !important;
+  font-size: 0.8rem !important;
+  font-weight: normal !important;
+  border-radius: 0px !important;
+  border: 2px solid !important;
+  border-color: #ffffff #5c5c5c #5c5c5c #ffffff !important;
+  background: #8c8c8c !important;
+  color: #e0e0e0 !important;
+  text-shadow: 2px 2px 0px #000 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: none !important;
+  cursor: pointer;
+}
+
+.btn:hover, .hud-btn:hover, .touch-btn:hover, .btn-claim-mission:hover {
+  background: #5c8c5c !important;
+  border-color: #a0ffa0 #305030 #305030 #a0ffa0 !important;
+  color: #fff !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.btn:active, .hud-btn:active, .touch-btn:active {
+  background: #4a4a4a !important;
+  border-color: #2b2b2b #808080 #808080 #2b2b2b !important;
+}
+
+.btn-emerald {
+  background: #2e7d32 !important;
+  border-color: #4caf50 #1b5e20 #1b5e20 #4caf50 !important;
+}
+.btn-emerald:hover {
+  background: #388e3c !important;
+  border-color: #66bb6a #2e7d32 #2e7d32 #66bb6a !important;
+}
+
+.btn-red, .btn-online-exit {
+  background: #c62828 !important;
+  border-color: #ef5350 #7f0000 #7f0000 #ef5350 !important;
+}
+.btn-red:hover, .btn-online-exit:hover {
+  background: #d32f2f !important;
+  border-color: #e57373 #c62828 #c62828 #e57373 !important;
+}
+
+.btn-gold {
+  background: #e65100 !important;
+  border-color: #ffb74d #e65100 #e65100 #ffb74d !important;
+}
+.btn-gold:hover {
+  background: #f57c00 !important;
+  border-color: #ffcc80 #ef6c00 #ef6c00 #ffcc80 !important;
+}
+
+.modal-card, .quests-board-card, #main-menu .menu-card {
+  background-color: #31281f !important;
+  background-image: repeating-conic-gradient(#2d241c 0% 25%, #352c22 0% 50%) !important;
+  background-size: 16px 16px !important;
+  border: 4px solid #1a120b !important;
+  border-radius: 0px !important;
+  outline: 4px solid #000 !important;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.9) !important;
+}
+
+.modal-title, .screen-panel h2, .quests-board-title, .quests-board-subtitle {
+  font-family: var(--font-pixel) !important;
+  text-shadow: 2px 2px 0px #000 !important;
+  letter-spacing: 0px !important;
+  color: #fff !important;
+}
+
+.stat-badge, #top-bar, .hud-mission-tracker, .toast-single-box {
+  border-radius: 0px !important;
+  border: 2px solid #555 !important;
+  background: rgba(0, 0, 0, 0.8) !important;
+  font-family: var(--font-pixel) !important;
+  font-size: 0.75rem !important;
+}
+

@@ -3595,6 +3595,11 @@
       
       mountedHorse.position.x += moveVecX * delta;
       mountedHorse.position.z += moveVecZ * delta;
+
+      // Keep mounted animal within map boundaries to prevent floating in the void
+      const bound = currentMapRadius - 2;
+      mountedHorse.position.x = Math.max(-bound, Math.min(bound, mountedHorse.position.x));
+      mountedHorse.position.z = Math.max(-bound, Math.min(bound, mountedHorse.position.z));
       
       // Directly align animal heading with player's look direction (Minecraft style)
       mountedHorse.rotation.y = yaw + Math.PI / 2;
